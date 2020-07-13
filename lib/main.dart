@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lost/pages/loading.dart';
 import 'package:lost/pages/login.dart';
 import 'package:lost/pages/home.dart';
+import 'package:lost/pages/dataDetails.dart';
 
 void main() {
   runApp(MyApp());
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => Loading(),
         '/home': (context) => Home(),
         '/login': (context) => Login(),
+        '/details': (context) => DataDetails(),
       },
     );
   }
