@@ -3,6 +3,51 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:flutter/services.dart';
+import 'dart:io';
+
+showAlertDialog(BuildContext context) {
+  // set up the buttons
+  Widget cancelButton = FlatButton(
+    textColor: Colors.red,
+    child: Text("Exit"),
+    onPressed: () {
+      Future<void> pop({bool animated}) async {
+        await SystemChannels.platform
+            .invokeMethod<void>('SystemNavigator.pop', animated);
+      }
+
+      sleep(Duration(seconds: 2));
+      exit(0);
+    },
+  );
+  Widget continueButton = FlatButton(
+    child: Text("Retry"),
+    onPressed: () {
+      Navigator.popAndPushNamed(context, '/');
+    },
+  );
+
+  // set up the AlertDialog
+  AlertDialog alert = AlertDialog(
+    title: Text("Network error!"),
+    content:
+        Text("Check your connection and then try again , or close the app"),
+    actions: [
+      cancelButton,
+      continueButton,
+    ],
+  );
+
+  // show the dialog
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
+
 class Loading extends StatefulWidget {
   @override
   _LoadingState createState() => _LoadingState();
@@ -14,10 +59,14 @@ class _LoadingState extends State<Loading> {
     super.initState();
 
     Future<void> getData() async {
-      http.Response data =
-          await http.get('https://jsonplaceholder.typicode.com/todos/1');
+      try {
+        http.Response data =
+            await http.get('https://jsonplaceholder.typicode.com/todos/1');
 
-      Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/home');
+      } catch (e) {
+        showAlertDialog(context);
+      }
     }
 
     getData();
