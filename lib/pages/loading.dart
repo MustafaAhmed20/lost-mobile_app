@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart' as http;
+
+import 'package:lost/models/appData.dart';
+
+import 'package:provider/provider.dart';
 
 import 'package:flutter/services.dart';
 import 'dart:io';
@@ -17,14 +20,17 @@ showAlertDialog(BuildContext context) {
             .invokeMethod<void>('SystemNavigator.pop', animated);
       }
 
-      sleep(Duration(seconds: 2));
+      pop();
+
+      sleep(Duration(seconds: 3));
       exit(0);
     },
   );
+
   Widget continueButton = FlatButton(
     child: Text("Retry"),
     onPressed: () {
-      Navigator.popAndPushNamed(context, '/');
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
     },
   );
 
@@ -58,18 +64,26 @@ class _LoadingState extends State<Loading> {
   void initState() {
     super.initState();
 
-    Future<void> getData() async {
-      try {
-        http.Response data =
-            await http.get('https://jsonplaceholder.typicode.com/todos/1');
+    countryData() async {
+      Provider.of<CountryData>(context, listen: false).loadData();
+    }
 
+    // check connection
+    void loadData() async {
+      bool result =
+          await Provider.of<AppData>(context, listen: false).checkConnection();
+
+      if (result == true) {
+        // load country data
+        await countryData();
         Navigator.pushReplacementNamed(context, '/home');
-      } catch (e) {
+      } else {
         showAlertDialog(context);
       }
     }
 
-    getData();
+    // load the data
+    loadData();
   }
 
   @override
