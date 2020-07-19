@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+//import 'package:lost/models/operation.dart';
 import 'package:lost/pages/loading.dart';
 import 'package:lost/pages/login.dart';
 import 'package:lost/pages/home.dart';
 import 'package:lost/pages/dataDetails.dart';
 
+import 'models/appData.dart';
+
+// the provider to manege state
+import 'package:provider/provider.dart';
+
 void main() {
-  runApp(MyApp());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (context) => CountryData()),
+    ChangeNotifierProvider(create: (context) => TypeOperationData()),
+    ChangeNotifierProvider(create: (context) => StatusOperationData()),
+    ChangeNotifierProvider(create: (context) => AppData()),
+  ], child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -19,11 +30,13 @@ class MyApp extends StatelessWidget {
 
         primaryColor: Colors.purple[800],
 
-        accentColor: Colors.purpleAccent[300],
+        //accentColor: Colors.purpleAccent[300],
+        accentColor: Colors.white,
+        backgroundColor: Colors.purple[50],
         //backgroundColor: Colors.purple[100],
 
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.lightBlueAccent[900],
+          backgroundColor: Colors.deepPurple[800],
           foregroundColor: Colors.white,
         ),
 
