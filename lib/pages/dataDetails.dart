@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:carousel_slider/carousel_options.dart';
 
-List<String> imgList = [
-  //'imeges/mustafa.jpg',
-  //'imeges/mustafa1.jpg',
-  //'imeges/mustafa2.jpg',
-];
+// import operation model
+import 'package:lost/models/operation.dart';
+import 'package:lost/models/person.dart';
+
+// use formatter
+import 'package:intl/intl.dart';
+
+List photos;
 
 class DataDetails extends StatefulWidget {
   @override
@@ -16,14 +19,50 @@ class DataDetails extends StatefulWidget {
 
 class _DataDetailsState extends State<DataDetails> {
   int _current = 0;
+  Map arguments;
+
+  Operations operation;
+  Age age;
+
+  var formatter = new DateFormat('yyyy-MM-dd');
+
   @override
   Widget build(BuildContext context) {
+    arguments = ModalRoute.of(context).settings.arguments;
+
+    operation = arguments['operation'];
+    age = arguments['age'];
+
+    // photos
+    photos = operation.object.photos;
+
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('details'),
+        actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Hero(
+              tag: operation.id.toString(),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundImage: photos == null || photos.isEmpty
+                    ? AssetImage(
+                        'imeges/profile.png',
+                      )
+                    : NetworkImage(
+                        photos[0],
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           CarouselSlider(
-            items: imageSliders,
+            items: imageSliders(photos),
             options: CarouselOptions(
                 autoPlay: true,
                 enlargeCenterPage: true,
@@ -36,8 +75,8 @@ class _DataDetailsState extends State<DataDetails> {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: imgList.map((url) {
-              int index = imgList.indexOf(url);
+            children: photos.map((url) {
+              int index = photos.indexOf(url);
               return Container(
                 width: 8.0,
                 height: 8.0,
@@ -51,13 +90,52 @@ class _DataDetailsState extends State<DataDetails> {
               );
             }).toList(),
           ),
+          // data
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+                //border: Border(left: BorderSide(color: Colors.black)),
+                //borderRadius: BorderRadius.all(Radius.circular(2)),
+                ),
+            child: Card(
+              margin: EdgeInsets.fromLTRB(15, 0, 20, 0),
+              color: Colors.grey[200],
+              child: Padding(
+                padding: EdgeInsets.only(top: 8, left: 15, bottom: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Name: ${operation.object.name}',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 2,
+                    ),
+                    Text(
+                      'age: ${age.minAge} - ${age.minAge}',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    SizedBox(
+                      height: 2,
+                    ),
+                    Text(
+                      'Date: ${formatter.format(operation.date)}',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-final List<Widget> imageSliders = imgList
+List<Widget> imageSliders(List photos) => photos
     .map((item) => Container(
           child: Container(
             margin: EdgeInsets.all(5.0),
@@ -65,7 +143,7 @@ final List<Widget> imageSliders = imgList
                 borderRadius: BorderRadius.all(Radius.circular(5.0)),
                 child: Stack(
                   children: <Widget>[
-                    Image.asset(item, fit: BoxFit.cover, width: 1000.0),
+                    Image.network(item, fit: BoxFit.cover, width: 1000.0),
                     Positioned(
                       bottom: 0.0,
                       left: 0.0,
