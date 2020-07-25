@@ -1,31 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 
+// import the app data
+import 'package:lost/models/appData.dart';
+import 'package:provider/provider.dart';
+import 'snackBars.dart';
+
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
 }
 
-// const users = const {
-//   'dribbble@gmail.com': '12345',
-//   'hunter@gmail.com': 'hunter',
-// };
-
 class _LoginState extends State<Login> {
-  Duration get loginTime => Duration(milliseconds: 2250);
+  Map arguments;
 
-  Future<String> _authUser(LoginData data) {
-    //   print('Name: ${data.name}, Password: ${data.password}');
-    //   return Future.delayed(loginTime).then((_) {
-    //     if (!users.containsKey(data.name)) {
-    //       return 'Username not exists';
-    //     }
-    //     if (users[data.name] != data.password) {
-    //       return 'Password does not match';
-    //     }
-    //     return null;
-    //   });
-    return null;
+  Future<String> _authUser(LoginData data) async {
+    // login the user
+    bool result = await Provider.of<UserData>(context, listen: false)
+        .login(data.name, data.password);
+
+    return result ? null : Future<String>.value('wrong phone or password!');
   }
 
   Future<String> _recoverPassword(String name) {
@@ -39,9 +33,22 @@ class _LoginState extends State<Login> {
     return null;
   }
 
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
+    Future<void> delay() async {
+      await Future.delayed(Duration(seconds: 2));
+      _scaffoldKey.currentState.showSnackBar(needLoginSnackBar);
+    }
+
+    arguments = ModalRoute.of(context).settings.arguments;
+    if (arguments != null && arguments['showAlert'] != null) {
+      delay();
+    }
+
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           'Login',
@@ -58,7 +65,21 @@ class _LoginState extends State<Login> {
       ),
       body: FlutterLogin(
         title: 'Login',
-        //logo: 'assets/images/ecorp-lightblue.png',
+        emailValidator: (value) {
+          if (value.isEmpty) {
+            return 'you must enter your phone number';
+          }
+          if (double.tryParse(value) == null) {
+            return 'this not valid number';
+          }
+          return null;
+        },
+        passwordValidator: (value) {
+          if (value.isEmpty) {
+            return 'enter your password';
+          }
+          return null;
+        },
         messages: LoginMessages(
           usernameHint: "you'r phone number",
           passwordHint: 'you\'r password',
@@ -66,13 +87,9 @@ class _LoginState extends State<Login> {
         ),
         onLogin: _authUser,
         onSignup: _authUser,
-
-        // onSubmitAnimationCompleted: () {
-        //   Navigator.of(context).pushReplacement(MaterialPageRoute(
-        //     builder: (context) => DashboardScreen(),
-        //   )
-        //   );
-        //},
+        onSubmitAnimationCompleted: () {
+          Navigator.of(context).pop();
+        },
         onRecoverPassword: _recoverPassword,
       ),
     );
