@@ -11,7 +11,7 @@ class Person {
   @JsonKey(name: 'age_id')
   int ageId;
 
-  List<Photos> photos;
+  List<String> photos;
 
   Person({this.id, this.name, this.ageId, this.photos});
 
@@ -35,15 +35,4 @@ class Age {
   factory Age.fromJson(Map<String, dynamic> json) => _$AgeFromJson(json);
 
   Map<String, dynamic> toJson() => _$AgeToJson(this);
-}
-
-@JsonSerializable()
-class Photos {
-  String link;
-
-  Photos({this.link});
-
-  factory Photos.fromJson(Map<String, dynamic> json) => _$PhotosFromJson(json);
-
-  Map<String, dynamic> toJson() => _$PhotosToJson(this);
 }
