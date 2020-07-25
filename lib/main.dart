@@ -15,7 +15,10 @@ void main() {
     ChangeNotifierProvider(create: (context) => CountryData()),
     ChangeNotifierProvider(create: (context) => TypeOperationData()),
     ChangeNotifierProvider(create: (context) => StatusOperationData()),
+    ChangeNotifierProvider(create: (context) => AgeData()),
     ChangeNotifierProvider(create: (context) => AppData()),
+    ChangeNotifierProvider(create: (context) => UserData()),
+    ChangeNotifierProvider(create: (context) => PostData()),
   ], child: MyApp()));
 }
 
