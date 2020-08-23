@@ -3,8 +3,15 @@ import 'package:flutter_login/flutter_login.dart';
 
 // import the app data
 import 'package:lost/models/appData.dart';
+import 'package:lost/models/operation.dart';
 import 'package:provider/provider.dart';
 import 'snackBars.dart';
+
+// the validators functions
+import 'validators.dart';
+
+//language support
+import 'package:lost/app_localizations.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -14,23 +21,37 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   Map arguments;
 
-  Future<String> _authUser(LoginData data) async {
-    // login the user
-    bool result = await Provider.of<UserData>(context, listen: false)
-        .login(data.name, data.password);
+  Future<String> _authUser(LoginData data, BuildContext context) async {
+    Country selectedCountry =
+        Provider.of<CountryData>(context, listen: false).selectedCountry;
 
-    return result ? null : Future<String>.value('wrong phone or password!');
+    // login the user
+    String result = await Provider.of<UserData>(context, listen: false)
+        .login(data.name, data.password, selectedCountry.id);
+
+    return result;
   }
 
-  Future<String> _recoverPassword(String name) {
-    // print('Name: $name');
-    // return Future.delayed(loginTime).then((_) {
-    //   if (!users.containsKey(name)) {
-    //     return 'Username not exists';
-    //   }
-    //   return null;
-    // });
-    return null;
+  Future<String> _registerUser(LoginData data, BuildContext context) async {
+    Country selectedCountry =
+        Provider.of<CountryData>(context, listen: false).selectedCountry;
+
+    // login the user
+    String result = await Provider.of<UserData>(context, listen: false)
+        .register(data.name, data.password, selectedCountry.id);
+
+    return result;
+  }
+
+  Future<String> _recoverPassword(String name, BuildContext context) async {
+    Country selectedCountry =
+        Provider.of<CountryData>(context, listen: false).selectedCountry;
+
+    // login the user
+    String result = await Provider.of<UserData>(context, listen: false)
+        .forgotPassword(name, selectedCountry.id);
+
+    return result;
   }
 
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -39,7 +60,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     Future<void> delay() async {
       await Future.delayed(Duration(seconds: 2));
-      _scaffoldKey.currentState.showSnackBar(needLoginSnackBar);
+      _scaffoldKey.currentState.showSnackBar(needLoginSnackBar(context));
     }
 
     arguments = ModalRoute.of(context).settings.arguments;
@@ -47,11 +68,14 @@ class _LoginState extends State<Login> {
       delay();
     }
 
+    Country selectedCountry =
+        Provider.of<CountryData>(context, listen: false).selectedCountry;
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          'Login',
+          AppLocalizations.of(context).translate('login_Login'),
           style: TextStyle(
             color: Colors.black,
             letterSpacing: 1.0,
@@ -64,34 +88,77 @@ class _LoginState extends State<Login> {
         ),
       ),
       body: FlutterLogin(
-        title: 'Login',
-        emailValidator: (value) {
-          if (value.isEmpty) {
-            return 'you must enter your phone number';
+          title: AppLocalizations.of(context).translate('login_Login'),
+          emailValidator: (value) {
+            if (value.isEmpty) {
+              return AppLocalizations.of(context).translate('login_mustPhone');
+            }
+            return validatPhone(context, value, selectedCountry);
+          },
+          passwordValidator: (value) {
+            if (value.isEmpty) {
+              return AppLocalizations.of(context).translate('login_mustPass');
+            }
+            if (value.length < 5) {
+              return AppLocalizations.of(context)
+                  .translate('login_mustPassLength');
+            }
+            return validatPassword(context, value);
+          },
+          messages: LoginMessages(
+            confirmPasswordHint:
+                AppLocalizations.of(context).translate('login_passConfirmHint'),
+            usernameHint:
+                AppLocalizations.of(context).translate('login_nameHint'),
+            passwordHint:
+                AppLocalizations.of(context).translate('login_passHint'),
+            recoverPasswordDescription:
+                AppLocalizations.of(context).translate('login_recoverPassword'),
+            recoverPasswordSuccess: AppLocalizations.of(context)
+                .translate('login_recoverPasswordSuccess'),
+            confirmPasswordError: AppLocalizations.of(context)
+                .translate('login_PassworConfirmError'),
+            loginButton: AppLocalizations.of(context).translate('login_Login'),
+            forgotPasswordButton:
+                AppLocalizations.of(context).translate('login_PassworReset'),
+            signupButton:
+                AppLocalizations.of(context).translate('login_Signup'),
+            goBackButton: AppLocalizations.of(context).translate('login_Back'),
+            recoverPasswordButton:
+                AppLocalizations.of(context).translate('login_Recover'),
+            recoverPasswordIntro: AppLocalizations.of(context)
+                .translate('login_recoverPasswordIntro'),
+          ),
+          onLogin: (data) => _authUser(data, context),
+          onSubmitAnimationCompleted: () {
+            Navigator.of(context).pop();
+          },
+          onSignup: (data) => _registerUser(data, context).then((value) {
+                // return to home and show snakebar
+                if (value != null) {
+                  return value;
+                }
+                Navigator.of(context).pop({'register': true});
+                return null;
+              }),
+          onRecoverPassword: (name) {
+            return Future.value(
+                AppLocalizations.of(context).translate('login_RecoverSorry'));
           }
-          if (double.tryParse(value) == null) {
-            return 'this not valid number';
-          }
-          return null;
-        },
-        passwordValidator: (value) {
-          if (value.isEmpty) {
-            return 'enter your password';
-          }
-          return null;
-        },
-        messages: LoginMessages(
-          usernameHint: "you'r phone number",
-          passwordHint: 'you\'r password',
-          recoverPasswordDescription: 'We will send you a confirm number.',
-        ),
-        onLogin: _authUser,
-        onSignup: _authUser,
-        onSubmitAnimationCompleted: () {
-          Navigator.of(context).pop();
-        },
-        onRecoverPassword: _recoverPassword,
-      ),
+          //     _recoverPassword(name, context).then((value) {
+          //   // pop the screen
+          //   if (value != null) {
+          //     return value;
+          //   }
+          //   //Navigator.of(context).pop();
+
+          //   Navigator.pushReplacementNamed(context, '/reset',
+          //       arguments: {'phone': name});
+
+          //   return null;
+          // }
+          // ),
+          ),
     );
   }
 }

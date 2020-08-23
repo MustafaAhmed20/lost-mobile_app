@@ -1,0 +1,86 @@
+{
+    "loading_Loading" : "جاري التحميل ...",
+    "loading_exit" : "خروج",
+    "loading_Retry" : "اعادة محاولة",
+    "loading_massege" : "تحقق من اتصال الانترنت ثم حاول مجددا, او قم باغلاق التطبيق",
+    "loading_NetworkError" : "فشل الاتصال!",
+    
+    "home_Login" : "تسجيل الدخول",
+    "home_Logout" : "تسجيل الخروج",
+    "home_Home" : "الرئيسية",
+    "home_Settings" : "الاعدادات",
+    "home_FeedBack" : "ارسال ملاحظات",
+    "home_AdminPanel" : "اعدادات المدير",
+
+    "homeData_Name": "الاسم: ",
+    "homeData_Age": "العمر: ",
+    
+    "dataDetails_noPhotos" : "لا يوجد صور..!",
+    "dataDetails_noLocation" : "لا يوجد موقع..!",
+    "dataDetails_details" : "التفاصيل",
+    "dataDetails_Name" : "الاسم:",
+    "dataDetails_age" : "العمر:",
+    "dataDetails_Date" : "التاريخ:",
+    "dataDetails_details_filed" : "التفاصيل:",
+
+    "map_location": "اختيار هذا الموقع",
+
+    "Settings_Settings": "الاعدادات",
+    "Settings_Country": "الدولة",
+    "Settings_language": "اللغة",
+    "Settings_languageMassege": "يجب اختيار لغة",
+    "Settings_Submit": "حفظ",
+
+    "SnackBar_successLogin": "لقد قمت بتسجيل الدخول بنجاح !",
+    "SnackBar_successRegister": "لقد سجلت بنجاح",
+    "SnackBar_successLogout": "لقد قمت بتسجيل الخروج بنجاح !",
+    "SnackBar_needLogin": "عليك تسجيل الدخول اولا!",
+    "SnackBar_successReset": "لقد قمت بتغيير الرقم السري بنجاح",
+    "SnackBar_chooseLocation": "اختر موقع بالضغط على الخريطة!!",
+    "SnackBar_sendFeddBack": "لقد ارسلت ملاحظاتك بنجاح",
+
+    "reset_Reset": "تغيير الرقم السري",
+    "reset_Submit": "حفظ",
+
+    "login_Login": "تسجيل الدخول",
+    "login_mustPhone": "ادخل رقم الهاتف",
+    "login_mustPass": "ادخل الرقم السري",
+    "login_mustPassLength": "الرقم السري يجب ان يكون 5 حروف على الاقل",
+    "login_nameHint": "رقم الهاتف",
+    "login_passHint": "الرقم السري",
+    "login_passConfirmHint": "تأكيد الرقم السري",
+    "login_recoverPassword": "سنرسل لك رقم تأكيد.",
+    "login_recoverPasswordSuccess": "سنرسل لك رقم تأكيد",
+    "login_PassworConfirmError": "الرقم السري غير مطابق",
+    "login_PassworReset": "نسيت كلمة المرور؟",
+    "login_Signup": "تسجيل",
+    "login_Back": "عودة",
+    "login_Recover": "استعادة",
+    "login_recoverPasswordIntro": "استعادة كلمة السر",
+    "login_RecoverSorry": "عذرا هذه الخاصية غير متوفرة الان",
+
+    "operatioForm_date" : "التاريخ",
+    "operatioForm_name" : "الاسم",
+    "operatioForm_age" : "العمر",
+    "operatioForm_details" : "التفاصيل",
+    "operatioForm_photos" : "الصور:",
+    "operatioForm_AgeRange" : "اختر فئة عمرية",
+    "operatioForm_Chooselocation" : "اختر الموقع",
+    "operatioForm_ActivateGps" : "Activate Gps",
+    "operatioForm_PleaseActivate" : "يرجى تفعيل نظام تحديد المواقع الخاص بك",
+    "operatioForm_Submit" : "حفظ",
+    "operatioForm_Cancel" : "الغاء",
+    "operatioForm_requiredError" : "هذا الحقل لايمكن ان يكون خاليا",
+
+    
+   "validation_mustDigits" : "الرقم السري يجب ان يحتوي على ارقام.",
+   "validation_mustEnglish" : "الرقم السري يجب ان يحتوي على حروف انجليزية.",
+   "validation_notValidPhone" : "هذا الرقم غير صالح لهذه الدولة!",
+
+   "wait_noData": "لا توجد بيانات!",
+
+   "feedback_Send": "ارسال",
+   "feedback_errorEmpty": "هذا الحقل لا يمكن ان يكون خاليا"
+   
+
+}

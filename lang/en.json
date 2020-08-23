@@ -1,0 +1,83 @@
+{
+    "loading_Loading" : "Loading...",
+    "loading_exit" : "Exit",
+    "loading_Retry" : "Retry",
+    "loading_massege" : "Check your connection and then try again , or close the app",
+    "loading_NetworkError" : "Network error!",
+
+    "home_Login" : "Login",
+    "home_Logout" : "Logout",
+    "home_Home" : "Home",
+    "home_Settings" : "Settings",
+    "home_FeedBack" : "Send FeedBack",
+    "home_AdminPanel" : "Admin panel",
+
+    "homeData_Name": "Name: ",
+    "homeData_Age": "Age: ",
+
+    "dataDetails_noPhotos" : "No photos..!",
+    "dataDetails_noLocation" : "No Location..!",
+    "dataDetails_details" : "details",
+    "dataDetails_Name" : "Name:",
+    "dataDetails_age" : "age:",
+    "dataDetails_Date" : "Date:",
+    "dataDetails_details_filed" : "details:",
+
+    "map_location": "choose this location",
+
+    "Settings_Settings": "Settings",
+    "Settings_Country": "Country",
+    "Settings_language": "language",
+    "Settings_languageMassege": "You must choose a language!",
+    "Settings_Submit": "Submit",
+    
+    "SnackBar_successLogin": "You logged-in!",
+    "SnackBar_successRegister": "you successfully registered!",
+    "SnackBar_successLogout": "You logout successfully!",
+    "SnackBar_needLogin": "You need to login first!!",
+    "SnackBar_successReset": "You successfully reset the password!",
+    "SnackBar_chooseLocation": "Choose location by click on the map!!",
+    "SnackBar_sendFeddBack": "You send feedback successfully",
+
+    "reset_Reset": "Reset password",
+    "reset_Submit": "Submit",
+
+    "login_Login": "Login",
+    "login_mustPhone": "you must enter your phone number",
+    "login_mustPass": "enter your password",
+    "login_mustPassLength": "password must be at least 5 characters",
+    "login_nameHint": "you'r phone number",
+    "login_passHint": "you'r password",
+    "login_passConfirmHint": "Confirn Password",
+    "login_recoverPassword": "We will send you a confirm number.",
+    "login_recoverPasswordSuccess": "We will send you a confirm number.",
+    "login_PassworConfirmError": "Password do not match",
+    "login_PassworReset": "Forgot Password?",
+    "login_Signup": "Signup",
+    "login_Back": "Back",
+    "login_Recover": "Recover",
+    "login_recoverPasswordIntro": "Reset your password here",
+    "login_RecoverSorry": "sorry this option not available now",
+
+    "operatioForm_date" : "Date",
+    "operatioForm_name" : "name",
+    "operatioForm_age" : "Age",
+    "operatioForm_details" : "details",
+    "operatioForm_photos" : "photos:",
+    "operatioForm_AgeRange" : "Select Age Range",
+    "operatioForm_Chooselocation" : "Choose location",
+    "operatioForm_ActivateGps" : "Activate Gps",
+    "operatioForm_PleaseActivate" : "Please activate your Gps",
+    "operatioForm_Submit" : "Submit",
+    "operatioForm_Cancel" : "Cancel",
+    "operatioForm_requiredError" : "This field cannot be empty.",
+
+   "validation_mustDigits" : "The password must include digits.",
+   "validation_mustEnglish" : "The password must include English characters.",
+   "validation_notValidPhone" : "This not valid phone-number for this country.",
+
+   "wait_noData": "No Data Found!",
+
+   "feedback_Send": "Send",
+   "feedback_errorEmpty": "feedback can't be empty"
+}

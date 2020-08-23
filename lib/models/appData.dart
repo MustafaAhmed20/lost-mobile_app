@@ -3,14 +3,21 @@ this the main state model of the app data
 
 */
 
+// the server URL
+import 'package:lost/pages/secrets.dart' as urls;
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'operation.dart';
 import 'person.dart';
+import 'user.dart';
 
 import 'package:path/path.dart';
+
+// storage user preferences
+import 'package:shared_preferences/shared_preferences.dart';
 
 String address = AppData().serverAddress;
 
@@ -22,7 +29,9 @@ class CountryData extends ChangeNotifier {
   // the slected country now .. this will go as a filter for operation selecting
   Country selectedCountry;
 
-  void loadData() async {
+  Future<bool> loadData() async {
+    // return True if there is selected country , return False if no selected contry
+
     Future<void> getData() async {
       try {
         http.Response response = await http.get(address + '/getcountry');
@@ -45,12 +54,37 @@ class CountryData extends ChangeNotifier {
       } catch (e) {
         print(e);
       }
+      notifyListeners();
     }
 
-    await getData();
+    // load the countries
+    Future<void> done = getData();
 
-    // make the selected country the first country (this will change later)
-    selectedCountry = countries[0];
+    //  try load the selected country from storge
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int countryId = prefs.getInt('countryId');
+
+    if (countryId != null) {
+      // set the country
+      done.then((value) {
+        this.selectedCountry = this.countries.firstWhere(
+            (country) => country.id == countryId,
+            orElse: () => this.countries[0]);
+      });
+
+      return Future<bool>.value(true);
+    }
+    return Future<bool>.value(false);
+  }
+
+  void setCountry(String countryName) async {
+    // the user set the slected country
+    this.selectedCountry = this.countries.firstWhere(
+        (country) => country.name == countryName.toLowerCase(),
+        orElse: () => this.countries[0]);
+    final prefs = await SharedPreferences.getInstance();
+    // set value
+    prefs.setInt('countryId', selectedCountry.id);
 
     notifyListeners();
   }
@@ -130,13 +164,13 @@ class StatusOperationData extends ChangeNotifier {
 }
 
 class AppData extends ChangeNotifier {
-  final serverAddress = 'http://192.168.56.1:8080/api';
-  final serverAddressImeges = 'http://192.168.56.1:8080/';
+  final serverAddress = urls.serverAddress;
+  final serverAddressImeges = urls.serverAddressImeges;
 
-  final serverName = '192.168.56.1:8080';
-  final apiSec = '/api';
+  final serverName = urls.serverName;
+  final apiSec = urls.apiSec;
 
-  // this will contain the availabl objects that the app can handel . like(person - car - wallet)
+  // this will contain the available objects that the app can handel . like(person - car - wallet)
   static final availableObjectsTypes = ['Person'];
 
   final selectedObject = availableObjectsTypes[0];
@@ -152,6 +186,7 @@ class AppData extends ChangeNotifier {
 
         return Future<bool>.value(true);
       } catch (e) {
+        print(e);
         return Future<bool>.value(false);
       }
     }
@@ -183,7 +218,7 @@ class OperationData extends ChangeNotifier {
       }
 
       try {
-        var uri = Uri.http(
+        var uri = Uri.https(
             AppData().serverName, AppData().apiSec + '/getoperation', temp);
 
         http.Response response = await http.get(uri.toString());
@@ -265,18 +300,35 @@ class UserData extends ChangeNotifier {
   String phone;
   String token;
 
-  Future<bool> login(phone, password) async {
-    Future<bool> getData() async {
+  dynamic user;
+
+  Future checkLogin() async {
+    // check login if saved
+    final prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token');
+    if (token != null) {
+      this.token = token;
+      notifyListeners();
+    }
+  }
+
+  Future<String> login(phone, password, selectedCountryId) async {
+    Future<String> getData() async {
+      // return null if success else erroe massege
       try {
-        String body = json.encode({'phone': phone, 'password': password});
+        String body = json.encode({
+          'phone': phone,
+          'password': password,
+          'country_id': selectedCountryId
+        });
         http.Response response = await http.post(address + '/login',
             body: body, headers: {"Content-Type": "application/json"});
 
         if (response.statusCode != 200) {
           // throw some error
           Map<String, dynamic> body = json.decode(response.body);
-          print(body['message']);
-          return false;
+
+          return body['message'];
         }
 
         if (response.statusCode == 200) {
@@ -287,24 +339,251 @@ class UserData extends ChangeNotifier {
           } else if (body['status'] == 'success') {
             this.token = body['data']['token'];
             this.phone = phone;
-            return true;
+            // load the user data
+            loadUserdata();
+
+            // save the token
+            final prefs = await SharedPreferences.getInstance();
+            prefs.setString('token', this.token);
+
+            return null;
           }
         }
       } catch (e) {
-        print(e);
-        return false;
+        return e.toString();
       }
-      return false;
+      return null;
     }
 
-    bool result = await getData();
+    String result = await getData();
     notifyListeners();
+    return result;
+  }
+
+  Future<String> register(phone, password, selectedCountryId) async {
+    Future<String> getData() async {
+      // return null if success else erroe massege
+      try {
+        String body = json.encode({
+          'phone': phone,
+          'password': password,
+          'country_id': selectedCountryId
+        });
+        http.Response response = await http.post(address + '/registeruser',
+            body: body, headers: {"Content-Type": "application/json"});
+
+        Map<String, dynamic> resultBody = json.decode(response.body);
+
+        if (response.statusCode != 201) {
+          // throw some error
+          return resultBody['message'];
+        }
+
+        if (response.statusCode == 201) {
+          if (resultBody['status'] != 'success') {
+            // error handling
+          } else if (resultBody['status'] == 'success') {
+            this.token = resultBody['data']['token'];
+            this.phone = phone;
+            // load the user data
+            loadUserdata();
+            notifyListeners();
+            return null;
+          }
+        }
+      } catch (e) {
+        return e.toString();
+      }
+      return null;
+    }
+
+    String result = await getData();
+
+    return result;
+  }
+
+  Future<String> forgotPassword(phone, selectedCountryId) async {
+    Future<String> getData() async {
+      // return null if success else erroe massege
+      try {
+        String body =
+            json.encode({'phone': phone, 'country_id': selectedCountryId});
+        http.Response response = await http.post(address + '/forgotpassword',
+            body: body, headers: {"Content-Type": "application/json"});
+
+        if (response.statusCode != 200) {
+          // throw some error
+          Map<String, dynamic> body = json.decode(response.body);
+
+          return body['message'];
+        }
+
+        if (response.statusCode == 200) {
+          Map<String, dynamic> body = json.decode(response.body);
+
+          if (body['status'] != 'success') {
+            // error handling
+          } else if (body['status'] == 'success') {
+            return null;
+          }
+        }
+      } catch (e) {
+        return e.toString();
+      }
+      return null;
+    }
+
+    String result = await getData();
+
+    return result;
+  }
+
+  Future<String> resetPassword(phone, code, selectedCountryId, password) async {
+    Future<String> getData() async {
+      // return null if success else erroe massege
+      try {
+        String body = json.encode({
+          'phone': phone,
+          'country_id': selectedCountryId,
+          'code': code,
+          'password': password
+        });
+        http.Response response = await http.post(address + '/resetpassword',
+            body: body, headers: {"Content-Type": "application/json"});
+
+        if (response.statusCode != 200) {
+          // throw some error
+          Map<String, dynamic> body = json.decode(response.body);
+
+          return body['message'];
+        }
+
+        if (response.statusCode == 200) {
+          Map<String, dynamic> body = json.decode(response.body);
+
+          if (body['status'] != 'success') {
+            // error handling
+          } else if (body['status'] == 'success') {
+            return null;
+          }
+        }
+      } catch (e) {
+        return e.toString();
+      }
+      return null;
+    }
+
+    String result = await getData();
+
     return result;
   }
 
   void logut() {
     // logut the user
     this.token = null;
+    this.user = null;
+    Future clear() async {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', null);
+    }
+
+    clear();
+    notifyListeners();
+  }
+
+  Future<void> loadUserdata() async {
+    try {
+      String body = json.encode({
+        'phone': this.phone,
+      });
+      http.Response response = await http.post(address + '/getuser',
+          body: body, headers: {"Content-Type": "application/json"});
+
+      if (response.statusCode != 200) {
+        // throw some error
+      }
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> body = json.decode(response.body);
+
+        if (body['status'] != 'success') {
+          // error handling
+        } else if (body['status'] == 'success') {
+          this.user = body['data']['user'].map((item) {
+            return Users.fromJson(item);
+          }).toList()[0];
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+}
+
+class UserStatusData extends ChangeNotifier {
+  List<dynamic> userStatus;
+
+  void loadData() async {
+    Future<void> getData() async {
+      try {
+        http.Response response = await http.get(address + '/getstatus');
+
+        if (response.statusCode != 200) {
+          // throw some error
+        }
+
+        if (response.statusCode == 200) {
+          Map<String, dynamic> body = json.decode(response.body);
+
+          if (body['status'] != 'success') {
+            // error handling
+          } else if (body['status'] == 'success') {
+            this.userStatus = body['data']['status'].map((item) {
+              return Status.fromJson(item);
+            }).toList();
+          }
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    await getData();
+
+    notifyListeners();
+  }
+}
+
+class UserPermissionData extends ChangeNotifier {
+  List<dynamic> userPermission;
+
+  void loadData() async {
+    Future<void> getData() async {
+      try {
+        http.Response response = await http.get(address + '/getpermission');
+
+        if (response.statusCode != 200) {
+          // throw some error
+        }
+
+        if (response.statusCode == 200) {
+          Map<String, dynamic> body = json.decode(response.body);
+
+          if (body['status'] != 'success') {
+            // error handling
+          } else if (body['status'] == 'success') {
+            this.userPermission = body['data']['permission'].map((item) {
+              return Permission.fromJson(item);
+            }).toList();
+          }
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    await getData();
+
     notifyListeners();
   }
 }
@@ -319,9 +598,11 @@ class PostData extends ChangeNotifier {
     List photos = data['photos'];
     data.remove('photos');
 
-    // print(photos.length);
-    // print(photos);
-    // return '';
+    if (data['location'] != null) {
+      data['lat'] = data['location']['lat'];
+      data['lng'] = data['location']['lng'];
+      data.remove('location');
+    }
 
     data.updateAll((key, value) => value.toString());
     data = Map<String, String>.from(data);
@@ -331,7 +612,7 @@ class PostData extends ChangeNotifier {
       Map<String, String> headers = {'token': userToken.toString()};
 
       var uri =
-          Uri.http(AppData().serverName, AppData().apiSec + '/addoperation');
+          Uri.https(AppData().serverName, AppData().apiSec + '/addoperation');
       var request = http.MultipartRequest('POST', uri);
       request.fields.addAll(data);
 
@@ -344,6 +625,7 @@ class PostData extends ChangeNotifier {
       request.headers.addAll(headers);
 
       var response = await request.send();
+      //print(utf8.decode(await response.stream.toBytes()));
 
       Map<String, dynamic> body =
           json.decode(utf8.decode(await response.stream.toBytes()));
@@ -360,8 +642,65 @@ class PostData extends ChangeNotifier {
       }
     } catch (e) {
       print(e);
-      return 'some error';
+      return e.toString();
     }
     return 'error in code';
+  }
+
+  Future<String> addFeedBack(String text, {String userToken}) async {
+    // send feedback - return null if success else string error message
+    try {
+      // headers
+      Map<String, String> headers = {
+        'token': userToken.toString(),
+        "Content-Type": "application/json"
+      };
+      String body = json.encode({'feedback': text});
+      http.Response response = await http.post(address + '/addfeedback',
+          body: body, headers: headers);
+
+      if (response.statusCode != 201) {
+        // throw some error
+        Map<String, dynamic> body = json.decode(response.body);
+
+        return body['message'];
+      }
+
+      if (response.statusCode == 201) {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      return Future.value(e.toString());
+    }
+    return Future.value('error');
+  }
+}
+
+class AppSettings extends ChangeNotifier {
+  Locale selectedLanguage;
+
+  AppSettings() {
+    Future<void> load() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String language = prefs.getString('language');
+      if (language != null) {
+        selectedLanguage = Locale(language);
+      } else {
+        // no language selected
+        selectedLanguage = Locale('en');
+      }
+    }
+
+    load();
+  }
+
+  Future<void> changeLanguage(String language) async {
+    selectedLanguage = Locale(language);
+
+    final prefs = await SharedPreferences.getInstance();
+    // set value
+    prefs.setString('language', language);
+    notifyListeners();
   }
 }

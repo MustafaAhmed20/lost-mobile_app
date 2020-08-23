@@ -9,11 +9,19 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 
+// version info
+//import 'package:package_info/package_info.dart';
+
+//language support
+import 'package:lost/app_localizations.dart';
+
 showAlertDialog(BuildContext context) {
   // set up the buttons
   Widget cancelButton = FlatButton(
     textColor: Colors.red,
-    child: Text("Exit"),
+    child: Text(
+      AppLocalizations.of(context).translate('loading_exit'),
+    ),
     onPressed: () {
       Future<void> pop({bool animated}) async {
         await SystemChannels.platform
@@ -28,7 +36,7 @@ showAlertDialog(BuildContext context) {
   );
 
   Widget continueButton = FlatButton(
-    child: Text("Retry"),
+    child: Text(AppLocalizations.of(context).translate('loading_Retry')),
     onPressed: () {
       Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
     },
@@ -36,9 +44,8 @@ showAlertDialog(BuildContext context) {
 
   // set up the AlertDialog
   AlertDialog alert = AlertDialog(
-    title: Text("Network error!"),
-    content:
-        Text("Check your connection and then try again , or close the app"),
+    title: Text(AppLocalizations.of(context).translate('loading_NetworkError')),
+    content: Text(AppLocalizations.of(context).translate('loading_massege')),
     actions: [
       cancelButton,
       continueButton,
@@ -65,7 +72,7 @@ class _LoadingState extends State<Loading> {
     super.initState();
 
     countryData() async {
-      Provider.of<CountryData>(context, listen: false).loadData();
+      return await Provider.of<CountryData>(context, listen: false).loadData();
     }
 
     // check connection
@@ -74,9 +81,18 @@ class _LoadingState extends State<Loading> {
           await Provider.of<AppData>(context, listen: false).checkConnection();
 
       if (result == true) {
+        //check loggin
+        Provider.of<UserData>(context, listen: false).checkLogin();
+
         // load country data
-        await countryData();
-        Navigator.pushReplacementNamed(context, '/home');
+        bool country = await countryData();
+        if (country) {
+          // home page
+          Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          // send him to choose
+          Navigator.pushReplacementNamed(context, '/choose');
+        }
       } else {
         showAlertDialog(context);
       }
@@ -100,7 +116,7 @@ class _LoadingState extends State<Loading> {
             ),
           ),
           Text(
-            "Loading...",
+            AppLocalizations.of(context).translate('loading_Loading'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20.0,

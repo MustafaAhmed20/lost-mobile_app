@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:lost/pages/menu.dart';
 
 import 'homeData.dart';
 import 'wait.dart';
@@ -8,7 +8,13 @@ import 'snackBars.dart';
 
 // import the app data
 import 'package:lost/models/appData.dart';
+import 'package:lost/models/user.dart';
 import 'package:provider/provider.dart';
+
+//language support
+import 'package:lost/app_localizations.dart';
+
+// the main menu
 
 class Home extends StatefulWidget {
   @override
@@ -27,14 +33,11 @@ class _HomeState extends State<Home> {
 
   PageController _pageController;
 
-  // form key
-  GlobalKey<FormBuilderState> _fbKey;
-
+  // this will be true if logged in user is admin
+  bool admin = false;
   @override
   void initState() {
     super.initState();
-
-    _fbKey = GlobalKey<FormBuilderState>();
 
     _pageController = PageController(initialPage: 0, keepPage: true);
 
@@ -46,6 +49,10 @@ class _HomeState extends State<Home> {
       Provider.of<StatusOperationData>(context, listen: false).loadData();
       // load the age ranges
       Provider.of<AgeData>(context, listen: false).loadData();
+
+      //user data - Permission & Status
+      Provider.of<UserStatusData>(context, listen: false).loadData();
+      Provider.of<UserPermissionData>(context, listen: false).loadData();
     }
 
     fetchData();
@@ -75,8 +82,25 @@ class _HomeState extends State<Home> {
     bool logged = Provider.of<UserData>(context, listen: true).token == null
         ? false
         : true;
+    if (logged) {
+      // check if user is admin
+      dynamic user = Provider.of<UserData>(context, listen: false).user;
+      List<dynamic> permission =
+          Provider.of<UserPermissionData>(context, listen: true).userPermission;
 
+      if (permission != null && user != null) {
+        if (user.permission ==
+            permission.firstWhere((element) => element.name == 'admin').id) {
+          admin = true;
+        } else {
+          admin = false;
+        }
+      }
+    } else {
+      admin = false;
+    }
     return Scaffold(
+      drawer: Menue(),
       floatingActionButton: isLoading || types.isEmpty
           ? null
           : Builder(
@@ -89,10 +113,16 @@ class _HomeState extends State<Home> {
                           barrierDismissible: false,
                           context: context,
                           builder: (BuildContext context) {
-                            return Dialog(
-                              // show add form with key and current type page
-                              child: operatioForm(
-                                  context, _fbKey, types[_currentPage]),
+                            return Stack(
+                              children: [
+                                // show add form with key and current type page
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 10),
+                                  child: OperatioForm(
+                                      typeOperation: types[_currentPage]),
+                                ),
+                              ],
                             );
                           },
                         )
@@ -100,17 +130,8 @@ class _HomeState extends State<Home> {
 
                       Navigator.pushNamed(context, '/login',
                           arguments: {'showAlert': true}).then((value) {
-                          bool logged =
-                              Provider.of<UserData>(context, listen: false)
-                                          .token ==
-                                      null
-                                  ? false
-                                  : true;
-                          // if logged-in show snakebar
-                          if (logged) {
-                            Scaffold.of(context)
-                                .showSnackBar(successLoginSnackBar);
-                          }
+                          // after login func
+                          afterLogin(value, context);
                         });
                 },
                 child: Text(
@@ -123,6 +144,7 @@ class _HomeState extends State<Home> {
               ),
             ),
       appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
         actions: <Widget>[
           Builder(
             builder: (BuildContext context) => PopupMenuButton<String>(
@@ -131,17 +153,38 @@ class _HomeState extends State<Home> {
                 return [
                   PopupMenuItem<String>(
                     value: logged ? 'Logout' : 'Login',
-                    child: logged ? Text('Logout') : Text('Login'),
+                    child: logged
+                        ? Text(AppLocalizations.of(context)
+                            .translate('home_Logout'))
+                        : Text(AppLocalizations.of(context)
+                            .translate('home_Login')),
                   ),
+                  PopupMenuItem<String>(
+                    value: 'Settings',
+                    child: Text(AppLocalizations.of(context)
+                        .translate('home_Settings')),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'feedback',
+                    child: Text(AppLocalizations.of(context)
+                        .translate('home_FeedBack')),
+                  ),
+                  !admin
+                      ? null
+                      : PopupMenuItem<String>(
+                          value: 'admin',
+                          child: Text(AppLocalizations.of(context)
+                              .translate('home_AdminPanel')),
+                        ),
                 ];
               },
             ),
           ),
         ],
-        title: Text('Home'),
+        title: Text(AppLocalizations.of(context).translate('home_Home')),
         centerTitle: true,
         bottom: PreferredSize(
-          preferredSize: null,
+          preferredSize: Size(double.infinity, 10),
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: types.map((type) {
@@ -198,8 +241,8 @@ class _HomeState extends State<Home> {
                         'country_id':
                             Provider.of<CountryData>(context, listen: false)
                                 .selectedCountry
-                                .id,
-                        'type_id': types[index].id,
+                                ?.id,
+                        'type_id': types[index]?.id,
                       }),
                     ),
                   ],
@@ -214,19 +257,47 @@ class _HomeState extends State<Home> {
 void handleClick(String value, context) {
   if (value == 'Login') {
     Navigator.pushNamed(context, '/login').then((value) {
-      bool logged = Provider.of<UserData>(context, listen: false).token == null
-          ? false
-          : true;
-      // if logged-in show snakebar
-      if (logged) {
-        Scaffold.of(context).showSnackBar(successLoginSnackBar);
-      }
+      afterLogin(value, context);
     });
   }
 
   if (value == 'Logout') {
     // logout the user
     Provider.of<UserData>(context, listen: false).logut();
-    Scaffold.of(context).showSnackBar(successLogoutSnackBar);
+    Scaffold.of(context).showSnackBar(successLogoutSnackBar(context));
+  }
+  if (value == 'Settings') {
+    Navigator.pushNamed(context, '/choose', arguments: {'pop': true});
+  }
+
+  if (value == 'feedback') {
+    Navigator.pushNamed(context, '/feedback').then((value) {
+      if (value != null) {
+        // add feedback successfully
+        Scaffold.of(context).showSnackBar(customSuccessSnackBar(context,
+            AppLocalizations.of(context).translate('SnackBar_sendFeddBack')));
+      }
+    });
+  }
+}
+
+void afterLogin(returnedValue, BuildContext context) {
+  // run after the login page pop here in (home)
+  bool logged = Provider.of<UserData>(context, listen: false).token == null
+      ? false
+      : true;
+  // if logged-in show snakebar
+  if (logged) {
+    Scaffold.of(context).showSnackBar(successLoginSnackBar(context));
+  }
+  // if reseted the password
+  if (returnedValue == null) {
+    return;
+  }
+  if (returnedValue['reset'] != null) {
+    Scaffold.of(context).showSnackBar(successResetSnackBar(context));
+  }
+  if (returnedValue['register'] != null) {
+    Scaffold.of(context).showSnackBar(successRegisterSnackBar(context));
   }
 }

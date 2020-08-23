@@ -1,4 +1,5 @@
 import 'person.dart';
+import 'user.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'operation.g.dart';
@@ -9,8 +10,10 @@ class Operations {
 
   DateTime date;
 
-  String lat;
-  String lng;
+  double lat;
+  double lng;
+
+  String details;
 
   @JsonKey(name: 'object_type')
   String objectType;
@@ -25,6 +28,9 @@ class Operations {
 
   @JsonKey(name: 'country_id')
   int countryId;
+
+  @JsonKey(name: 'user')
+  Users user;
 
   Operations(
       {this.id,
@@ -76,6 +82,12 @@ class Country {
 
   @JsonKey(name: 'phone_code')
   int phoneCode;
+
+  @JsonKey(name: 'phone_length')
+  int phoneLength;
+
+  @JsonKey(name: 'iso_name')
+  String isoName;
 
   Country({this.id, this.name, this.phoneCode});
 

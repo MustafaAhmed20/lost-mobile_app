@@ -9,6 +9,9 @@ import 'package:lost/models/person.dart';
 import 'package:provider/provider.dart';
 import 'package:lost/models/appData.dart';
 
+//language support
+import 'package:lost/app_localizations.dart';
+
 class HomeData extends StatefulWidget {
   @override
   _HomeDataState createState() => _HomeDataState();
@@ -42,7 +45,7 @@ class _HomeDataState extends State<HomeData> {
       return operations == null
           ? wait()
           : operations.isEmpty
-              ? noData()
+              ? noData(context)
               : ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
@@ -103,8 +106,10 @@ class DataCard extends StatelessWidget {
                 ),
         ),
       ),
-      title: Text('Name: ${operation.object.name}'),
-      subtitle: Text('Age: ${age.minAge} - ${age.maxAge}'),
+      title: Text(AppLocalizations.of(context).translate('homeData_Name') +
+          '${operation.object.name}'),
+      subtitle: Text(AppLocalizations.of(context).translate('homeData_Age') +
+          '${age.minAge} - ${age.maxAge}'),
       isThreeLine: true,
     );
   }

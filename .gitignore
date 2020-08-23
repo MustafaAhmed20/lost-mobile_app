@@ -1,5 +1,7 @@
+android/
 # imeges file
 imeges/
+lib/pages/secrets.dart
 # Miscellaneous
 *.class
 *.log
