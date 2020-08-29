@@ -14,12 +14,12 @@ Operations _$OperationsFromJson(Map<String, dynamic> json) {
     lng: (json['lng'] as num)?.toDouble(),
     objectType: json['object_type'] as String,
     typeId: json['type_id'] as int,
-    object: json['object'] == null
-        ? null
-        : Person.fromJson(json['object'] as Map<String, dynamic>),
+    object: json['object'],
     countryId: json['country_id'] as int,
     statusId: json['status_id'] as int,
   )
+    ..state = json['state'] as String
+    ..city = json['city'] as String
     ..details = json['details'] as String
     ..user = json['user'] == null
         ? null
@@ -32,9 +32,11 @@ Map<String, dynamic> _$OperationsToJson(Operations instance) =>
       'date': instance.date?.toIso8601String(),
       'lat': instance.lat,
       'lng': instance.lng,
+      'state': instance.state,
+      'city': instance.city,
       'details': instance.details,
       'object_type': instance.objectType,
-      'object': instance.object?.toJson(),
+      'object': instance.object,
       'type_id': instance.typeId,
       'status_id': instance.statusId,
       'country_id': instance.countryId,

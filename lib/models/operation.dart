@@ -1,4 +1,3 @@
-import 'person.dart';
 import 'user.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -10,15 +9,20 @@ class Operations {
 
   DateTime date;
 
+  // location
   double lat;
   double lng;
+  // location as text
+  String state;
+  String city;
 
   String details;
 
   @JsonKey(name: 'object_type')
   String objectType;
 
-  Person object;
+  // this object will be loaded manually
+  dynamic object;
 
   @JsonKey(name: 'type_id')
   int typeId;
