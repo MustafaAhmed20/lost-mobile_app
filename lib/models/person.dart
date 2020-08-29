@@ -13,7 +13,12 @@ class Person {
 
   List<String> photos;
 
-  Person({this.id, this.name, this.ageId, this.photos});
+  String gender;
+
+  // skin color - range from (1 - 5)
+  int skin;
+
+  Person({this.id, this.name, this.ageId, this.photos, this.gender, this.skin});
 
   factory Person.fromJson(Map<String, dynamic> json) => _$PersonFromJson(json);
 
