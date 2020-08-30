@@ -80,7 +80,8 @@
    "wait_noData": "لا توجد بيانات!",
 
    "feedback_Send": "ارسال",
-   "feedback_errorEmpty": "هذا الحقل لا يمكن ان يكون خاليا"
-   
+   "feedback_errorEmpty": "هذا الحقل لا يمكن ان يكون خاليا",
 
+   "menu_people" : "الأشخاص",
+   "menu_cars" : "السيارات"
 }

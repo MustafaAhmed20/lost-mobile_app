@@ -79,5 +79,8 @@
    "wait_noData": "No Data Found!",
 
    "feedback_Send": "Send",
-   "feedback_errorEmpty": "feedback can't be empty"
+   "feedback_errorEmpty": "feedback can't be empty",
+
+   "menu_people" : "People",
+   "menu_cars" : "Cars"
 }
