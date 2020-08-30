@@ -24,15 +24,16 @@ class _HomeDataState extends State<HomeData> {
   List operations;
   List ages;
 
-  String server;
-
   @override
   void initState() {
     super.initState();
+    // get the selected object
+    String selectedObject =
+        Provider.of<AppSettings>(context, listen: false).selectedObject;
+    filters['object'] = selectedObject;
 
     // load the operations with the filters
     Provider.of<OperationData>(context, listen: false).loadData(filters);
-    server = Provider.of<AppData>(context, listen: false).serverAddress;
   }
 
   @override
