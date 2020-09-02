@@ -38,6 +38,7 @@ dependencies:
   geolocator: ^5.3.2+2
   package_info: ^0.4.1
   share: '>=0.6.4+3 <2.0.0'
+  emojis: ^0.9.3
   
 
   
