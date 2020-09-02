@@ -13,6 +13,7 @@ import 'dart:convert';
 import 'operation.dart';
 import 'person.dart';
 import 'user.dart';
+import 'car.dart';
 
 import 'package:path/path.dart';
 
@@ -218,7 +219,7 @@ class OperationData extends ChangeNotifier {
       }
 
       try {
-        var uri = Uri.https(
+        var uri = Uri.http(
             AppData().serverName, AppData().apiSec + '/getoperation', temp);
 
         http.Response response = await http.get(uri.toString());
@@ -234,7 +235,16 @@ class OperationData extends ChangeNotifier {
             // error handling
           } else if (body['status'] == 'success') {
             this.operations = body['data']['operations'].map((item) {
-              return Operations.fromJson(item);
+              dynamic operation = Operations.fromJson(item);
+              // load the object data manually
+              var object = operation.objectType;
+              if (object == 'Person') {
+                operation.object = Person.fromJson(item['object']);
+              } else if (object == 'Car') {
+                operation.object = Car.fromJson(item['object']);
+              }
+
+              return operation;
             }).toList();
 
             // updata the photos with server address
@@ -250,6 +260,7 @@ class OperationData extends ChangeNotifier {
         }
       } catch (e) {
         print(e);
+        //throw e;
       }
     }
 
@@ -612,7 +623,7 @@ class PostData extends ChangeNotifier {
       Map<String, String> headers = {'token': userToken.toString()};
 
       var uri =
-          Uri.https(AppData().serverName, AppData().apiSec + '/addoperation');
+          Uri.http(AppData().serverName, AppData().apiSec + '/addoperation');
       var request = http.MultipartRequest('POST', uri);
       request.fields.addAll(data);
 
@@ -680,7 +691,17 @@ class PostData extends ChangeNotifier {
 class AppSettings extends ChangeNotifier {
   Locale selectedLanguage;
 
+  // this determine the selected object (like person, cars , etc)
+  Map availableObjects = {'Person': 'menu_people', 'Car': 'menu_cars'};
+  String selectedObject = 'Person';
+  String selectedObjectString;
+
+  // main screen(Home) snkebar - if have value then the home page will show snakbar
+  String homeSnakeBar;
+
   AppSettings() {
+    this.selectedObjectString = availableObjects[this.selectedObject];
+
     Future<void> load() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String language = prefs.getString('language');
@@ -702,5 +723,19 @@ class AppSettings extends ChangeNotifier {
     // set value
     prefs.setString('language', language);
     notifyListeners();
+  }
+
+  changeObject(String newObject) {
+    this.selectedObject = newObject;
+    this.selectedObjectString = availableObjects[newObject];
+    notifyListeners();
+  }
+
+  setHomeSnakeBar(String value) {
+    this.homeSnakeBar = value;
+    notifyListeners();
+
+    // // then set it to null
+    // this.homeSnakeBar = null;
   }
 }
