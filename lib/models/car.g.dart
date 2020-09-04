@@ -13,7 +13,7 @@ Car _$CarFromJson(Map<String, dynamic> json) {
     plateNumberLettrs: json['plate_number_letters'] as String,
     plateNumberNumbers: json['plate_number_numbers'] as String,
     brand: json['brand'] as String,
-    modle: json['modle'] as String,
+    model: json['modle'] as String,
   );
 }
 
@@ -23,5 +23,5 @@ Map<String, dynamic> _$CarToJson(Car instance) => <String, dynamic>{
       'plate_number_numbers': instance.plateNumberNumbers,
       'plate_number_letters': instance.plateNumberLettrs,
       'brand': instance.brand,
-      'modle': instance.modle,
+      'modle': instance.model,
     };

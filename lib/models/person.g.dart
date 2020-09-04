@@ -11,7 +11,6 @@ Person _$PersonFromJson(Map<String, dynamic> json) {
     id: json['id'] as int,
     name: json['name'] as String,
     ageId: json['age_id'] as int,
-    photos: (json['photos'] as List)?.map((e) => e as String)?.toList(),
     gender: json['gender'] as String,
     skin: json['skin'] as int,
   );
@@ -21,7 +20,6 @@ Map<String, dynamic> _$PersonToJson(Person instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'age_id': instance.ageId,
-      'photos': instance.photos,
       'gender': instance.gender,
       'skin': instance.skin,
     };

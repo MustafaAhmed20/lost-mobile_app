@@ -17,6 +17,7 @@ Operations _$OperationsFromJson(Map<String, dynamic> json) {
     object: json['object'],
     countryId: json['country_id'] as int,
     statusId: json['status_id'] as int,
+    photos: (json['photos'] as List)?.map((e) => e as String)?.toList(),
   )
     ..state = json['state'] as String
     ..city = json['city'] as String
@@ -41,6 +42,7 @@ Map<String, dynamic> _$OperationsToJson(Operations instance) =>
       'status_id': instance.statusId,
       'country_id': instance.countryId,
       'user': instance.user?.toJson(),
+      'photos': instance.photos,
     };
 
 TypeOperation _$TypeOperationFromJson(Map<String, dynamic> json) {

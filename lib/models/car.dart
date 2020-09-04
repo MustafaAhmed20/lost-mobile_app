@@ -18,7 +18,7 @@ class Car {
 
   String brand;
 
-  String modle;
+  String model;
 
   Car(
       {this.id,
@@ -26,7 +26,7 @@ class Car {
       this.plateNumberLettrs,
       this.plateNumberNumbers,
       this.brand,
-      this.modle});
+      this.model});
 
   factory Car.fromJson(Map<String, dynamic> json) => _$CarFromJson(json);
 

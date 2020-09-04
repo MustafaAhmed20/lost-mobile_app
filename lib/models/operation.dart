@@ -36,6 +36,8 @@ class Operations {
   @JsonKey(name: 'user')
   Users user;
 
+  List<String> photos;
+
   Operations(
       {this.id,
       this.date,
@@ -45,7 +47,8 @@ class Operations {
       this.typeId,
       this.object,
       this.countryId,
-      this.statusId});
+      this.statusId,
+      this.photos});
 
   factory Operations.fromJson(Map<String, dynamic> json) =>
       _$OperationsFromJson(json);
