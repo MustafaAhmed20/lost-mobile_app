@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lost/pages/menu.dart';
 
 import 'homeData.dart';
 import 'wait.dart';
@@ -15,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:lost/app_localizations.dart';
 
 // the main menu
+import 'package:lost/pages/menu.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -66,6 +66,15 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    // check if there is a snakebar need to show from provider
+    String massege =
+        Provider.of<AppSettings>(context, listen: true).homeSnakeBar;
+    // show the snakebar
+    showSnake(context, massege);
+
+    String selectedObject =
+        Provider.of<AppSettings>(context, listen: true).selectedObjectString;
+
     // variable numbers of tabs
     List types =
         Provider.of<TypeOperationData>(context, listen: true).typeOperation;
@@ -100,7 +109,7 @@ class _HomeState extends State<Home> {
       admin = false;
     }
     return Scaffold(
-      drawer: Menue(),
+      drawer: Menu(logged: logged),
       floatingActionButton: isLoading || types.isEmpty
           ? null
           : Builder(
@@ -113,16 +122,12 @@ class _HomeState extends State<Home> {
                           barrierDismissible: false,
                           context: context,
                           builder: (BuildContext context) {
-                            return Stack(
-                              children: [
-                                // show add form with key and current type page
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 30, vertical: 10),
-                                  child: OperatioForm(
-                                      typeOperation: types[_currentPage]),
-                                ),
-                              ],
+                            return Dialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(32.0))),
+                              child: OperatioForm(
+                                  typeOperation: types[_currentPage]),
                             );
                           },
                         )
@@ -145,43 +150,44 @@ class _HomeState extends State<Home> {
             ),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
-        actions: <Widget>[
-          Builder(
-            builder: (BuildContext context) => PopupMenuButton<String>(
-              onSelected: (value) => handleClick(value, context),
-              itemBuilder: (BuildContext context) {
-                return [
-                  PopupMenuItem<String>(
-                    value: logged ? 'Logout' : 'Login',
-                    child: logged
-                        ? Text(AppLocalizations.of(context)
-                            .translate('home_Logout'))
-                        : Text(AppLocalizations.of(context)
-                            .translate('home_Login')),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'Settings',
-                    child: Text(AppLocalizations.of(context)
-                        .translate('home_Settings')),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'feedback',
-                    child: Text(AppLocalizations.of(context)
-                        .translate('home_FeedBack')),
-                  ),
-                  !admin
-                      ? null
-                      : PopupMenuItem<String>(
-                          value: 'admin',
-                          child: Text(AppLocalizations.of(context)
-                              .translate('home_AdminPanel')),
-                        ),
-                ];
-              },
-            ),
-          ),
-        ],
-        title: Text(AppLocalizations.of(context).translate('home_Home')),
+        // actions: <Widget>[
+        //   Builder(
+        //     builder: (BuildContext context) => PopupMenuButton<String>(
+        //       onSelected: (value) => handleClick(value, context),
+        //       itemBuilder: (BuildContext context) {
+        //         return [
+        //           PopupMenuItem<String>(
+        //             value: logged ? 'Logout' : 'Login',
+        //             child: logged
+        //                 ? Text(AppLocalizations.of(context)
+        //                     .translate('home_Logout'))
+        //                 : Text(AppLocalizations.of(context)
+        //                     .translate('home_Login')),
+        //           ),
+        //           PopupMenuItem<String>(
+        //             value: 'Settings',
+        //             child: Text(AppLocalizations.of(context)
+        //                 .translate('home_Settings')),
+        //           ),
+        //           PopupMenuItem<String>(
+        //             value: 'feedback',
+        //             child: Text(AppLocalizations.of(context)
+        //                 .translate('home_FeedBack')),
+        //           ),
+        //           !admin
+        //               ? null
+        //               : PopupMenuItem<String>(
+        //                   value: 'admin',
+        //                   child: Text(AppLocalizations.of(context)
+        //                       .translate('home_AdminPanel')),
+        //                 ),
+        //         ];
+        //       },
+        //     ),
+        //   ),
+        // ],
+        title: Text(AppLocalizations.of(context).translate(selectedObject)),
+
         centerTitle: true,
         bottom: PreferredSize(
           preferredSize: Size(double.infinity, 10),
@@ -300,4 +306,24 @@ void afterLogin(returnedValue, BuildContext context) {
   if (returnedValue['register'] != null) {
     Scaffold.of(context).showSnackBar(successRegisterSnackBar(context));
   }
+}
+
+showSnake(BuildContext context, String choice) {
+  print('this happend');
+  print('massege: $choice');
+  Builder(builder: (context) {
+    () {
+      if (choice == null) {
+        return;
+      } else if (choice == 'addFeddBack') {
+        // success add feddback
+        Scaffold.of(context).showSnackBar(customSuccessSnackBar(context,
+            AppLocalizations.of(context).translate('SnackBar_sendFeddBack')));
+      } else if (choice == 'logout') {
+        // logout successfully
+        Scaffold.of(context).showSnackBar(successLogoutSnackBar(context));
+      } else if (choice == 'logout') {}
+    }();
+    return;
+  });
 }

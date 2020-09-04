@@ -40,7 +40,12 @@ class _HomeDataState extends State<HomeData> {
   Widget build(BuildContext context) {
     operations = Provider.of<OperationData>(context, listen: true).operations;
 
+    // this for 'Person' object
     ages = Provider.of<AgeData>(context, listen: true).ages;
+
+    // selected object now
+    String selectedObject =
+        Provider.of<AppSettings>(context, listen: true).selectedObject;
 
     return FutureBuilder(builder: (context, snapshot) {
       return operations == null
@@ -56,8 +61,10 @@ class _HomeDataState extends State<HomeData> {
                       onTap: () {
                         Navigator.pushNamed(context, '/details', arguments: {
                           'operation': operations[index],
-                          'age': ages.firstWhere((element) =>
-                              element.id == operations[index].object.ageId)
+                          'age': selectedObject != 'Person'
+                              ? null
+                              : ages.firstWhere((element) =>
+                                  element.id == operations[index].object.ageId)
                         });
                       },
                       child: Container(
@@ -69,11 +76,16 @@ class _HomeDataState extends State<HomeData> {
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: DataCard(
-                          operation: operations[index],
-                          age: ages.firstWhere((element) =>
-                              element.id == operations[index].object.ageId),
-                        ),
+                        child: operations[index].objectType == 'Person'
+                            ? DataCardPerson(
+                                operation: operations[index],
+                                age: ages.firstWhere((element) =>
+                                    element.id ==
+                                    operations[index].object.ageId),
+                              )
+                            : DataCardCar(
+                                operation: operations[index],
+                              ),
                       ),
                     );
                   },
@@ -82,16 +94,16 @@ class _HomeDataState extends State<HomeData> {
   }
 }
 
-class DataCard extends StatelessWidget {
+class DataCardPerson extends StatelessWidget {
   final Operations operation;
   final Age age;
 
-  DataCard({this.operation, this.age});
+  DataCardPerson({this.operation, this.age});
 
   @override
   Widget build(BuildContext context) {
     // photos
-    List photos = operation.object.photos;
+    List photos = operation.photos;
 
     return ListTile(
       leading: Hero(
@@ -111,6 +123,37 @@ class DataCard extends StatelessWidget {
           '${operation.object.name}'),
       subtitle: Text(AppLocalizations.of(context).translate('homeData_Age') +
           '${age.minAge} - ${age.maxAge}'),
+      isThreeLine: true,
+    );
+  }
+}
+
+class DataCardCar extends StatelessWidget {
+  final Operations operation;
+
+  DataCardCar({this.operation});
+
+  @override
+  Widget build(BuildContext context) {
+    // photos
+    List photos = operation.photos;
+
+    return ListTile(
+      leading: Hero(
+        tag: operation.id.toString(),
+        child: CircleAvatar(
+          radius: 30,
+          backgroundImage: photos == null || photos.isEmpty
+              ? AssetImage(
+                  'imeges/car.png',
+                )
+              : NetworkImage(
+                  photos[0],
+                ),
+        ),
+      ),
+      title: Text('model:' + '${operation.object.model}'),
+      subtitle: Text('brand' + '${operation.object.brand}'),
       isThreeLine: true,
     );
   }

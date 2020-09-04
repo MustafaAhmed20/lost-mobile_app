@@ -104,18 +104,25 @@ class _ChooseMapState extends State<ChooseMap> {
                 ),
                 color: Theme.of(context).primaryColor,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      AppLocalizations.of(context).translate('map_location'),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
+                    Expanded(
+                      flex: 7,
+                      child: Text(
+                        AppLocalizations.of(context).translate('map_location'),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
-                    Icon(
-                      Icons.check_circle,
-                      color: Colors.white,
+                    Expanded(
+                      flex: 1,
+                      child: Icon(
+                        Icons.check_circle,
+                        color: Colors.white,
+                        size: 25,
+                      ),
                     )
                   ],
                 ),
