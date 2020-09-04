@@ -20,6 +20,10 @@ import 'package:path/path.dart';
 // storage user preferences
 import 'package:shared_preferences/shared_preferences.dart';
 
+// emojis
+import 'package:emojis/emojis.dart';
+import 'package:emojis/emoji.dart';
+
 String address = AppData().serverAddress;
 
 class CountryData extends ChangeNotifier {
@@ -249,10 +253,10 @@ class OperationData extends ChangeNotifier {
 
             // updata the photos with server address
             for (int i = 0; i < this.operations.length; i++) {
-              List photos = this.operations[i].object.photos;
+              List photos = this.operations[i].photos;
               for (int j = 0; j < photos.length; j++) {
-                var current = this.operations[i].object.photos[j];
-                this.operations[i].object.photos[j] =
+                var current = this.operations[i].photos[j];
+                this.operations[i].photos[j] =
                     AppData().serverAddressImeges + current;
               }
             }
@@ -699,6 +703,15 @@ class AppSettings extends ChangeNotifier {
   // main screen(Home) snkebar - if have value then the home page will show snakbar
   String homeSnakeBar;
 
+  // person available skin colors (Emoji - name)
+  // the emoji used
+  Emoji boy = Emoji.byChar(Emojis.boy);
+  List skins;
+
+  // car available types (Emoji - name)
+  // the emoji used
+  List cars;
+
   AppSettings() {
     this.selectedObjectString = availableObjects[this.selectedObject];
 
@@ -714,6 +727,23 @@ class AppSettings extends ChangeNotifier {
     }
 
     load();
+
+    // skins
+    skins = [
+      [boy.newSkin(fitzpatrick.light), 'light'],
+      [boy.newSkin(fitzpatrick.mediumLight), 'mediumLight'],
+      [boy.newSkin(fitzpatrick.medium), 'medium'],
+      [boy.newSkin(fitzpatrick.mediumDark), 'mediumDark'],
+      [boy.newSkin(fitzpatrick.dark), 'dark']
+    ];
+
+    cars = [
+      [Emoji.byChar(Emojis.automobile), 'light'],
+      [Emoji.byChar(Emojis.tramCar), 'mediumLight'],
+      [Emoji.byChar(Emojis.minibus), 'medium'],
+      //[Emoji.byChar(Emojis.pickup), 'mediumDark'],
+      //[Emoji.byChar(Emojis.automobile), 'dark']
+    ];
   }
 
   Future<void> changeLanguage(String language) async {
