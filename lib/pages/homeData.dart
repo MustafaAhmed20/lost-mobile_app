@@ -49,7 +49,7 @@ class _HomeDataState extends State<HomeData> {
 
     return FutureBuilder(builder: (context, snapshot) {
       return operations == null
-          ? wait()
+          ? wait(context)
           : operations.isEmpty
               ? noData(context)
               : ListView.builder(
@@ -68,13 +68,18 @@ class _HomeDataState extends State<HomeData> {
                         });
                       },
                       child: Container(
-                        margin: EdgeInsets.all(2.0),
+                        //margin: EdgeInsets.all(2.0),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.purple[800],
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
+                          // border: Border.all(
+                          //   color: Colors.purple[800],
+                          //   width: 1,
+                          // ),
+                          border: Border.symmetric(
+                              vertical: BorderSide(
+                            color: Colors.grey,
+                            width: 0.2,
+                          )),
+                          //borderRadius: BorderRadius.circular(12),
                         ),
                         child: operations[index].objectType == 'Person'
                             ? DataCardPerson(
@@ -152,8 +157,14 @@ class DataCardCar extends StatelessWidget {
                 ),
         ),
       ),
-      title: Text('model:' + '${operation.object.model}'),
-      subtitle: Text('brand' + '${operation.object.brand}'),
+      title: Text(AppLocalizations.of(context).translate('carForm_model') +
+          (operation.object.model != null
+              ? ': ${operation.object.model}'
+              : ": ")),
+      subtitle: Text(AppLocalizations.of(context).translate('carForm_brand') +
+          (operation.object.brand != null
+              ? ': ${operation.object.brand}'
+              : ": ")),
       isThreeLine: true,
     );
   }

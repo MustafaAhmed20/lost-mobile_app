@@ -50,7 +50,7 @@ class _ChooseCountryState extends State<ChooseCountry> {
         ),
       ),
       body: countries == null
-          ? wait()
+          ? wait(context)
           : Center(
               child: Container(
                 decoration: BoxDecoration(

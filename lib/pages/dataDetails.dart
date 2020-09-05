@@ -115,8 +115,10 @@ class _DataDetailsState extends State<DataDetails> {
                       // object Title
                       Text(
                         selectedObject == 'Person'
-                            ? 'Person details'
-                            : 'Car details',
+                            ? AppLocalizations.of(context)
+                                .translate('personForm_operatioDetails')
+                            : AppLocalizations.of(context)
+                                .translate('carForm_operatioDetails'),
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -135,7 +137,8 @@ class _DataDetailsState extends State<DataDetails> {
                       Padding(
                         padding: const EdgeInsets.only(top: 15),
                         child: Text(
-                          'ad details',
+                          AppLocalizations.of(context)
+                              .translate('operatioForm_operatioDetails'),
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
@@ -269,7 +272,6 @@ Widget operationTable(BuildContext context, country, operation) {
       border: TableBorder.symmetric(inside: BorderSide(width: 0.08)),
       children: [
         // date
-
         TableRow(children: [
           Text(
             AppLocalizations.of(context).translate('dataDetails_Date'),
@@ -280,11 +282,10 @@ Widget operationTable(BuildContext context, country, operation) {
             style: TextStyle(fontSize: 18),
           ),
         ]),
-
         // state
         TableRow(children: [
           Text(
-            'state',
+            AppLocalizations.of(context).translate('operatioForm_state'),
             style: TextStyle(fontSize: 20),
           ),
           Text(
@@ -295,7 +296,7 @@ Widget operationTable(BuildContext context, country, operation) {
         // city
         TableRow(children: [
           Text(
-            'city',
+            AppLocalizations.of(context).translate('operatioForm_city'),
             style: TextStyle(fontSize: 20),
           ),
           Text(
@@ -315,11 +316,12 @@ Widget operationTable(BuildContext context, country, operation) {
           ),
         ]),
         // publisher info
+        /*
         TableRow(
             // user info
             children: [
               Text(
-                "publisher",
+                AppLocalizations.of(context).translate('dataDetails_publisher'),
                 style: TextStyle(fontSize: 18),
               ),
               RaisedButton(
@@ -328,8 +330,9 @@ Widget operationTable(BuildContext context, country, operation) {
                 ),
                 color: Theme.of(context).primaryColor,
                 child: Text(
-                  'Show publisher info',
-                  style: TextStyle(color: Colors.white),
+                  AppLocalizations.of(context)
+                      .translate('dataDetails_showPublisher'),
+                  style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
                 onPressed: () {
                   showDialog(
@@ -386,6 +389,7 @@ Widget operationTable(BuildContext context, country, operation) {
                 },
               ),
             ]),
+      */
       ]);
 }
 
@@ -393,6 +397,8 @@ Widget personTable(BuildContext context, operation) {
   List ages = Provider.of<AgeData>(context, listen: true).ages;
   Age age = ages.firstWhere((element) => element.id == operation.object.ageId);
   List skins = Provider.of<AppSettings>(context, listen: true).skins;
+  Map genders =
+      Provider.of<AppSettings>(context, listen: true).availableGenders;
   return Table(
     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
     border: TableBorder.symmetric(inside: BorderSide(width: 0.08)),
@@ -411,11 +417,12 @@ Widget personTable(BuildContext context, operation) {
       // gender
       TableRow(children: [
         Text(
-          'Gender',
+          AppLocalizations.of(context).translate('personForm_gender'),
           style: TextStyle(fontSize: 20),
         ),
         Text(
-          '${operation.object.gender}',
+          AppLocalizations.of(context)
+              .translate(genders[operation.object.gender]),
           style: TextStyle(fontSize: 18),
         ),
       ]),
@@ -433,7 +440,7 @@ Widget personTable(BuildContext context, operation) {
       // skin
       TableRow(children: [
         Text(
-          'skin',
+          AppLocalizations.of(context).translate('personForm_skinApprox'),
           style: TextStyle(fontSize: 20),
         ),
         RichText(
@@ -461,29 +468,29 @@ Widget carTable(BuildContext context, operation) {
       // brand
       TableRow(children: [
         Text(
-          'Brand',
+          AppLocalizations.of(context).translate('carForm_brand'),
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         Text(
-          '${operation.object.brand}',
+          operation.object.brand != null ? '${operation.object.brand}' : '',
           style: TextStyle(fontSize: 20),
         ),
       ]),
       // model
       TableRow(children: [
         Text(
-          'Model',
+          AppLocalizations.of(context).translate('carForm_model'),
           style: TextStyle(fontSize: 20),
         ),
         Text(
-          '${operation.object.model}',
+          operation.object.model != null ? '${operation.object.model}' : "",
           style: TextStyle(fontSize: 18),
         ),
       ]),
       // car type
       TableRow(children: [
         Text(
-          'car type',
+          AppLocalizations.of(context).translate('carForm_type'),
           style: TextStyle(fontSize: 20),
         ),
         RichText(
@@ -501,11 +508,11 @@ Widget carTable(BuildContext context, operation) {
       // plate number
       TableRow(children: [
         Text(
-          'plate number',
+          AppLocalizations.of(context).translate('carForm_plate'),
           style: TextStyle(fontSize: 20),
         ),
         Text(
-          '${operation.object.plateNumberLettrs} - ${operation.object.plateNumberNumbers}',
+          '${operation.object.plateNumberLettrs.toUpperCase()} - ${operation.object.plateNumberNumbers}',
           style: TextStyle(fontSize: 18, letterSpacing: 2),
         ),
       ]),

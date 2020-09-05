@@ -22,6 +22,8 @@
     "dataDetails_age" : "age:",
     "dataDetails_Date" : "Date:",
     "dataDetails_details_filed" : "details:",
+    "dataDetails_publisher" : "Publisher",
+    "dataDetails_showPublisher" : "Show publisher info",
 
     "map_location": "choose this location",
 
@@ -60,6 +62,8 @@
     "login_RecoverSorry": "sorry this option not available now",
 
     "operatioForm_date" : "Date",
+    "operatioForm_state" : "State",
+    "operatioForm_city" : "City",
     "operatioForm_name" : "name",
     "operatioForm_age" : "Age",
     "operatioForm_details" : "details",
@@ -71,10 +75,28 @@
     "operatioForm_Submit" : "Submit",
     "operatioForm_Cancel" : "Cancel",
     "operatioForm_requiredError" : "This field cannot be empty.",
+    "operatioForm_operatioDetails" : "operation details",
+    
+    "personForm_operatioDetails" : "Person Details",
+    "personForm_gender" : "Gender",
+    "personForm_skin" : "Skin color ",
+    "personForm_skinApprox" : "Skin color (approx)",
+
+    "carForm_operatioDetails" : "Car Details",
+    "carForm_brand" : "Brand",
+    "carForm_model" : "Model",
+    "carForm_type" : "car type",
+    "carForm_plate" : "Plate Number",
+    "carForm_plateNumbers" : "Numbers",
+    "carForm_plateLetters" : "Letters",
 
    "validation_mustDigits" : "The password must include digits.",
    "validation_mustEnglish" : "The password must include English characters.",
    "validation_notValidPhone" : "This not valid phone-number for this country.",
+   
+   "validation_onlyNumbers" : "only numbers",
+   "validation_noMoreThan4" : " no more than 4",
+   "validation_onlyLetters" : "only letters",
 
    "wait_noData": "No Data Found!",
 
@@ -82,5 +104,14 @@
    "feedback_errorEmpty": "feedback can't be empty",
 
    "menu_people" : "People",
-   "menu_cars" : "Cars"
+   "menu_cars" : "Cars",
+
+   "typeOperation_lost": "lost",
+   "typeOperation_found": "found",
+
+   "typeOperation": "ad type",
+   "typeObject": "object type",
+
+   "gender_male": "male",
+   "gender_female": "female"
 }

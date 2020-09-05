@@ -51,8 +51,8 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         // This is the theme of your application.
 
-        primaryColor: Colors.purple[800],
-        //primaryColor: Colors.orange[700],
+        //primaryColor: Colors.purple[800],
+        primaryColor: Colors.orange[800],
 
         //accentColor: Colors.purpleAccent[300],
         accentColor: Colors.white,
@@ -60,7 +60,8 @@ class _MyAppState extends State<MyApp> {
         //backgroundColor: Colors.purple[100],
 
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.deepPurple[800],
+          //backgroundColor: Colors.deepPurple[800],
+          backgroundColor: Colors.orange[800],
           foregroundColor: Colors.white,
         ),
 

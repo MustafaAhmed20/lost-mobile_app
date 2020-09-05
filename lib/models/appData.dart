@@ -100,6 +100,9 @@ class TypeOperationData extends ChangeNotifier {
 
   List<dynamic> typeOperation;
 
+  // the translate of the type operation
+  Map names = {'found': 'typeOperation_found', 'lost': 'typeOperation_lost'};
+
   void loadData() async {
     Future<void> getData() async {
       try {
@@ -707,6 +710,9 @@ class AppSettings extends ChangeNotifier {
   // the emoji used
   Emoji boy = Emoji.byChar(Emojis.boy);
   List skins;
+
+  // person available genders
+  Map availableGenders = {'male': 'gender_male', "female": "gender_female"};
 
   // car available types (Emoji - name)
   // the emoji used

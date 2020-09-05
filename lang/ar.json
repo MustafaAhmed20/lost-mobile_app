@@ -14,7 +14,7 @@
 
     "homeData_Name": "الاسم: ",
     "homeData_Age": "العمر: ",
-    
+
     "dataDetails_noPhotos" : "لا يوجد صور..!",
     "dataDetails_noLocation" : "لا يوجد موقع..!",
     "dataDetails_details" : "التفاصيل",
@@ -22,6 +22,8 @@
     "dataDetails_age" : "العمر:",
     "dataDetails_Date" : "التاريخ:",
     "dataDetails_details_filed" : "التفاصيل:",
+    "dataDetails_publisher" : "الناشر",
+    "dataDetails_showPublisher" : "عرض بيانات الناشر",
 
     "map_location": "اختيار هذا الموقع",
 
@@ -60,6 +62,8 @@
     "login_RecoverSorry": "عذرا هذه الخاصية غير متوفرة الان",
 
     "operatioForm_date" : "التاريخ",
+    "operatioForm_state" : "الولاية/المحافظة",
+    "operatioForm_city" : "المدينة",
     "operatioForm_name" : "الاسم",
     "operatioForm_age" : "العمر",
     "operatioForm_details" : "التفاصيل",
@@ -71,11 +75,28 @@
     "operatioForm_Submit" : "حفظ",
     "operatioForm_Cancel" : "الغاء",
     "operatioForm_requiredError" : "هذا الحقل لايمكن ان يكون خاليا",
+    "operatioForm_operatioDetails" : "تفاصيل الاعلان",
 
-    
+    "personForm_operatioDetails" : "تفاصيل الشخص",
+    "personForm_gender" : "النوع",
+    "personForm_skin" : "لون البشرة",
+    "personForm_skinApprox" : "لون البشرة (تقريبي)",
+
+    "carForm_operatioDetails" : "تفاصيل السيارة",
+    "carForm_brand" : "الماركة",
+    "carForm_model" : "الموديل",
+    "carForm_type" : "نوع السيارة",
+    "carForm_plate" : "رقم اللوحة",
+    "carForm_plateNumbers" : "الارقام",
+    "carForm_plateLetters" : "الحروف",
+
    "validation_mustDigits" : "الرقم السري يجب ان يحتوي على ارقام.",
    "validation_mustEnglish" : "الرقم السري يجب ان يحتوي على حروف انجليزية.",
    "validation_notValidPhone" : "هذا الرقم غير صالح لهذه الدولة!",
+
+   "validation_onlyNumbers" : "ارقام فقط",
+   "validation_noMoreThan4" : "اكثر عدد 4",
+   "validation_onlyLetters" : "حروف فقط",
 
    "wait_noData": "لا توجد بيانات!",
 
@@ -83,5 +104,15 @@
    "feedback_errorEmpty": "هذا الحقل لا يمكن ان يكون خاليا",
 
    "menu_people" : "الأشخاص",
-   "menu_cars" : "السيارات"
+   "menu_cars" : "السيارات",
+
+   "typeOperation_lost": "مفقود",
+   "typeOperation_found": "عثر عليه",
+
+   "typeOperation": "نوع الاعلان",
+   "typeObject": "نوع البند",
+
+   "gender_male": "ذكر",
+   "gender_female": "انثى"
+
 }

@@ -49,7 +49,7 @@ String validatPlateNumberNumbers(BuildContext context, String value) {
 
   // max length of plate numbers
   if (value.length > 4) {
-    return "numbers can't be more than 4";
+    return AppLocalizations.of(context).translate('validation_noMoreThan4');
   }
 
   //must contain only numbers
@@ -61,7 +61,7 @@ String validatPlateNumberNumbers(BuildContext context, String value) {
 
   if (!exp1.hasMatch(value) && !exp2.hasMatch(value)) {
     // not have digits
-    return 'only numbers';
+    return AppLocalizations.of(context).translate('validation_onlyNumbers');
   }
 
   // success
@@ -73,7 +73,7 @@ String validatPlateNumberLetters(BuildContext context, String value) {
 
   // max length of plate numbers
   if (value.length > 4) {
-    return "letters can't be more than 4";
+    return AppLocalizations.of(context).translate('validation_noMoreThan4');
   }
 
   // must contain only letters (Arabic or English)
@@ -85,7 +85,7 @@ String validatPlateNumberLetters(BuildContext context, String value) {
 
   if (!exp1.hasMatch(value) && !exp2.hasMatch(value)) {
     // not have digits
-    return 'only letters';
+    return AppLocalizations.of(context).translate('validation_onlyLetters');
   }
 
   // success

@@ -108,6 +108,9 @@ class _HomeState extends State<Home> {
     } else {
       admin = false;
     }
+
+    // the operation types names
+    Map names = Provider.of<TypeOperationData>(context, listen: true).names;
     return Scaffold(
       drawer: Menu(logged: logged),
       floatingActionButton: isLoading || types.isEmpty
@@ -150,47 +153,10 @@ class _HomeState extends State<Home> {
             ),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
-        // actions: <Widget>[
-        //   Builder(
-        //     builder: (BuildContext context) => PopupMenuButton<String>(
-        //       onSelected: (value) => handleClick(value, context),
-        //       itemBuilder: (BuildContext context) {
-        //         return [
-        //           PopupMenuItem<String>(
-        //             value: logged ? 'Logout' : 'Login',
-        //             child: logged
-        //                 ? Text(AppLocalizations.of(context)
-        //                     .translate('home_Logout'))
-        //                 : Text(AppLocalizations.of(context)
-        //                     .translate('home_Login')),
-        //           ),
-        //           PopupMenuItem<String>(
-        //             value: 'Settings',
-        //             child: Text(AppLocalizations.of(context)
-        //                 .translate('home_Settings')),
-        //           ),
-        //           PopupMenuItem<String>(
-        //             value: 'feedback',
-        //             child: Text(AppLocalizations.of(context)
-        //                 .translate('home_FeedBack')),
-        //           ),
-        //           !admin
-        //               ? null
-        //               : PopupMenuItem<String>(
-        //                   value: 'admin',
-        //                   child: Text(AppLocalizations.of(context)
-        //                       .translate('home_AdminPanel')),
-        //                 ),
-        //         ];
-        //       },
-        //     ),
-        //   ),
-        // ],
         title: Text(AppLocalizations.of(context).translate(selectedObject)),
-
         centerTitle: true,
         bottom: PreferredSize(
-          preferredSize: Size(double.infinity, 10),
+          preferredSize: Size(double.infinity, 20),
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: types.map((type) {
@@ -207,22 +173,22 @@ class _HomeState extends State<Home> {
                       );
                     },
                     child: Container(
+                      color: index == _currentPage ? Colors.white : null,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                       margin:
                           EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
                       child: Text(
-                        types[index].name,
+                        AppLocalizations.of(context)
+                            .translate(names[types[index].name]),
                         style: TextStyle(
-                          color: Theme.of(context).accentColor,
+                          //color: Theme.of(context).accentColor,
+                          color: index == _currentPage
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context).accentColor,
                           fontWeight: FontWeight.bold,
+                          fontSize: 14,
                           letterSpacing: 1.0,
-
-                          // decoration for selectes tab
-                          decoration: index == _currentPage
-                              ? TextDecoration.underline
-                              : null,
-                          decorationStyle: index == _currentPage
-                              ? TextDecorationStyle.double
-                              : null,
                         ),
                       ),
                     ));
@@ -230,7 +196,7 @@ class _HomeState extends State<Home> {
         ),
       ),
       body: isLoading
-          ? wait()
+          ? wait(context)
           : PageView.builder(
               controller: _pageController,
               onPageChanged: (index) {

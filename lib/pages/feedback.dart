@@ -68,7 +68,7 @@ class _FeedBackState extends State<FeedBack> {
                   height: 30,
                 ),
                 waiting
-                    ? wait()
+                    ? wait(context)
                     : RaisedButton(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),

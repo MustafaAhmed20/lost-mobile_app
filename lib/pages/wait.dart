@@ -5,13 +5,13 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 //language support
 import 'package:lost/app_localizations.dart';
 
-Widget wait() {
+Widget wait(BuildContext context) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
       Center(
         child: SpinKitCircle(
-          color: Colors.purple[800],
+          color: Theme.of(context).primaryColor,
           size: 100.0,
         ),
       ),

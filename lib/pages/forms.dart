@@ -104,7 +104,7 @@ class _OperatioFormState extends State<OperatioForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   // wait
-                  formWait ? wait() : SizedBox.shrink(),
+                  formWait ? wait(context) : SizedBox.shrink(),
                   // Submit
                   Expanded(
                     child: formWait
@@ -219,10 +219,19 @@ Widget formPerson(context, formKey) {
   // the emoji used - get it from provider
   List skins = Provider.of<AppSettings>(context, listen: true).skins;
 
+  // list of genders
+  Map genders =
+      Provider.of<AppSettings>(context, listen: true).availableGenders;
+
   return FormBuilder(
     key: formKey,
     autovalidate: true,
     child: Column(children: [
+      // person Details
+      Text(
+        AppLocalizations.of(context).translate('personForm_operatioDetails'),
+        style: TextStyle(fontSize: 20),
+      ),
       // name
       FormBuilderTextField(
         attribute: "person_name",
@@ -231,20 +240,28 @@ Widget formPerson(context, formKey) {
                 AppLocalizations.of(context).translate('operatioForm_name')),
       ),
       // gender
-      FormBuilderDropdown(
+      FormBuilderRadioGroup(
+        activeColor: Colors.blue,
+        orientation: GroupedRadioOrientation.vertical,
         attribute: "gender",
         decoration: InputDecoration(
-          labelText: 'Gender',
+          labelText:
+              AppLocalizations.of(context).translate('personForm_gender'),
         ),
-        hint: Text('gender'),
+        //hint: Text(AppLocalizations.of(context).translate('personForm_gender')),
         validators: [
-          FormBuilderValidators.required(errorText: 'this field is required'),
+          FormBuilderValidators.required(
+              errorText: AppLocalizations.of(context)
+                  .translate('operatioForm_requiredError')),
         ],
-        items: ['male', 'female']
-            .map((sex) => DropdownMenuItem(value: sex, child: Text("$sex")))
+        options: genders.keys
+            .map((sex) => FormBuilderFieldOption(
+                  value: sex,
+                  child: Text(
+                      AppLocalizations.of(context).translate(genders[sex])),
+                ))
             .toList(),
       ),
-
       // age
       FormBuilderDropdown(
         attribute: "age_id",
@@ -267,9 +284,10 @@ Widget formPerson(context, formKey) {
       FormBuilderDropdown(
         attribute: "skin",
         decoration: InputDecoration(
-          labelText: 'skin color',
+          labelText: AppLocalizations.of(context).translate('personForm_skin'),
         ),
-        hint: Text('Skin color (approx)'),
+        hint: Text(
+            AppLocalizations.of(context).translate('personForm_skinApprox')),
         items: skins
             .map((skin) => DropdownMenuItem(
                 value: skins.indexOf(skin) + 1,
@@ -290,39 +308,48 @@ Widget formCar(context, formKey) {
     key: formKey,
     autovalidate: true,
     child: Column(children: [
+      // car Details
       Text(
-        'Car details',
+        AppLocalizations.of(context).translate('carForm_operatioDetails'),
         style: TextStyle(fontSize: 20),
       ),
       // Brand
       FormBuilderTextField(
         attribute: "brand",
-        decoration: InputDecoration(labelText: 'Brand'),
+        decoration: InputDecoration(
+            labelText: AppLocalizations.of(context).translate('carForm_brand')),
         validators: [
-          FormBuilderValidators.required(errorText: 'this field is required'),
+          FormBuilderValidators.required(
+              errorText: AppLocalizations.of(context)
+                  .translate('operatioForm_requiredError')),
         ],
       ),
       // Modle
       FormBuilderTextField(
         attribute: "model",
-        decoration: InputDecoration(labelText: 'Model'),
+        decoration: InputDecoration(
+            labelText: AppLocalizations.of(context).translate('carForm_model')),
         validators: [
-          FormBuilderValidators.required(errorText: 'this field is required'),
+          FormBuilderValidators.required(
+              errorText: AppLocalizations.of(context)
+                  .translate('operatioForm_requiredError')),
         ],
       ),
       // type
       FormBuilderDropdown(
         attribute: "car_type",
         decoration: InputDecoration(
-          labelText: 'type',
+          labelText: AppLocalizations.of(context).translate('carForm_type'),
         ),
-        hint: Text('type of the car'),
+        hint: Text(AppLocalizations.of(context).translate('carForm_type')),
         validators: [
-          FormBuilderValidators.required(errorText: 'this field is required'),
+          FormBuilderValidators.required(
+              errorText: AppLocalizations.of(context)
+                  .translate('operatioForm_requiredError')),
         ],
         items: cars
             .map((type) => DropdownMenuItem(
-                value: type.indexOf(type) + 1,
+                value: cars.indexOf(type) + 1,
                 child: Text(
                   '${type[0]} ${type[1]}',
                   style: TextStyle(fontSize: 20),
@@ -334,7 +361,7 @@ Widget formCar(context, formKey) {
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
         child: Text(
-          'Plate number',
+          AppLocalizations.of(context).translate('carForm_plate'),
           style: TextStyle(fontSize: 16),
         ),
       ),
@@ -345,7 +372,8 @@ Widget formCar(context, formKey) {
             child: FormBuilderTextField(
               attribute: "plate_number_letters",
               decoration: InputDecoration(
-                labelText: 'Letters',
+                labelText: AppLocalizations.of(context)
+                    .translate('carForm_plateLetters'),
                 labelStyle: TextStyle(
                   letterSpacing: 1.0,
                 ),
@@ -357,7 +385,8 @@ Widget formCar(context, formKey) {
               ),
               validators: [
                 FormBuilderValidators.required(
-                    errorText: 'this field is required'),
+                    errorText: AppLocalizations.of(context)
+                        .translate('operatioForm_requiredError')),
                 // validate the value
                 (val) {
                   return validatPlateNumberLetters(context, val);
@@ -370,7 +399,8 @@ Widget formCar(context, formKey) {
             child: FormBuilderTextField(
               attribute: "plate_number_numbers",
               decoration: InputDecoration(
-                labelText: 'Numbers',
+                labelText: AppLocalizations.of(context)
+                    .translate('carForm_plateNumbers'),
                 labelStyle: TextStyle(
                   letterSpacing: 1.0,
                 ),
@@ -382,7 +412,8 @@ Widget formCar(context, formKey) {
               ),
               validators: [
                 FormBuilderValidators.required(
-                    errorText: 'this field is required'),
+                    errorText: AppLocalizations.of(context)
+                        .translate('operatioForm_requiredError')),
                 // validate the value
                 (val) {
                   return validatPlateNumberNumbers(context, val);
@@ -400,13 +431,15 @@ Widget form0(context, formKey) {
   // the types of operations
   List typeOperation =
       Provider.of<TypeOperationData>(context, listen: true).typeOperation;
+  // opeation type translator
+  Map names = Provider.of<TypeOperationData>(context, listen: true).names;
   return FormBuilder(
     key: formKey,
     autovalidate: true,
     child: Column(
       children: [
         Text(
-          'Type of operation',
+          AppLocalizations.of(context).translate('typeOperation'),
           style: TextStyle(fontSize: 20),
         ),
         // stage 0 - the type of operation
@@ -414,16 +447,21 @@ Widget form0(context, formKey) {
           padding: EdgeInsets.all(8.0),
           child: FormBuilderDropdown(
             attribute: "type_id",
-            decoration: InputDecoration(labelText: 'type of operation'),
-            hint: Text('type of operation'),
+            decoration: InputDecoration(
+                labelText:
+                    AppLocalizations.of(context).translate('typeOperation')),
+            hint: Text(AppLocalizations.of(context).translate('typeOperation')),
             validators: [
               FormBuilderValidators.required(
-                errorText: 'this field is required',
+                errorText: AppLocalizations.of(context)
+                    .translate('operatioForm_requiredError'),
               )
             ],
             items: typeOperation
                 .map((type) => DropdownMenuItem(
-                    value: type.id, child: Text("${type.name}")))
+                    value: type.id,
+                    child: Text(
+                        "${AppLocalizations.of(context).translate(names[type.name])}")))
                 .toList(),
           ),
         ),
@@ -443,7 +481,7 @@ Widget form1(context, formKey) {
     child: Column(
       children: [
         Text(
-          'Type of object',
+          AppLocalizations.of(context).translate('typeObject'),
           style: TextStyle(fontSize: 20),
         ),
         // stage 1 - the object type
@@ -451,16 +489,21 @@ Widget form1(context, formKey) {
           padding: EdgeInsets.all(8.0),
           child: FormBuilderDropdown(
             attribute: "object_type",
-            decoration: InputDecoration(labelText: 'type of object'),
-            hint: Text('type of object'),
+            decoration: InputDecoration(
+                labelText:
+                    AppLocalizations.of(context).translate('typeObject')),
+            hint: Text(AppLocalizations.of(context).translate('typeObject')),
             validators: [
               FormBuilderValidators.required(
-                errorText: 'this field is required',
+                errorText: AppLocalizations.of(context)
+                    .translate('operatioForm_requiredError'),
               )
             ],
             items: objects.keys
-                .map((object) =>
-                    DropdownMenuItem(value: object, child: Text("$object")))
+                .map((object) => DropdownMenuItem(
+                    value: object,
+                    child: Text(AppLocalizations.of(context)
+                        .translate(objects[object]))))
                 .toList(),
           ),
         ),
@@ -481,7 +524,8 @@ Widget form2(context, formKey) {
     child: Column(
       children: [
         Text(
-          'operation details',
+          AppLocalizations.of(context)
+              .translate('operatioForm_operatioDetails'),
           style: TextStyle(fontSize: 20),
         ),
         // date
@@ -508,23 +552,27 @@ Widget form2(context, formKey) {
         FormBuilderTextField(
             attribute: 'state',
             decoration: InputDecoration(
-              labelText: 'stete',
+              labelText:
+                  AppLocalizations.of(context).translate('operatioForm_state'),
               alignLabelWithHint: true,
             ),
             validators: [
               FormBuilderValidators.required(
-                  errorText: 'this field is required'),
+                  errorText: AppLocalizations.of(context)
+                      .translate('operatioForm_requiredError')),
             ]),
         // city
         FormBuilderTextField(
             attribute: 'city',
             decoration: InputDecoration(
-              labelText: 'city',
+              labelText:
+                  AppLocalizations.of(context).translate('operatioForm_city'),
               alignLabelWithHint: true,
             ),
             validators: [
               FormBuilderValidators.required(
-                  errorText: 'this field is required'),
+                  errorText: AppLocalizations.of(context)
+                      .translate('operatioForm_requiredError')),
             ]),
         // details
         FormBuilderTextField(
