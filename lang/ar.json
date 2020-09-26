@@ -11,9 +11,13 @@
     "home_Settings" : "الاعدادات",
     "home_FeedBack" : "ارسال ملاحظات",
     "home_AdminPanel" : "اعدادات المدير",
+    "home_addAccident" : "اضافة حادث",
 
     "homeData_Name": "الاسم: ",
     "homeData_Age": "العمر: ",
+
+    "homeData_cars": "عدد السيارات: ",
+    "homeData_persons": "عدد الاشخاص: ",
 
     "dataDetails_noPhotos" : "لا يوجد صور..!",
     "dataDetails_noLocation" : "لا يوجد موقع..!",
@@ -24,6 +28,9 @@
     "dataDetails_details_filed" : "التفاصيل:",
     "dataDetails_publisher" : "الناشر",
     "dataDetails_showPublisher" : "عرض بيانات الناشر",
+
+    "dataDetails_CarsInvolved" : "السيارات التي في الحادث: ",
+    "dataDetails_PersonsInvolved" : "الاشخاص في الحادث: ",
 
     "map_location": "اختيار هذا الموقع",
 
@@ -90,6 +97,13 @@
     "carForm_plateNumbers" : "الارقام",
     "carForm_plateLetters" : "الحروف",
 
+    "accidentForm_details" : "تفاصيل الحادث",
+    "accidentForm_cars" : "السيارات",
+    "accidentForm_persons" : "الاشخاص",
+    "accidentForm_car" : "السيارة",
+    "accidentForm_person" : "الشخص",
+    "accidentForm_add" : "اضافة",
+
    "validation_mustDigits" : "الرقم السري يجب ان يحتوي على ارقام.",
    "validation_mustEnglish" : "الرقم السري يجب ان يحتوي على حروف انجليزية.",
    "validation_notValidPhone" : "هذا الرقم غير صالح لهذه الدولة!",
@@ -105,6 +119,8 @@
 
    "menu_people" : "الأشخاص",
    "menu_cars" : "السيارات",
+   "menu_accident": "الحوادث",
+
 
    "typeOperation_lost": "مفقود",
    "typeOperation_found": "عثر عليه",
@@ -113,6 +129,11 @@
    "typeObject": "نوع البند",
 
    "gender_male": "ذكر",
-   "gender_female": "انثى"
+   "gender_female": "انثى",
 
+   "skin_light": "فاتح",
+   "skin_mediumLight": "متوسط فاتح",
+   "skin_medium": "متوسط",
+   "skin_mediumDark": "متوسط غامق",
+   "skin_dark": "غامق"
 }

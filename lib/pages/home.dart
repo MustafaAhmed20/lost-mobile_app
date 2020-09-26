@@ -117,98 +117,78 @@ class _HomeState extends State<Home> {
           ? null
           : Builder(
               // user Builder to have new context under Scaffold
-              builder: (BuildContext context) => FloatingActionButton(
-                onPressed: () {
-                  // login if not already logged-in
-                  logged
-                      ? showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Dialog(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(32.0))),
-                              child: OperatioForm(
-                                  typeOperation: types[_currentPage]),
-                            );
-                          },
-                        )
-                      : // loggin page
-
-                      Navigator.pushNamed(context, '/login',
-                          arguments: {'showAlert': true}).then((value) {
-                          // after login func
-                          afterLogin(value, context);
-                        });
-                },
-                child: Text(
-                  '+',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+              builder: (BuildContext context) =>
+                  plusButton(context, selectedObject, logged)),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
         title: Text(AppLocalizations.of(context).translate(selectedObject)),
         centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: Size(double.infinity, 20),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: types.map((type) {
-                int index = types.indexOf(type);
-                return InkWell(
-                    onTap: () {
-                      setState(() {
-                        _currentPage = index;
-                      });
-                      _pageController.animateToPage(
-                        index,
-                        duration: Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    child: Container(
-                      color: index == _currentPage ? Colors.white : null,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                      margin:
-                          EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-                      child: Text(
-                        AppLocalizations.of(context)
-                            .translate(names[types[index].name]),
-                        style: TextStyle(
-                          //color: Theme.of(context).accentColor,
-                          color: index == _currentPage
-                              ? Theme.of(context).primaryColor
-                              : Theme.of(context).accentColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                    ));
-              }).toList()),
-        ),
+        // no tap bar if the objct selected is accident
+        bottom: selectedObject == 'menu_accident'
+            ? null
+            : PreferredSize(
+                preferredSize: Size(double.infinity, 20),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: types.map((type) {
+                      int index = types.indexOf(type);
+                      return InkWell(
+                          onTap: () {
+                            setState(() {
+                              _currentPage = index;
+                            });
+                            _pageController.animateToPage(
+                              index,
+                              duration: Duration(milliseconds: 400),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                          child: Container(
+                            color: index == _currentPage ? Colors.white : null,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 3),
+                            margin: EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 2.0),
+                            child: Text(
+                              AppLocalizations.of(context)
+                                  .translate(names[types[index].name]),
+                              style: TextStyle(
+                                //color: Theme.of(context).accentColor,
+                                color: index == _currentPage
+                                    ? Theme.of(context).primaryColor
+                                    : Theme.of(context).accentColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ));
+                    }).toList()),
+              ),
       ),
       body: isLoading
           ? wait(context)
-          : PageView.builder(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index;
-                });
-              },
-              itemCount: types.length,
-              itemBuilder: (context, index) {
-                return MultiProvider(
-                  providers: [
-                    ChangeNotifierProvider(
+          : // if selected object is accident not use pageView
+          selectedObject == 'menu_accident'
+              ? ChangeNotifierProvider(
+                  create: (context) => OperationData({
+                    'country_id':
+                        Provider.of<CountryData>(context, listen: false)
+                            .selectedCountry
+                            ?.id,
+                  }),
+                  child: HomeData(),
+                )
+              : PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
+                  itemCount: types.length,
+                  itemBuilder: (context, index) {
+                    return ChangeNotifierProvider(
                       create: (context) => OperationData({
                         'country_id':
                             Provider.of<CountryData>(context, listen: false)
@@ -216,14 +196,64 @@ class _HomeState extends State<Home> {
                                 ?.id,
                         'type_id': types[index]?.id,
                       }),
-                    ),
-                  ],
-                  child: HomeData(),
-                );
-              },
-            ),
+                      child: HomeData(),
+                    );
+                  },
+                ),
     );
   }
+}
+
+Widget plusButton(BuildContext context, selectedObject, logged) {
+  return FloatingActionButton.extended(
+    onPressed: () {
+      // login if not already logged-in
+      logged
+          ? showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                  child:
+                      // all object types forms
+                      OperatioForm(
+                    accident: selectedObject == 'menu_accident',
+                  ),
+                );
+              },
+            )
+          : // loggin page
+
+          Navigator.pushNamed(context, '/login', arguments: {'showAlert': true})
+              .then((value) {
+              // after login func
+              afterLogin(value, context);
+            });
+    },
+    label: Text(
+      selectedObject == 'menu_accident'
+          ? AppLocalizations.of(context).translate('home_addAccident')
+          : '+',
+      style: TextStyle(
+        fontSize: 20.0,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    // this only when the selected object is accident
+    icon: selectedObject == 'menu_accident'
+        ? Image.asset(
+            'imeges/accident.png',
+            width: 30,
+          )
+        : null,
+    shape: selectedObject == 'menu_accident'
+        ? RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.0),
+          )
+        : null,
+  );
 }
 
 void handleClick(String value, context) {

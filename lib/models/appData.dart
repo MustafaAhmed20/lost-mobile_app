@@ -14,6 +14,7 @@ import 'operation.dart';
 import 'person.dart';
 import 'user.dart';
 import 'car.dart';
+import 'accident.dart';
 
 import 'package:path/path.dart';
 
@@ -178,11 +179,6 @@ class AppData extends ChangeNotifier {
   final serverName = urls.serverName;
   final apiSec = urls.apiSec;
 
-  // this will contain the available objects that the app can handel . like(person - car - wallet)
-  static final availableObjectsTypes = ['Person'];
-
-  final selectedObject = availableObjectsTypes[0];
-
   Future<bool> checkConnection() async {
     Future<bool> getData() async {
       try {
@@ -230,9 +226,9 @@ class OperationData extends ChangeNotifier {
             AppData().serverName, AppData().apiSec + '/getoperation', temp);
 
         http.Response response = await http.get(uri.toString());
-
         if (response.statusCode != 200) {
           // throw some error
+          this.operations = [];
         }
 
         if (response.statusCode == 200) {
@@ -249,6 +245,8 @@ class OperationData extends ChangeNotifier {
                 operation.object = Person.fromJson(item['object']);
               } else if (object == 'Car') {
                 operation.object = Car.fromJson(item['object']);
+              } else if (object == 'Accident') {
+                operation.object = Accident.fromJson(item['object']);
               }
 
               return operation;
@@ -320,6 +318,24 @@ class UserData extends ChangeNotifier {
 
   dynamic user;
 
+  Future<bool> checkLoginToken(String token) async {
+    // this will check if the token is valid or not
+
+    http.Response response = await http.post(address + '/checklogin',
+        headers: {"Content-Type": "application/json", 'token': token});
+    if (response.statusCode != 200) {
+      // remove the token
+      this.token = null;
+      notifyListeners();
+
+      // remove the token from the Preferences
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', null);
+      return false;
+    }
+    return true;
+  }
+
   Future checkLogin() async {
     // check login if saved
     final prefs = await SharedPreferences.getInstance();
@@ -327,6 +343,9 @@ class UserData extends ChangeNotifier {
     if (token != null) {
       this.token = token;
       notifyListeners();
+
+      // check the token if valid or not - if not valid the token will be deleted
+      checkLoginToken(token);
     }
   }
 
@@ -699,8 +718,12 @@ class AppSettings extends ChangeNotifier {
   Locale selectedLanguage;
 
   // this determine the selected object (like person, cars , etc)
-  Map availableObjects = {'Person': 'menu_people', 'Car': 'menu_cars'};
-  String selectedObject = 'Person';
+  Map availableObjects = {
+    'Accident': 'menu_accident',
+    'Person': 'menu_people',
+    'Car': 'menu_cars'
+  };
+  String selectedObject = 'Accident';
   String selectedObjectString;
 
   // main screen(Home) snkebar - if have value then the home page will show snakbar
@@ -708,7 +731,7 @@ class AppSettings extends ChangeNotifier {
 
   // person available skin colors (Emoji - name)
   // the emoji used
-  Emoji boy = Emoji.byChar(Emojis.boy);
+  //Emoji boy = Emoji.byChar(Emojis.boy);
   List skins;
 
   // person available genders
@@ -734,13 +757,12 @@ class AppSettings extends ChangeNotifier {
 
     load();
 
-    // skins
     skins = [
-      [boy.newSkin(fitzpatrick.light), 'light'],
-      [boy.newSkin(fitzpatrick.mediumLight), 'mediumLight'],
-      [boy.newSkin(fitzpatrick.medium), 'medium'],
-      [boy.newSkin(fitzpatrick.mediumDark), 'mediumDark'],
-      [boy.newSkin(fitzpatrick.dark), 'dark']
+      ['1.png', 'skin_light'],
+      ['2.png', 'skin_mediumLight'],
+      ['3.png', 'skin_medium'],
+      ['4.png', 'skin_mediumDark'],
+      ['5.png', 'skin_dark']
     ];
 
     cars = [

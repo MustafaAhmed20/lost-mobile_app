@@ -36,7 +36,23 @@ class Menu extends StatelessWidget {
             ],
           ),
           ListTile(
-            leading: Icon(Icons.people),
+            leading: Image.asset(
+              'imeges/accident.png',
+              width: 40,
+            ),
+            title:
+                Text(AppLocalizations.of(context).translate('menu_accident')),
+            onTap: () {
+              Navigator.of(context).pop();
+              // change the object selected
+              Provider.of<AppSettings>(context, listen: false)
+                  .changeObject('Accident');
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.people,
+            ),
             title: Text(AppLocalizations.of(context).translate('menu_people')),
             onTap: () {
               Navigator.of(context).pop();

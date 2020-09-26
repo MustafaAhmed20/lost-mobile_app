@@ -14,18 +14,19 @@ import 'package:lost/app_localizations.dart';
 
 import 'wait.dart';
 
-import 'package:lost/models/operation.dart';
-
 // validation
 import 'validators.dart';
 
+// use json
+import 'dart:convert';
+
 class OperatioForm extends StatefulWidget {
-  final TypeOperation typeOperation;
-  OperatioForm({this.typeOperation});
+  // if object selected is accident
+  final bool accident;
+  OperatioForm({this.accident});
 
   @override
-  _OperatioFormState createState() =>
-      _OperatioFormState(typeOperation: typeOperation);
+  _OperatioFormState createState() => _OperatioFormState();
 }
 
 class _OperatioFormState extends State<OperatioForm> {
@@ -41,14 +42,14 @@ class _OperatioFormState extends State<OperatioForm> {
   // stage - this integer will help the form be like stages
   int stage = 0;
 
-  TypeOperation typeOperation;
-  _OperatioFormState({this.typeOperation});
-
   // bool wait for uploading - true mean wait
   bool formWait = false;
 
   //the summation of the forms data
   Map data;
+
+  // data needed to post from provider
+  Map<String, String> envData;
 
   @override
   void initState() {
@@ -62,22 +63,37 @@ class _OperatioFormState extends State<OperatioForm> {
     formsKeys = [_form0, _form1, _form2, _form3];
 
     data = {};
-  }
 
-  @override
-  Widget build(BuildContext context) {
+    // the accident form only use two forms
+    if (widget.accident) {
+      stage = 2;
+    }
+
     // data needed to post from provider
-
-    Map<String, String> envData = {
-      //'type_id': typeOperation.id.toString(),
+    envData = {
       'country_id': Provider.of<CountryData>(context, listen: false)
           .selectedCountry
           .id
           .toString(),
-      //'object_type':
-      //    Provider.of<AppData>(context, listen: false).selectedObject.toString()
     };
 
+    if (widget.accident) {
+      // the default data unique to 'Accident' object
+      envData.addAll({
+        'object_type': Provider.of<AppSettings>(context, listen: false)
+            .selectedObject
+            .toString(),
+        // not important field - just put the first in the list
+        'type_id': Provider.of<TypeOperationData>(context, listen: false)
+            .typeOperation[0]
+            .id
+            .toString(),
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // the current logged in user
     String userToken = Provider.of<UserData>(context, listen: false).token;
 
@@ -96,7 +112,8 @@ class _OperatioFormState extends State<OperatioForm> {
               // the form
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: chooseForm(stage, context, formsKeys, data),
+                child: chooseForm(
+                    stage, context, formsKeys, data, widget.accident),
               ),
 
               // the buttons
@@ -125,7 +142,7 @@ class _OperatioFormState extends State<OperatioForm> {
                               if (formKey.currentState.saveAndValidate()) {
                                 // valid state form
 
-                                // add the data form to the global data var
+                                // add the form data to the global data var
                                 data.addAll(formKey.currentState.value);
 
                                 if (stage < 3) {
@@ -146,20 +163,28 @@ class _OperatioFormState extends State<OperatioForm> {
 
                                 // add the env data
                                 data.addAll(envData);
-
-                                Provider.of<PostData>(context, listen: false)
-                                    .addOperation(data, userToken)
-                                    .then((value) {
+                                print(data);
+                                try {
+                                  Provider.of<PostData>(context, listen: false)
+                                      .addOperation(data, userToken)
+                                      .then((value) {
+                                    // stop waiting
+                                    setState(() {
+                                      formWait = false;
+                                    });
+                                    if (value != null) {
+                                      print(value);
+                                    } else {
+                                      Navigator.of(context).pop();
+                                    }
+                                  });
+                                } catch (e) {
                                   // stop waiting
                                   setState(() {
                                     formWait = false;
                                   });
-                                  if (value != null) {
-                                    print(value);
-                                  } else {
-                                    Navigator.of(context).pop();
-                                  }
-                                });
+                                  throw e;
+                                }
                               }
                             },
                           ),
@@ -194,7 +219,7 @@ class _OperatioFormState extends State<OperatioForm> {
   }
 }
 
-Widget chooseForm(int stage, context, formsList, data) {
+Widget chooseForm(int stage, context, formsList, data, accident) {
   if (stage == 0) {
     return form0(context, formsList[stage]);
   } else if (stage == 1) {
@@ -202,28 +227,32 @@ Widget chooseForm(int stage, context, formsList, data) {
   } else if (stage == 2) {
     return form2(context, formsList[stage]);
   } else if (stage == 3) {
-    if (data['object_type'] == 'Person') {
+    if (accident) {
+      // accident form
+      return FormAccident(formKey: formsList[stage]);
+    } else if (data['object_type'] == 'Person') {
       return formPerson(context, formsList[stage]);
     } else if (data['object_type'] == 'Car') {
       return formCar(context, formsList[stage]);
     }
-  } else {
-    return SizedBox.shrink();
   }
+
+  return SizedBox.shrink();
 }
 
-Widget formPerson(context, formKey) {
+Widget formPerson(context, formKey, {Function onChange}) {
   // the ages ranges - for 'person' object
-  List ages = Provider.of<AgeData>(context, listen: true).ages;
+  List ages = Provider.of<AgeData>(context, listen: false).ages;
 
   // the emoji used - get it from provider
-  List skins = Provider.of<AppSettings>(context, listen: true).skins;
+  List skins = Provider.of<AppSettings>(context, listen: false).skins;
 
   // list of genders
   Map genders =
-      Provider.of<AppSettings>(context, listen: true).availableGenders;
+      Provider.of<AppSettings>(context, listen: false).availableGenders;
 
   return FormBuilder(
+    onChanged: (val) => onChange(),
     key: formKey,
     autovalidate: true,
     child: Column(children: [
@@ -248,7 +277,6 @@ Widget formPerson(context, formKey) {
           labelText:
               AppLocalizations.of(context).translate('personForm_gender'),
         ),
-        //hint: Text(AppLocalizations.of(context).translate('personForm_gender')),
         validators: [
           FormBuilderValidators.required(
               errorText: AppLocalizations.of(context)
@@ -291,9 +319,17 @@ Widget formPerson(context, formKey) {
         items: skins
             .map((skin) => DropdownMenuItem(
                 value: skins.indexOf(skin) + 1,
-                child: Text(
-                  '${skin[0]} ${skin[1]}',
-                  style: TextStyle(fontSize: 20),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'imeges/person/${skin[0]}',
+                      width: 50,
+                    ),
+                    Text(
+                      AppLocalizations.of(context).translate(skin[1]),
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ],
                 )))
             .toList(),
       ),
@@ -301,10 +337,11 @@ Widget formPerson(context, formKey) {
   );
 }
 
-Widget formCar(context, formKey) {
+Widget formCar(context, formKey, {Function onChange}) {
   // the emoji used - get it from provider
-  List cars = Provider.of<AppSettings>(context, listen: true).cars;
+  List cars = Provider.of<AppSettings>(context, listen: false).cars;
   return FormBuilder(
+    onChanged: (val) => onChange(),
     key: formKey,
     autovalidate: true,
     child: Column(children: [
@@ -335,26 +372,31 @@ Widget formCar(context, formKey) {
                   .translate('operatioForm_requiredError')),
         ],
       ),
-      // type
-      FormBuilderDropdown(
-        attribute: "car_type",
-        decoration: InputDecoration(
-          labelText: AppLocalizations.of(context).translate('carForm_type'),
-        ),
-        hint: Text(AppLocalizations.of(context).translate('carForm_type')),
-        validators: [
-          FormBuilderValidators.required(
-              errorText: AppLocalizations.of(context)
-                  .translate('operatioForm_requiredError')),
-        ],
-        items: cars
-            .map((type) => DropdownMenuItem(
-                value: cars.indexOf(type) + 1,
-                child: Text(
-                  '${type[0]} ${type[1]}',
-                  style: TextStyle(fontSize: 20),
-                )))
-            .toList(),
+      // type - this field not used now
+      Offstage(
+        offstage: true,
+        child: FormBuilderDropdown(
+            attribute: "car_type",
+            initialValue: 1,
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context).translate('carForm_type'),
+            ),
+            hint: Text(AppLocalizations.of(context).translate('carForm_type')),
+            validators: [
+              FormBuilderValidators.required(
+                  errorText: AppLocalizations.of(context)
+                      .translate('operatioForm_requiredError')),
+            ],
+            items: []
+            //cars
+            //     .map((type) => DropdownMenuItem(
+            //         value: cars.indexOf(type) + 1,
+            //         child: Text(
+            //           '${type[0]} ${type[1]}',
+            //           style: TextStyle(fontSize: 20),
+            //         )))
+            //     .toList(),
+            ),
       ),
 
       // plate number
@@ -390,7 +432,7 @@ Widget formCar(context, formKey) {
                 // validate the value
                 (val) {
                   return validatPlateNumberLetters(context, val);
-                }
+                },
               ],
             ),
           ),
@@ -417,7 +459,7 @@ Widget formCar(context, formKey) {
                 // validate the value
                 (val) {
                   return validatPlateNumberNumbers(context, val);
-                }
+                },
               ],
             ),
           )
@@ -430,9 +472,9 @@ Widget formCar(context, formKey) {
 Widget form0(context, formKey) {
   // the types of operations
   List typeOperation =
-      Provider.of<TypeOperationData>(context, listen: true).typeOperation;
+      Provider.of<TypeOperationData>(context, listen: false).typeOperation;
   // opeation type translator
-  Map names = Provider.of<TypeOperationData>(context, listen: true).names;
+  Map names = Provider.of<TypeOperationData>(context, listen: false).names;
   return FormBuilder(
     key: formKey,
     autovalidate: true,
@@ -473,7 +515,9 @@ Widget form0(context, formKey) {
 Widget form1(context, formKey) {
   // the list of available objects
   Map objects =
-      Provider.of<AppSettings>(context, listen: true).availableObjects;
+      Provider.of<AppSettings>(context, listen: false).availableObjects;
+  // remove 'Accident object'
+  objects.remove('Accident');
 
   return FormBuilder(
     key: formKey,
@@ -485,27 +529,23 @@ Widget form1(context, formKey) {
           style: TextStyle(fontSize: 20),
         ),
         // stage 1 - the object type
-        Padding(
-          padding: EdgeInsets.all(8.0),
-          child: FormBuilderDropdown(
-            attribute: "object_type",
-            decoration: InputDecoration(
-                labelText:
-                    AppLocalizations.of(context).translate('typeObject')),
-            hint: Text(AppLocalizations.of(context).translate('typeObject')),
-            validators: [
-              FormBuilderValidators.required(
-                errorText: AppLocalizations.of(context)
-                    .translate('operatioForm_requiredError'),
-              )
-            ],
-            items: objects.keys
-                .map((object) => DropdownMenuItem(
-                    value: object,
-                    child: Text(AppLocalizations.of(context)
-                        .translate(objects[object]))))
-                .toList(),
-          ),
+        FormBuilderChoiceChip(
+          attribute: "object_type",
+          direction: Axis.vertical,
+          validators: [
+            FormBuilderValidators.required(
+              errorText: AppLocalizations.of(context)
+                  .translate('operatioForm_requiredError'),
+            )
+          ],
+          options: objects.keys
+              .map((object) => FormBuilderFieldOption(
+                  value: object,
+                  child: Text(
+                    AppLocalizations.of(context).translate(objects[object]),
+                    style: TextStyle(fontSize: 18),
+                  )))
+              .toList(),
         ),
       ],
     ),
@@ -668,4 +708,234 @@ Widget form2(context, formKey) {
       ],
     ),
   );
+}
+
+class FormAccident extends StatefulWidget {
+  final GlobalKey<FormBuilderState> formKey;
+
+  FormAccident({this.formKey});
+
+  @override
+  _FormAccidentState createState() => _FormAccidentState();
+}
+
+class _FormAccidentState extends State<FormAccident> {
+  List<Widget> cars = [];
+  List<GlobalKey<FormBuilderState>> carsFormsKeys = [];
+
+  List<Widget> persons = [];
+  List<GlobalKey<FormBuilderState>> personsFormsKeys = [];
+
+  void collectData() {
+    // collect the data from the forms and put it in the main form as json
+
+    // delete the main form data
+    widget.formKey.currentState.fields['cars'].currentState.reset();
+    widget.formKey.currentState.fields['persons'].currentState.reset();
+
+    if (carsFormsKeys.isEmpty && personsFormsKeys.isEmpty) {
+      // no cars and no persons added
+      return;
+    }
+
+    for (int i = 0, l = carsFormsKeys.length; i < l; i++) {
+      // check if the forms is ready for submit
+      if (!carsFormsKeys[i].currentState.saveAndValidate()) {
+        return;
+      }
+    }
+
+    // the persons forms
+    for (int i = 0, l = personsFormsKeys.length; i < l; i++) {
+      // check if the forms is ready for submit
+      if (!personsFormsKeys[i].currentState.saveAndValidate()) {
+        return;
+      }
+    }
+
+    // collect the data and convarte it to json and save it to the main form
+    //
+    // cars
+    List<Map> carsData = [];
+    for (int i = 0, l = carsFormsKeys.length; i < l; i++) {
+      Map value = carsFormsKeys[i].currentState.value;
+      carsData.add(value);
+    }
+    // persons
+    List<Map> personsData = [];
+    for (int i = 0, l = personsFormsKeys.length; i < l; i++) {
+      Map value = personsFormsKeys[i].currentState.value;
+      personsData.add(value);
+    }
+
+    // save it as json
+
+    widget.formKey.currentState.fields['cars'].currentState
+        .setValue(jsonEncode(carsData));
+    widget.formKey.currentState.fields['persons'].currentState
+        .setValue(jsonEncode(personsData));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+            // not visble form with the main form key
+            // this will control the submit to the main form
+            Offstage(
+              offstage: true,
+              child: FormBuilder(
+                key: widget.formKey,
+                child: Column(
+                  children: [
+                    FormBuilderTextField(
+                      attribute: 'cars',
+                      validators: [
+                        (val) {
+                          if (val == null || val == '') {
+                            // the other field must not be null
+                            var other = widget.formKey.currentState
+                                .fields['persons'].currentState.value;
+                            if (other == null || other == '') {
+                              return 'error';
+                            }
+                          }
+
+                          return null;
+                        }
+                      ],
+                    ),
+                    FormBuilderTextField(
+                      attribute: 'persons',
+                      validators: [
+                        (val) {
+                          if (val == null || val == '') {
+                            // the other field must not be null
+                            var other = widget.formKey.currentState
+                                .fields['cars'].currentState.value;
+                            if (other == null || other == '') {
+                              return 'error';
+                            }
+                          }
+
+                          return null;
+                        }
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // title
+            Text(
+              AppLocalizations.of(context).translate('accidentForm_details'),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            // cars title
+            Text(
+              AppLocalizations.of(context).translate('accidentForm_cars'),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+          ] +
+          cars.map((e) {
+            int index = cars.indexOf(e);
+            return ExpansionTile(
+              maintainState: true,
+              initiallyExpanded: true,
+              title: Text(
+                  AppLocalizations.of(context).translate('accidentForm_car') +
+                      ' ${index + 1}'),
+              trailing: RaisedButton(
+                  shape: CircleBorder(),
+                  color: Colors.red,
+                  child: Icon(Icons.delete, color: Colors.white),
+                  onPressed: () {
+                    setState(() {
+                      carsFormsKeys.removeAt(index);
+                      cars.removeAt(index);
+                    });
+                  }),
+              children: [e],
+            );
+          }).toList() +
+          [
+            SizedBox(
+              height: 15,
+            ),
+            // add car
+            RaisedButton(
+                color: Colors.green,
+                child: Text(
+                    AppLocalizations.of(context).translate('accidentForm_add'),
+                    style: TextStyle(
+                      color: Colors.white,
+                    )),
+                onPressed: () {
+                  setState(() {
+                    GlobalKey<FormBuilderState> key =
+                        GlobalKey<FormBuilderState>();
+                    carsFormsKeys.add(key);
+                    cars.add(formCar(context, key, onChange: collectData));
+                  });
+                }),
+            Divider(),
+            Text(
+              AppLocalizations.of(context).translate('accidentForm_persons'),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+          ] +
+          persons.map((e) {
+            int index = persons.indexOf(e);
+            return ExpansionTile(
+              initiallyExpanded: true,
+              maintainState: true,
+              title: Text(AppLocalizations.of(context)
+                      .translate('accidentForm_person') +
+                  ' ${index + 1}'),
+              trailing: RaisedButton(
+                  shape: CircleBorder(),
+                  color: Colors.red,
+                  child: Icon(Icons.delete, color: Colors.white),
+                  onPressed: () {
+                    setState(() {
+                      personsFormsKeys.removeAt(index);
+                      persons.removeAt(index);
+                    });
+                  }),
+              children: [e],
+            );
+          }).toList() +
+          [
+            SizedBox(
+              height: 15,
+            ),
+            // add persons
+            RaisedButton(
+                color: Colors.green,
+                child: Text(
+                    AppLocalizations.of(context).translate('accidentForm_add'),
+                    style: TextStyle(
+                      color: Colors.white,
+                    )),
+                onPressed: () {
+                  setState(() {
+                    GlobalKey<FormBuilderState> key =
+                        GlobalKey<FormBuilderState>();
+                    personsFormsKeys.add(key);
+                    persons
+                        .add(formPerson(context, key, onChange: collectData));
+                  });
+                }),
+          ],
+    );
+  }
 }

@@ -117,8 +117,11 @@ class _DataDetailsState extends State<DataDetails> {
                         selectedObject == 'Person'
                             ? AppLocalizations.of(context)
                                 .translate('personForm_operatioDetails')
-                            : AppLocalizations.of(context)
-                                .translate('carForm_operatioDetails'),
+                            : selectedObject == 'Car'
+                                ? AppLocalizations.of(context)
+                                    .translate('carForm_operatioDetails')
+                                : AppLocalizations.of(context)
+                                    .translate('accidentForm_details'),
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -130,8 +133,10 @@ class _DataDetailsState extends State<DataDetails> {
 
                       // the object data
                       selectedObject == 'Person'
-                          ? personTable(context, operation)
-                          : carTable(context, operation),
+                          ? personTable(context, operation.object)
+                          : selectedObject == 'Car'
+                              ? carTable(context, operation.object)
+                              : accidentTable(context, operation),
 
                       // operation Title
                       Padding(
@@ -393,9 +398,9 @@ Widget operationTable(BuildContext context, country, operation) {
       ]);
 }
 
-Widget personTable(BuildContext context, operation) {
+Widget personTable(BuildContext context, object) {
   List ages = Provider.of<AgeData>(context, listen: true).ages;
-  Age age = ages.firstWhere((element) => element.id == operation.object.ageId);
+  Age age = ages.firstWhere((element) => element.id == object.ageId);
   List skins = Provider.of<AppSettings>(context, listen: true).skins;
   Map genders =
       Provider.of<AppSettings>(context, listen: true).availableGenders;
@@ -410,7 +415,7 @@ Widget personTable(BuildContext context, operation) {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         Text(
-          '${operation.object.name}',
+          '${object.name}',
           style: TextStyle(fontSize: 20),
         ),
       ]),
@@ -421,8 +426,7 @@ Widget personTable(BuildContext context, operation) {
           style: TextStyle(fontSize: 20),
         ),
         Text(
-          AppLocalizations.of(context)
-              .translate(genders[operation.object.gender]),
+          AppLocalizations.of(context).translate(genders[object.gender]),
           style: TextStyle(fontSize: 18),
         ),
       ]),
@@ -443,23 +447,26 @@ Widget personTable(BuildContext context, operation) {
           AppLocalizations.of(context).translate('personForm_skinApprox'),
           style: TextStyle(fontSize: 20),
         ),
-        RichText(
-          // the emoji
-          text: TextSpan(style: TextStyle(fontSize: 18), children: [
-            TextSpan(
-              text: "${skins[operation.object.skin - 1][0]}",
-            ),
-            TextSpan(
-                text: "(${skins[operation.object.skin - 1][1]})",
-                style: TextStyle(color: Colors.black, fontSize: 13)),
-          ]),
-        ),
+        object.skin != null
+            ? Row(
+                children: [
+                  Image.asset(
+                    "imeges/person/${skins[(object.skin) - 1][0]}",
+                    width: 50,
+                  ),
+                  Text(
+                      AppLocalizations.of(context)
+                          .translate(skins[object.skin - 1][1]),
+                      style: TextStyle(color: Colors.black, fontSize: 13)),
+                ],
+              )
+            : SizedBox.shrink(),
       ]),
     ],
   );
 }
 
-Widget carTable(BuildContext context, operation) {
+Widget carTable(BuildContext context, object) {
   List cars = Provider.of<AppSettings>(context, listen: true).cars;
   return Table(
     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -472,7 +479,7 @@ Widget carTable(BuildContext context, operation) {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         Text(
-          operation.object.brand != null ? '${operation.object.brand}' : '',
+          object.brand != null ? '${object.brand}' : '',
           style: TextStyle(fontSize: 20),
         ),
       ]),
@@ -483,11 +490,13 @@ Widget carTable(BuildContext context, operation) {
           style: TextStyle(fontSize: 20),
         ),
         Text(
-          operation.object.model != null ? '${operation.object.model}' : "",
+          object.model != null ? '${object.model}' : "",
           style: TextStyle(fontSize: 18),
         ),
       ]),
-      // car type
+      // car type - not used now
+
+      /*
       TableRow(children: [
         Text(
           AppLocalizations.of(context).translate('carForm_type'),
@@ -497,14 +506,15 @@ Widget carTable(BuildContext context, operation) {
           // the emoji
           text: TextSpan(style: TextStyle(fontSize: 18), children: [
             TextSpan(
-              text: "${cars[operation.object.type - 1][0]}",
+              text: "${cars[object.type - 1][0]}",
             ),
             TextSpan(
-                text: "(${cars[operation.object.type - 1][1]})",
+                text: "(${cars[object.type - 1][1]})",
                 style: TextStyle(color: Colors.black, fontSize: 13)),
           ]),
         ),
       ]),
+      */
       // plate number
       TableRow(children: [
         Text(
@@ -512,10 +522,54 @@ Widget carTable(BuildContext context, operation) {
           style: TextStyle(fontSize: 20),
         ),
         Text(
-          '${operation.object.plateNumberLettrs.toUpperCase()} - ${operation.object.plateNumberNumbers}',
+          '${object.plateNumberLettrs.toUpperCase()} - ${object.plateNumberNumbers}',
           style: TextStyle(fontSize: 18, letterSpacing: 2),
         ),
       ]),
     ],
+  );
+}
+
+Widget accidentTable(BuildContext context, operation) {
+  List cars = operation.object.cars;
+  List persons = operation.object.persons;
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+          // cars titel
+          cars.length != 0
+              ? Text(
+                  AppLocalizations.of(context)
+                      .translate('dataDetails_CarsInvolved'),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                )
+              : SizedBox.shrink(),
+        ] +
+        cars.map((e) {
+          int index = cars.indexOf(e);
+          return ExpansionTile(
+              title: Text(
+                  AppLocalizations.of(context).translate('accidentForm_car') +
+                      '${index + 1}:'),
+              children: [carTable(context, e)]);
+        }).toList() +
+        [
+          // cars titel
+          persons.length != 0
+              ? Text(
+                  AppLocalizations.of(context)
+                      .translate('dataDetails_PersonsInvolved'),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                )
+              : SizedBox.shrink()
+        ] +
+        persons.map((e) {
+          int index = persons.indexOf(e);
+          return ExpansionTile(
+              title: Text(AppLocalizations.of(context)
+                      .translate('accidentForm_person') +
+                  '${index + 1}:'),
+              children: [personTable(context, e)]);
+        }).toList(),
   );
 }

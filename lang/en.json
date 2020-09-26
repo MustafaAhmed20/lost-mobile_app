@@ -11,9 +11,13 @@
     "home_Settings" : "Settings",
     "home_FeedBack" : "Send FeedBack",
     "home_AdminPanel" : "Admin panel",
+    "home_addAccident" : "add accident",
 
     "homeData_Name": "Name: ",
     "homeData_Age": "Age: ",
+    
+    "homeData_cars": "number of cars: ",
+    "homeData_persons": "number of persons: ",
 
     "dataDetails_noPhotos" : "No photos..!",
     "dataDetails_noLocation" : "No Location..!",
@@ -24,6 +28,11 @@
     "dataDetails_details_filed" : "details:",
     "dataDetails_publisher" : "Publisher",
     "dataDetails_showPublisher" : "Show publisher info",
+    
+    "dataDetails_CarsInvolved" : "Cars involved: ",
+    "dataDetails_PersonsInvolved" : "Persons involved: ",
+    
+    
 
     "map_location": "choose this location",
 
@@ -89,6 +98,13 @@
     "carForm_plate" : "Plate Number",
     "carForm_plateNumbers" : "Numbers",
     "carForm_plateLetters" : "Letters",
+    
+    "accidentForm_details" : "Accident details",
+    "accidentForm_cars" : "cars",
+    "accidentForm_persons" : "persons",
+    "accidentForm_car" : "car",
+    "accidentForm_person" : "person",
+    "accidentForm_add" : "Add",
 
    "validation_mustDigits" : "The password must include digits.",
    "validation_mustEnglish" : "The password must include English characters.",
@@ -105,6 +121,7 @@
 
    "menu_people" : "People",
    "menu_cars" : "Cars",
+   "menu_accident": "Accident",
 
    "typeOperation_lost": "lost",
    "typeOperation_found": "found",
@@ -113,5 +130,11 @@
    "typeObject": "object type",
 
    "gender_male": "male",
-   "gender_female": "female"
+   "gender_female": "female",
+
+   "skin_light": "light",
+   "skin_mediumLight": "medium Light",
+   "skin_medium": "medium",
+   "skin_mediumDark": "medium dark",
+   "skin_dark": "dark"
 }

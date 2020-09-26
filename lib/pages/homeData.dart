@@ -83,14 +83,21 @@ class _HomeDataState extends State<HomeData> {
                         ),
                         child: operations[index].objectType == 'Person'
                             ? DataCardPerson(
+                                // if the object is person
                                 operation: operations[index],
                                 age: ages.firstWhere((element) =>
                                     element.id ==
                                     operations[index].object.ageId),
                               )
-                            : DataCardCar(
-                                operation: operations[index],
-                              ),
+                            : operations[index].objectType == 'Car'
+                                ? DataCardCar(
+                                    // if the object is car
+                                    operation: operations[index],
+                                  )
+                                : DataCardAccident(
+                                    // if the object is accident
+                                    operation: operations[index],
+                                  ),
                       ),
                     );
                   },
@@ -165,6 +172,45 @@ class DataCardCar extends StatelessWidget {
           (operation.object.brand != null
               ? ': ${operation.object.brand}'
               : ": ")),
+      isThreeLine: true,
+    );
+  }
+}
+
+class DataCardAccident extends StatelessWidget {
+  final Operations operation;
+
+  DataCardAccident({this.operation});
+
+  @override
+  Widget build(BuildContext context) {
+    // photos
+    List photos = operation.photos;
+
+    var cars = operation.object.cars;
+
+    var persons = operation.object.persons;
+
+    return ListTile(
+      leading: Hero(
+        tag: operation.id.toString(),
+        child: CircleAvatar(
+          backgroundColor: Colors.white,
+          radius: 30,
+          backgroundImage: photos == null || photos.isEmpty
+              ? AssetImage(
+                  'imeges/accident.png',
+                )
+              : NetworkImage(
+                  photos[0],
+                ),
+        ),
+      ),
+      title: Text(AppLocalizations.of(context).translate('homeData_cars') +
+          '${cars.length}'),
+      subtitle: Text(
+          AppLocalizations.of(context).translate('homeData_persons') +
+              '${persons.length}'),
       isThreeLine: true,
     );
   }
