@@ -82,9 +82,9 @@
     "operatioForm_ActivateGps" : "Activate Gps",
     "operatioForm_PleaseActivate" : "Please activate your Gps",
     "operatioForm_Submit" : "Submit",
-    "operatioForm_Cancel" : "Cancel",
+    "operatioForm_Cancel" : "Back",
     "operatioForm_requiredError" : "This field cannot be empty.",
-    "operatioForm_operatioDetails" : "operation details",
+    "operatioForm_operatioDetails" : "Ad details",
     
     "personForm_operatioDetails" : "Person Details",
     "personForm_gender" : "Gender",
@@ -126,7 +126,7 @@
    "typeOperation_lost": "lost",
    "typeOperation_found": "found",
 
-   "typeOperation": "ad type",
+   "typeOperation": "Ad Type",
    "typeObject": "object type",
 
    "gender_male": "male",

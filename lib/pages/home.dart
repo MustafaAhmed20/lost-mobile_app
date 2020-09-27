@@ -72,8 +72,10 @@ class _HomeState extends State<Home> {
     // show the snakebar
     showSnake(context, massege);
 
+    // use defalt value of 'Accident' object string - this is a fix for a bug that somtimes apper
     String selectedObject =
-        Provider.of<AppSettings>(context, listen: true).selectedObjectString;
+        Provider.of<AppSettings>(context, listen: true).selectedObjectString ??
+            'menu_accident';
 
     // variable numbers of tabs
     List types =
@@ -209,21 +211,12 @@ Widget plusButton(BuildContext context, selectedObject, logged) {
     onPressed: () {
       // login if not already logged-in
       logged
-          ? showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (BuildContext context) {
-                return Dialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                  child:
-                      // all object types forms
-                      OperatioForm(
-                    accident: selectedObject == 'menu_accident',
-                  ),
-                );
-              },
-            )
+          ? Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => OperatioForm(
+                        accident: selectedObject == 'menu_accident',
+                      )))
           : // loggin page
 
           Navigator.pushNamed(context, '/login', arguments: {'showAlert': true})

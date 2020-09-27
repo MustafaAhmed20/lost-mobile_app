@@ -97,147 +97,200 @@ class _OperatioFormState extends State<OperatioForm> {
     // the current logged in user
     String userToken = Provider.of<UserData>(context, listen: false).token;
 
-    return ConstrainedBox(
-      constraints: new BoxConstraints(
-        minHeight: 200,
-        maxHeight: 500.0,
+    List<Step> steps = [
+      Step(
+        title: SizedBox.shrink(),
+        isActive: stage == 0,
+        state: stage > 0 ? StepState.complete : StepState.indexed,
+        content: Container(
+            decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(25)),
+            padding: EdgeInsets.all(8),
+            margin: EdgeInsets.only(top: 60),
+            child: form0(context, formsKeys[0], data)),
       ),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            //crossAxisAlignment: CrossAxisAlignment.center,
+      Step(
+        title: SizedBox.shrink(),
+        isActive: stage == 1,
+        state: stage > 1 ? StepState.complete : StepState.indexed,
+        content: Container(
+            padding: EdgeInsets.all(8),
+            margin: EdgeInsets.only(top: 60),
+            decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(25)),
+            child: form1(context, formsKeys[1], data)),
+      ),
+      Step(
+        title: SizedBox.shrink(),
+        isActive: stage == 2,
+        state: stage > 2 ? StepState.complete : StepState.indexed,
+        content: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(25)),
+            child: form2(context, formsKeys[2], data)),
+      ),
+      Step(
+        title: SizedBox.shrink(),
+        isActive: stage == 3,
+        state: stage > 3 ? StepState.complete : StepState.indexed,
+        content: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(25)),
+            child:
+                chooseObjectForm(context, formsKeys[3], data, widget.accident)),
+      ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+          leading: FlatButton(
+        child: Icon(Icons.close, color: Colors.white),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      )),
+      body: Stepper(
+        type: StepperType.horizontal,
+        currentStep: stage,
+        steps: steps,
+        onStepContinue: () {
+          setState(() {
+            stage += 1;
+          });
+        },
+        onStepCancel: () {
+          if (widget.accident && stage == 2) {
+            // don't back from stage 3(index 2)
+            Navigator.pop(context);
+          }
+
+          if (stage > 0) {
+            setState(() {
+              stage -= 1;
+            });
+          } else {
+            Navigator.pop(context);
+          }
+        },
+        controlsBuilder: (context,
+            {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              // the form
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: chooseForm(
-                    stage, context, formsKeys, data, widget.accident),
-              ),
+              // wait
+              formWait ? wait(context) : SizedBox.shrink(),
+              // Submit
+              Expanded(
+                child: formWait
+                    ? SizedBox.shrink()
+                    : MaterialButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                        ),
+                        color: Theme.of(context).primaryColor,
+                        child: Text(
+                          AppLocalizations.of(context)
+                              .translate('operatioForm_Submit'),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: () {
+                          var formKey = formsKeys[stage];
+                          // validate the currnt form
+                          if (formKey.currentState.saveAndValidate()) {
+                            // valid state form
 
-              // the buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  // wait
-                  formWait ? wait(context) : SizedBox.shrink(),
-                  // Submit
-                  Expanded(
-                    child: formWait
-                        ? SizedBox.shrink()
-                        : MaterialButton(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                            ),
-                            color: Theme.of(context).primaryColor,
-                            child: Text(
-                              AppLocalizations.of(context)
-                                  .translate('operatioForm_Submit'),
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: () {
-                              var formKey = formsKeys[stage];
-                              // validate the currnt form
-                              if (formKey.currentState.saveAndValidate()) {
-                                // valid state form
+                            // add the form data to the global data var
+                            data.addAll(formKey.currentState.value);
 
-                                // add the form data to the global data var
-                                data.addAll(formKey.currentState.value);
+                            if (stage < 3) {
+                              // mean the form stages not completed
+                              onStepContinue();
+                              return;
+                            }
 
-                                if (stage < 3) {
-                                  // mean the form stages not completed
-                                  setState(() {
-                                    stage += 1;
-                                  });
-                                  return;
-                                }
+                            // now done with the forms
+                            // send the form
 
-                                // now done with the forms
-                                // send the form
+                            //disable the button and wait
+                            setState(() {
+                              formWait = true;
+                            });
 
-                                //disable the button and wait
+                            // add the env data
+                            data.addAll(envData);
+
+                            try {
+                              Provider.of<PostData>(context, listen: false)
+                                  .addOperation(data, userToken)
+                                  .then((value) {
+                                // stop waiting
                                 setState(() {
-                                  formWait = true;
+                                  formWait = false;
                                 });
-
-                                // add the env data
-                                data.addAll(envData);
-                                print(data);
-                                try {
-                                  Provider.of<PostData>(context, listen: false)
-                                      .addOperation(data, userToken)
-                                      .then((value) {
-                                    // stop waiting
-                                    setState(() {
-                                      formWait = false;
-                                    });
-                                    if (value != null) {
-                                      print(value);
-                                    } else {
-                                      Navigator.of(context).pop();
-                                    }
-                                  });
-                                } catch (e) {
-                                  // stop waiting
-                                  setState(() {
-                                    formWait = false;
-                                  });
-                                  throw e;
+                                if (value != null) {
+                                  print(value);
+                                } else {
+                                  Navigator.of(context).pop();
                                 }
-                              }
-                            },
-                          ),
-                  ),
-                  // cancel
-                  Expanded(
-                    child: formWait
-                        ? SizedBox.shrink()
-                        : MaterialButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18.0),
-                                side: BorderSide(color: Colors.red)),
-                            color: Colors.red,
-                            child: Text(
-                              AppLocalizations.of(context)
-                                  .translate('operatioForm_Cancel'),
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: () {
-                              //_fbKey.currentState.reset();
-                              Navigator.pop(context);
-                            },
-                          ),
-                  ),
-                ],
-              )
+                              });
+                            } catch (e) {
+                              // stop waiting
+                              setState(() {
+                                formWait = false;
+                              });
+                              throw e;
+                            }
+                          }
+                        },
+                      ),
+              ),
+              // cancel
+              Expanded(
+                child: formWait
+                    ? SizedBox.shrink()
+                    : MaterialButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18.0),
+                            side: BorderSide(color: Colors.red)),
+                        color: Colors.red,
+                        child: Text(
+                          AppLocalizations.of(context)
+                              .translate('operatioForm_Cancel'),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: () {
+                          //_fbKey.currentState.reset();
+                          onStepCancel();
+                        },
+                      ),
+              ),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 }
 
-Widget chooseForm(int stage, context, formsList, data, accident) {
-  if (stage == 0) {
-    return form0(context, formsList[stage]);
-  } else if (stage == 1) {
-    return form1(context, formsList[stage]);
-  } else if (stage == 2) {
-    return form2(context, formsList[stage]);
-  } else if (stage == 3) {
-    if (accident) {
-      // accident form
-      return FormAccident(formKey: formsList[stage]);
-    } else if (data['object_type'] == 'Person') {
-      return formPerson(context, formsList[stage]);
-    } else if (data['object_type'] == 'Car') {
-      return formCar(context, formsList[stage]);
-    }
+Widget chooseObjectForm(context, formKey, data, accident) {
+  String object = data['object_type'] ?? '';
+  if (accident) {
+    // accident form
+    return FormAccident(formKey: formKey);
+  } else if (object == 'Person') {
+    return formPerson(context, formKey);
+  } else if (object == 'Car') {
+    return formCar(context, formKey);
   }
 
-  return SizedBox.shrink();
+  // default form if the user not select a form yet
+  return formPerson(context, formKey);
 }
 
 Widget formPerson(context, formKey, {Function onChange}) {
@@ -252,7 +305,7 @@ Widget formPerson(context, formKey, {Function onChange}) {
       Provider.of<AppSettings>(context, listen: false).availableGenders;
 
   return FormBuilder(
-    onChanged: (val) => onChange(),
+    onChanged: onChange != null ? (val) => onChange() : null,
     key: formKey,
     autovalidate: true,
     child: Column(children: [
@@ -341,7 +394,7 @@ Widget formCar(context, formKey, {Function onChange}) {
   // the emoji used - get it from provider
   List cars = Provider.of<AppSettings>(context, listen: false).cars;
   return FormBuilder(
-    onChanged: (val) => onChange(),
+    onChanged: onChange != null ? (val) => onChange() : null,
     key: formKey,
     autovalidate: true,
     child: Column(children: [
@@ -469,7 +522,7 @@ Widget formCar(context, formKey, {Function onChange}) {
   );
 }
 
-Widget form0(context, formKey) {
+Widget form0(context, formKey, data) {
   // the types of operations
   List typeOperation =
       Provider.of<TypeOperationData>(context, listen: false).typeOperation;
@@ -487,23 +540,24 @@ Widget form0(context, formKey) {
         // stage 0 - the type of operation
         Padding(
           padding: EdgeInsets.all(8.0),
-          child: FormBuilderDropdown(
+          child: FormBuilderChoiceChip(
             attribute: "type_id",
-            decoration: InputDecoration(
-                labelText:
-                    AppLocalizations.of(context).translate('typeOperation')),
-            hint: Text(AppLocalizations.of(context).translate('typeOperation')),
+            initialValue: data['type_id'] ?? null,
+            direction: Axis.vertical,
+            shape: RoundedRectangleBorder(),
             validators: [
               FormBuilderValidators.required(
                 errorText: AppLocalizations.of(context)
                     .translate('operatioForm_requiredError'),
               )
             ],
-            items: typeOperation
-                .map((type) => DropdownMenuItem(
+            options: typeOperation
+                .map((type) => FormBuilderFieldOption(
                     value: type.id,
                     child: Text(
-                        "${AppLocalizations.of(context).translate(names[type.name])}")))
+                      "${AppLocalizations.of(context).translate(names[type.name])}",
+                      style: TextStyle(fontSize: 18),
+                    )))
                 .toList(),
           ),
         ),
@@ -512,7 +566,7 @@ Widget form0(context, formKey) {
   );
 }
 
-Widget form1(context, formKey) {
+Widget form1(context, formKey, data) {
   // the list of available objects
   Map objects =
       Provider.of<AppSettings>(context, listen: false).availableObjects;
@@ -531,7 +585,9 @@ Widget form1(context, formKey) {
         // stage 1 - the object type
         FormBuilderChoiceChip(
           attribute: "object_type",
+          initialValue: data['object_type'] ?? null,
           direction: Axis.vertical,
+          shape: RoundedRectangleBorder(),
           validators: [
             FormBuilderValidators.required(
               errorText: AppLocalizations.of(context)
@@ -552,7 +608,7 @@ Widget form1(context, formKey) {
   );
 }
 
-Widget form2(context, formKey) {
+Widget form2(context, formKey, data) {
   // current time
   DateTime now = new DateTime.now();
 
@@ -571,7 +627,8 @@ Widget form2(context, formKey) {
         // date
         FormBuilderDateTimePicker(
           attribute: "date",
-          initialValue: now,
+          initialValue:
+              data['date'] != null ? DateTime.parse(data['date']) : now,
           inputType: InputType.date,
           format: formatter,
           lastDate: now,
@@ -591,6 +648,7 @@ Widget form2(context, formKey) {
         // state
         FormBuilderTextField(
             attribute: 'state',
+            initialValue: data['state'] ?? null,
             decoration: InputDecoration(
               labelText:
                   AppLocalizations.of(context).translate('operatioForm_state'),
@@ -604,6 +662,7 @@ Widget form2(context, formKey) {
         // city
         FormBuilderTextField(
             attribute: 'city',
+            initialValue: data['city'] ?? null,
             decoration: InputDecoration(
               labelText:
                   AppLocalizations.of(context).translate('operatioForm_city'),
@@ -617,6 +676,7 @@ Widget form2(context, formKey) {
         // details
         FormBuilderTextField(
           attribute: 'details',
+          initialValue: data['details'] ?? null,
           decoration: InputDecoration(
             labelText:
                 AppLocalizations.of(context).translate('operatioForm_details'),
@@ -625,6 +685,7 @@ Widget form2(context, formKey) {
         ),
         // photos
         FormBuilderImagePicker(
+          initialValue: data['photos'] ?? null,
           labelText:
               AppLocalizations.of(context).translate('operatioForm_photos'),
           maxImages: 5,
@@ -632,6 +693,7 @@ Widget form2(context, formKey) {
         ),
         // Gps location
         FormBuilderCustomField(
+            initialValue: data['location'] ?? null,
             attribute: 'location',
             formField: FormField(
               enabled: true,

@@ -467,7 +467,7 @@ Widget personTable(BuildContext context, object) {
 }
 
 Widget carTable(BuildContext context, object) {
-  List cars = Provider.of<AppSettings>(context, listen: true).cars;
+  //List cars = Provider.of<AppSettings>(context, listen: true).cars;
   return Table(
     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
     border: TableBorder.symmetric(inside: BorderSide(width: 0.08)),

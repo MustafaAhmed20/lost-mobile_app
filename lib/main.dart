@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:lost/pages/loading.dart';
 import 'package:lost/pages/login.dart';
@@ -8,7 +9,6 @@ import 'package:lost/pages/choosecountry.dart';
 import 'package:lost/pages/resetPassword.dart';
 import 'package:lost/pages/googlemap.dart';
 import 'package:lost/pages/feedback.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'models/appData.dart';
 

@@ -154,6 +154,7 @@ class DataCardCar extends StatelessWidget {
       leading: Hero(
         tag: operation.id.toString(),
         child: CircleAvatar(
+          backgroundColor: Colors.white,
           radius: 30,
           backgroundImage: photos == null || photos.isEmpty
               ? AssetImage(
