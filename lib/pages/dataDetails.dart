@@ -179,15 +179,29 @@ class _DataDetailsState extends State<DataDetails> {
   }
 }
 
-List<Widget> imageSliders(List photos) => photos
-    .map((item) => Container(
+List<Widget> imageSliders(List photos, BuildContext context) => photos
+    .map((item) => InkWell(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => FullScreenImege(item)));
+          },
           child: Container(
             margin: EdgeInsets.all(5.0),
             child: ClipRRect(
                 borderRadius: BorderRadius.all(Radius.circular(5.0)),
                 child: Stack(
                   children: <Widget>[
-                    Image.network(item, fit: BoxFit.cover, width: 1000.0),
+                    FadeInImage(
+                      fit: BoxFit.cover,
+                      width: 1000.0,
+                      placeholder: AssetImage('imeges/loading.gif'),
+                      image: NetworkImage(item),
+                    ),
+                    // Image.network(
+                    //   item,
+                    //   fit: BoxFit.cover,
+                    //   width: 1000.0,
+                    // ),
                     Positioned(
                       bottom: 0.0,
                       left: 0.0,
@@ -215,7 +229,7 @@ List<Widget> imageSliders(List photos) => photos
 
 Widget imegeSliderBuilder(BuildContext context, Function setState, object) {
   return CarouselSlider(
-    items: imageSliders(photos),
+    items: imageSliders(photos, context),
     options: CarouselOptions(
         autoPlay: true,
         enlargeCenterPage: true,
@@ -246,6 +260,21 @@ Widget sliderRow(int _current) {
       );
     }).toList(),
   );
+}
+
+class FullScreenImege extends StatelessWidget {
+  final String link;
+  FullScreenImege(this.link);
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(image: NetworkImage(link), fit: BoxFit.cover),
+        ),
+      ),
+    );
+  }
 }
 
 Widget noPhotos(BuildContext context) {
@@ -550,7 +579,8 @@ Widget accidentTable(BuildContext context, operation) {
           return ExpansionTile(
               title: Text(
                   AppLocalizations.of(context).translate('accidentForm_car') +
-                      '${index + 1}:'),
+                      '${index + 1}:',
+                  style: TextStyle(color: Colors.black)),
               children: [carTable(context, e)]);
         }).toList() +
         [
@@ -566,9 +596,11 @@ Widget accidentTable(BuildContext context, operation) {
         persons.map((e) {
           int index = persons.indexOf(e);
           return ExpansionTile(
-              title: Text(AppLocalizations.of(context)
-                      .translate('accidentForm_person') +
-                  '${index + 1}:'),
+              title: Text(
+                  AppLocalizations.of(context)
+                          .translate('accidentForm_person') +
+                      '${index + 1}:',
+                  style: TextStyle(color: Colors.black)),
               children: [personTable(context, e)]);
         }).toList(),
   );

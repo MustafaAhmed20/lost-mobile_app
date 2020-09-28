@@ -688,6 +688,7 @@ Widget form2(context, formKey, data) {
           initialValue: data['photos'] ?? null,
           labelText:
               AppLocalizations.of(context).translate('operatioForm_photos'),
+          imageQuality: 70,
           maxImages: 5,
           attribute: "photos",
         ),
@@ -912,7 +913,8 @@ class _FormAccidentState extends State<FormAccident> {
               initiallyExpanded: true,
               title: Text(
                   AppLocalizations.of(context).translate('accidentForm_car') +
-                      ' ${index + 1}'),
+                      ' ${index + 1}',
+                  style: TextStyle(color: Colors.black)),
               trailing: RaisedButton(
                   shape: CircleBorder(),
                   color: Colors.red,
@@ -960,9 +962,11 @@ class _FormAccidentState extends State<FormAccident> {
             return ExpansionTile(
               initiallyExpanded: true,
               maintainState: true,
-              title: Text(AppLocalizations.of(context)
-                      .translate('accidentForm_person') +
-                  ' ${index + 1}'),
+              title: Text(
+                  AppLocalizations.of(context)
+                          .translate('accidentForm_person') +
+                      ' ${index + 1}',
+                  style: TextStyle(color: Colors.black)),
               trailing: RaisedButton(
                   shape: CircleBorder(),
                   color: Colors.red,
