@@ -131,6 +131,9 @@ class _LoginState extends State<Login> {
           ),
           onLogin: (data) => _authUser(data, context),
           onSubmitAnimationCompleted: () {
+            // tell the home page to show snakebar throw Provider
+            Provider.of<AppSettings>(context, listen: false)
+                .setHomeSnakeBar('login');
             Navigator.of(context).pop();
           },
           onSignup: (data) => _registerUser(data, context).then((value) {
@@ -138,7 +141,10 @@ class _LoginState extends State<Login> {
                 if (value != null) {
                   return value;
                 }
-                Navigator.of(context).pop({'register': true});
+                // tell the home page to show snakebar throw Provider
+                Provider.of<AppSettings>(context, listen: false)
+                    .setHomeSnakeBar('register');
+                Navigator.of(context).pop();
                 return null;
               }),
           onRecoverPassword: (name) {

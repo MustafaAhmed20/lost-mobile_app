@@ -93,7 +93,7 @@ class Menu extends StatelessWidget {
             title:
                 Text(AppLocalizations.of(context).translate('home_FeedBack')),
             onTap: () {
-              Navigator.of(context).pop();
+              // Navigator.of(context).pop();
               Navigator.pushNamed(context, '/feedback').then((value) {
                 if (value != null) {
                   // add feedback successfully
@@ -102,6 +102,7 @@ class Menu extends StatelessWidget {
                   Provider.of<AppSettings>(context, listen: false)
                       .setHomeSnakeBar('addFeddBack');
                 }
+                Navigator.of(context).pop();
               });
             },
           ),
@@ -126,11 +127,7 @@ class Menu extends StatelessWidget {
                 Navigator.of(context).pop();
 
                 // show login screen
-                Navigator.pushNamed(context, '/login').then((value) {
-                  // tell the home page to show snakebar throw Provider
-                  Provider.of<AppSettings>(context, listen: false)
-                      .setHomeSnakeBar(value);
-                });
+                Navigator.pushNamed(context, '/login');
               }
             },
           ),

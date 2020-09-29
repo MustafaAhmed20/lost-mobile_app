@@ -35,6 +35,9 @@ class _HomeState extends State<Home> {
 
   // this will be true if logged in user is admin
   bool admin = false;
+
+  // key for the scaffold - helps in show the snackbar
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   void initState() {
     super.initState();
@@ -70,7 +73,9 @@ class _HomeState extends State<Home> {
     String massege =
         Provider.of<AppSettings>(context, listen: true).homeSnakeBar;
     // show the snakebar
-    showSnake(context, massege);
+    Future.delayed(Duration(seconds: 0)).then((value) {
+      showSnake(context, massege, _scaffoldKey);
+    });
 
     // use defalt value of 'Accident' object string - this is a fix for a bug that somtimes apper
     String selectedObject =
@@ -114,13 +119,11 @@ class _HomeState extends State<Home> {
     // the operation types names
     Map names = Provider.of<TypeOperationData>(context, listen: true).names;
     return Scaffold(
+      key: _scaffoldKey,
       drawer: Menu(logged: logged),
       floatingActionButton: isLoading || types.isEmpty
           ? null
-          : Builder(
-              // user Builder to have new context under Scaffold
-              builder: (BuildContext context) =>
-                  plusButton(context, selectedObject, logged)),
+          : plusButton(context, selectedObject, logged),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
         title: Text(AppLocalizations.of(context).translate(selectedObject)),
@@ -219,11 +222,8 @@ Widget plusButton(BuildContext context, selectedObject, logged) {
                       )))
           : // loggin page
 
-          Navigator.pushNamed(context, '/login', arguments: {'showAlert': true})
-              .then((value) {
-              // after login func
-              afterLogin(value, context);
-            });
+          Navigator.pushNamed(context, '/login',
+              arguments: {'showAlert': true});
     },
     label: Text(
       selectedObject == 'menu_accident'
@@ -249,70 +249,26 @@ Widget plusButton(BuildContext context, selectedObject, logged) {
   );
 }
 
-void handleClick(String value, context) {
-  if (value == 'Login') {
-    Navigator.pushNamed(context, '/login').then((value) {
-      afterLogin(value, context);
-    });
-  }
-
-  if (value == 'Logout') {
-    // logout the user
-    Provider.of<UserData>(context, listen: false).logut();
-    Scaffold.of(context).showSnackBar(successLogoutSnackBar(context));
-  }
-  if (value == 'Settings') {
-    Navigator.pushNamed(context, '/choose', arguments: {'pop': true});
-  }
-
-  if (value == 'feedback') {
-    Navigator.pushNamed(context, '/feedback').then((value) {
-      if (value != null) {
-        // add feedback successfully
-        Scaffold.of(context).showSnackBar(customSuccessSnackBar(context,
-            AppLocalizations.of(context).translate('SnackBar_sendFeddBack')));
-      }
-    });
-  }
-}
-
-void afterLogin(returnedValue, BuildContext context) {
-  // run after the login page pop here in (home)
-  bool logged = Provider.of<UserData>(context, listen: false).token == null
-      ? false
-      : true;
-  // if logged-in show snakebar
-  if (logged) {
-    Scaffold.of(context).showSnackBar(successLoginSnackBar(context));
-  }
-  // if reseted the password
-  if (returnedValue == null) {
+showSnake(BuildContext context, String choice, GlobalKey<ScaffoldState> key) {
+  if (choice == null) {
     return;
+  } else if (choice == 'addFeddBack') {
+    // success add feddback
+    key.currentState.showSnackBar(customSuccessSnackBar(context,
+        AppLocalizations.of(context).translate('SnackBar_sendFeddBack')));
+  } else if (choice == 'logout') {
+    // logout successfully
+    key.currentState.showSnackBar(successLogoutSnackBar(context));
+  } else if (choice == 'login') {
+    key.currentState.showSnackBar(successLoginSnackBar(context));
+  } else if (choice == 'register') {
+    //user succefully registed
+    key.currentState.showSnackBar(successRegisterSnackBar(context));
+  } else if (choice == 'reset') {
+    // user reseted the password
+    key.currentState.showSnackBar(successResetSnackBar(context));
   }
-  if (returnedValue['reset'] != null) {
-    Scaffold.of(context).showSnackBar(successResetSnackBar(context));
-  }
-  if (returnedValue['register'] != null) {
-    Scaffold.of(context).showSnackBar(successRegisterSnackBar(context));
-  }
-}
 
-showSnake(BuildContext context, String choice) {
-  print('this happend');
-  print('massege: $choice');
-  Builder(builder: (context) {
-    () {
-      if (choice == null) {
-        return;
-      } else if (choice == 'addFeddBack') {
-        // success add feddback
-        Scaffold.of(context).showSnackBar(customSuccessSnackBar(context,
-            AppLocalizations.of(context).translate('SnackBar_sendFeddBack')));
-      } else if (choice == 'logout') {
-        // logout successfully
-        Scaffold.of(context).showSnackBar(successLogoutSnackBar(context));
-      } else if (choice == 'logout') {}
-    }();
-    return;
-  });
+  // clear the massege after show it
+  Provider.of<AppSettings>(context, listen: false).clearHomeSnakeBar();
 }

@@ -205,14 +205,21 @@ class OperationData extends ChangeNotifier {
   // operations loaded
   List<dynamic> operations;
 
+  // if this is true mean show temp screen
+  bool isLoading;
+
   Map<String, String> filters = {};
 
   OperationData(Map f) {
     f.updateAll((key, value) => value.toString());
     this.filters.addAll(Map<String, String>.from(f));
+    isLoading = false;
   }
 
-  void loadData(Map filters) async {
+  Future<void> loadData(Map filters) async {
+    // till the screen to wait
+    isLoading = true;
+
     Future<void> getData(filters) async {
       Map<String, String> temp = this.filters;
 
@@ -270,8 +277,14 @@ class OperationData extends ChangeNotifier {
     }
 
     await getData(filters);
-
+    isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> reLoad(Map filters) async {
+    isLoading = true;
+    notifyListeners();
+    await loadData(filters);
   }
 }
 
@@ -792,8 +805,9 @@ class AppSettings extends ChangeNotifier {
   setHomeSnakeBar(String value) {
     this.homeSnakeBar = value;
     notifyListeners();
+  }
 
-    // // then set it to null
-    // this.homeSnakeBar = null;
+  clearHomeSnakeBar() {
+    this.homeSnakeBar = null;
   }
 }

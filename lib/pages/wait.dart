@@ -20,15 +20,24 @@ Widget wait(BuildContext context) {
 }
 
 Widget noData(BuildContext context) {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: <Widget>[
-      Center(
+  // return Column(
+  //   mainAxisAlignment: MainAxisAlignment.center,
+  //   children: <Widget>[
+  //     Center(
+  //       child: Text(
+  //         AppLocalizations.of(context).translate('wait_noData'),
+  //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+  //       ),
+  //     ),
+  //   ],
+  // )
+  var h = MediaQuery.of(context).size.height - 100;
+  return Container(
+      height: h,
+      child: Center(
         child: Text(
           AppLocalizations.of(context).translate('wait_noData'),
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
         ),
-      ),
-    ],
-  );
+      ));
 }

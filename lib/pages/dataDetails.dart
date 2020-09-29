@@ -58,6 +58,7 @@ class _DataDetailsState extends State<DataDetails> {
       appBar: AppBar(
         title:
             Text(AppLocalizations.of(context).translate('dataDetails_details')),
+        /*
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.only(right: 20),
@@ -76,6 +77,7 @@ class _DataDetailsState extends State<DataDetails> {
             ),
           ),
         ],
+      */
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -197,11 +199,6 @@ List<Widget> imageSliders(List photos, BuildContext context) => photos
                       placeholder: AssetImage('imeges/loading.gif'),
                       image: NetworkImage(item),
                     ),
-                    // Image.network(
-                    //   item,
-                    //   fit: BoxFit.cover,
-                    //   width: 1000.0,
-                    // ),
                     Positioned(
                       bottom: 0.0,
                       left: 0.0,
@@ -270,7 +267,10 @@ class FullScreenImege extends StatelessWidget {
     return SafeArea(
       child: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(image: NetworkImage(link), fit: BoxFit.cover),
+          image: DecorationImage(
+            image: NetworkImage(link),
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );

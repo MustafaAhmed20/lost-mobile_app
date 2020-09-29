@@ -40,6 +40,13 @@ class _HomeDataState extends State<HomeData> {
   Widget build(BuildContext context) {
     operations = Provider.of<OperationData>(context, listen: true).operations;
 
+    if (operations == null) {
+      operations = [];
+    }
+
+    bool isLoading =
+        Provider.of<OperationData>(context, listen: true).isLoading;
+
     // this for 'Person' object
     ages = Provider.of<AgeData>(context, listen: true).ages;
 
@@ -47,11 +54,17 @@ class _HomeDataState extends State<HomeData> {
     String selectedObject =
         Provider.of<AppSettings>(context, listen: true).selectedObject;
 
-    return FutureBuilder(builder: (context, snapshot) {
-      return operations == null
+    return RefreshIndicator(
+      onRefresh: () {
+        return Provider.of<OperationData>(context, listen: false).reLoad({});
+      },
+      child: isLoading
           ? wait(context)
           : operations.isEmpty
-              ? noData(context)
+              ? ListView(
+                  // use list view to be able to refrsh with pull
+                  children: [noData(context)],
+                )
               : ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
@@ -68,18 +81,12 @@ class _HomeDataState extends State<HomeData> {
                         });
                       },
                       child: Container(
-                        //margin: EdgeInsets.all(2.0),
                         decoration: BoxDecoration(
-                          // border: Border.all(
-                          //   color: Colors.purple[800],
-                          //   width: 1,
-                          // ),
                           border: Border.symmetric(
                               vertical: BorderSide(
                             color: Colors.grey,
                             width: 0.2,
                           )),
-                          //borderRadius: BorderRadius.circular(12),
                         ),
                         child: operations[index].objectType == 'Person'
                             ? DataCardPerson(
@@ -101,8 +108,8 @@ class _HomeDataState extends State<HomeData> {
                       ),
                     );
                   },
-                );
-    });
+                ),
+    );
   }
 }
 
