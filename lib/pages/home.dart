@@ -7,7 +7,6 @@ import 'snackBars.dart';
 
 // import the app data
 import 'package:lost/models/appData.dart';
-import 'package:lost/models/user.dart';
 import 'package:provider/provider.dart';
 
 //language support
@@ -38,6 +37,7 @@ class _HomeState extends State<Home> {
 
   // key for the scaffold - helps in show the snackbar
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -84,15 +84,8 @@ class _HomeState extends State<Home> {
 
     // variable numbers of tabs
     List types =
-        Provider.of<TypeOperationData>(context, listen: true).typeOperation;
-    bool isLoading;
-
-    if (types == null) {
-      types = [];
-      isLoading = true;
-    } else {
-      isLoading = false;
-    }
+        Provider.of<TypeOperationData>(context, listen: true).typeOperation ??
+            [];
 
     // login state - true if user logged-in
     bool logged = Provider.of<UserData>(context, listen: true).token == null
@@ -118,10 +111,11 @@ class _HomeState extends State<Home> {
 
     // the operation types names
     Map names = Provider.of<TypeOperationData>(context, listen: true).names;
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: Menu(logged: logged),
-      floatingActionButton: isLoading || types.isEmpty
+      floatingActionButton: types?.isEmpty ?? true
           ? null
           : plusButton(context, selectedObject, logged),
       appBar: AppBar(
@@ -135,76 +129,88 @@ class _HomeState extends State<Home> {
                 preferredSize: Size(double.infinity, 20),
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: types.map((type) {
-                      int index = types.indexOf(type);
-                      return InkWell(
-                          onTap: () {
-                            setState(() {
-                              _currentPage = index;
-                            });
-                            _pageController.animateToPage(
-                              index,
-                              duration: Duration(milliseconds: 400),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                          child: Container(
-                            color: index == _currentPage ? Colors.white : null,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 3),
-                            margin: EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 2.0),
-                            child: Text(
-                              AppLocalizations.of(context)
-                                  .translate(names[types[index].name]),
-                              style: TextStyle(
-                                //color: Theme.of(context).accentColor,
-                                color: index == _currentPage
-                                    ? Theme.of(context).primaryColor
-                                    : Theme.of(context).accentColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                          ));
-                    }).toList()),
+                    children: types?.map((type) {
+                          int index = types.indexOf(type);
+                          return InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _currentPage = index;
+                                });
+                                _pageController.animateToPage(
+                                  index,
+                                  duration: Duration(milliseconds: 400),
+                                  curve: Curves.easeInOut,
+                                );
+                              },
+                              child: Container(
+                                color:
+                                    index == _currentPage ? Colors.white : null,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 3),
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 10.0, horizontal: 2.0),
+                                child: Text(
+                                  AppLocalizations.of(context)
+                                      .translate(names[types[index].name]),
+                                  style: TextStyle(
+                                    //color: Theme.of(context).accentColor,
+                                    color: index == _currentPage
+                                        ? Theme.of(context).primaryColor
+                                        : Theme.of(context).accentColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ));
+                        })?.toList() ??
+                        // if the types is null
+                        []),
               ),
       ),
-      body: isLoading
-          ? wait(context)
-          : // if selected object is accident not use pageView
-          selectedObject == 'menu_accident'
-              ? ChangeNotifierProvider(
-                  create: (context) => OperationData({
-                    'country_id':
-                        Provider.of<CountryData>(context, listen: false)
-                            .selectedCountry
-                            ?.id,
-                  }),
-                  child: HomeData(),
-                )
-              : PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  },
-                  itemCount: types.length,
-                  itemBuilder: (context, index) {
-                    return ChangeNotifierProvider(
+      body: types == null
+          ?
+          // null mean still loading
+          wait(context)
+          : types.isEmpty
+              ?
+              // no data
+              noData(context)
+              :
+              // if selected object is accident not use pageView
+              selectedObject == 'menu_accident'
+                  ? // Accident object
+                  ChangeNotifierProvider(
                       create: (context) => OperationData({
                         'country_id':
                             Provider.of<CountryData>(context, listen: false)
                                 .selectedCountry
                                 ?.id,
-                        'type_id': types[index]?.id,
                       }),
                       child: HomeData(),
-                    );
-                  },
-                ),
+                    )
+                  : // all the objects
+                  PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentPage = index;
+                        });
+                      },
+                      itemCount: types?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        return ChangeNotifierProvider(
+                          create: (context) => OperationData({
+                            'country_id':
+                                Provider.of<CountryData>(context, listen: false)
+                                    .selectedCountry
+                                    ?.id,
+                            'type_id': types[index]?.id,
+                          }),
+                          child: HomeData(),
+                        );
+                      },
+                    ),
     );
   }
 }

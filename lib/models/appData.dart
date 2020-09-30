@@ -345,6 +345,15 @@ class UserData extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', null);
       return false;
+    } else {
+      // new token
+      Map<String, dynamic> body = json.decode(response.body);
+      String token = body['data']['token'];
+      this.token = token;
+
+      // save it in the Preferences
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', token);
     }
     return true;
   }
