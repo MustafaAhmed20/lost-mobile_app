@@ -12,6 +12,8 @@ import 'package:lost/models/appData.dart';
 //language support
 import 'package:lost/app_localizations.dart';
 
+import 'package:intl/intl.dart';
+
 class HomeData extends StatefulWidget {
   @override
   _HomeDataState createState() => _HomeDataState();
@@ -190,6 +192,8 @@ class DataCardAccident extends StatelessWidget {
 
   DataCardAccident({this.operation});
 
+  final formatter = DateFormat('yyyy/MM/dd - HH:mm');
+
   @override
   Widget build(BuildContext context) {
     // photos
@@ -214,11 +218,10 @@ class DataCardAccident extends StatelessWidget {
                 ),
         ),
       ),
-      title: Text(AppLocalizations.of(context).translate('homeData_cars') +
-          '${cars.length}'),
-      subtitle: Text(
-          AppLocalizations.of(context).translate('homeData_persons') +
-              '${persons.length}'),
+      title: Text(
+          '${cars.length} ${AppLocalizations.of(context).translate('homeData_cars')} - ${persons.length} ${AppLocalizations.of(context).translate('homeData_persons')}'),
+      // the time is utc - convarte it to local
+      subtitle: Text(formatter.format(operation.addDate.toLocal())),
       isThreeLine: true,
     );
   }

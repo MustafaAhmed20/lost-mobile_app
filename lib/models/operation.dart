@@ -9,6 +9,10 @@ class Operations {
 
   DateTime date;
 
+  @JsonKey(name: 'add_date')
+  // UTC time
+  DateTime addDate;
+
   // location
   double lat;
   double lng;

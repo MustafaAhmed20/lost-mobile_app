@@ -19,6 +19,9 @@ Operations _$OperationsFromJson(Map<String, dynamic> json) {
     statusId: json['status_id'] as int,
     photos: (json['photos'] as List)?.map((e) => e as String)?.toList(),
   )
+    ..addDate = json['add_date'] == null
+        ? null
+        : DateTime.parse(json['add_date'] as String)
     ..state = json['state'] as String
     ..city = json['city'] as String
     ..details = json['details'] as String
@@ -31,6 +34,7 @@ Map<String, dynamic> _$OperationsToJson(Operations instance) =>
     <String, dynamic>{
       'id': instance.id,
       'date': instance.date?.toIso8601String(),
+      'add_date': instance.addDate?.toIso8601String(),
       'lat': instance.lat,
       'lng': instance.lng,
       'state': instance.state,

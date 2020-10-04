@@ -16,8 +16,8 @@
     "homeData_Name": "Name: ",
     "homeData_Age": "Age: ",
     
-    "homeData_cars": "number of cars: ",
-    "homeData_persons": "number of persons: ",
+    "homeData_cars": "cars",
+    "homeData_persons": "persons",
 
     "dataDetails_noPhotos" : "No photos..!",
     "dataDetails_noLocation" : "No Location..!",
@@ -31,6 +31,8 @@
     
     "dataDetails_CarsInvolved" : "Cars involved: ",
     "dataDetails_PersonsInvolved" : "Persons involved: ",
+    
+    "dataDetails_AccidentTime" : "Accident Time:",
     
     
 
@@ -121,7 +123,7 @@
 
    "menu_people" : "People",
    "menu_cars" : "Cars",
-   "menu_accident": "Accident",
+   "menu_accident": "car Accidents",
 
    "typeOperation_lost": "lost",
    "typeOperation_found": "found",

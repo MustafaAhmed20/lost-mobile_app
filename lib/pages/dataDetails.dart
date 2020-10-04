@@ -58,26 +58,6 @@ class _DataDetailsState extends State<DataDetails> {
       appBar: AppBar(
         title:
             Text(AppLocalizations.of(context).translate('dataDetails_details')),
-        /*
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: Hero(
-              tag: operation.id.toString(),
-              child: CircleAvatar(
-                radius: 30,
-                backgroundImage: photos == null || photos.isEmpty
-                    ? AssetImage(
-                        'imeges/profile.png',
-                      )
-                    : NetworkImage(
-                        photos[0],
-                      ),
-              ),
-            ),
-          ),
-        ],
-      */
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -562,9 +542,18 @@ Widget carTable(BuildContext context, object) {
 Widget accidentTable(BuildContext context, operation) {
   List cars = operation.object.cars;
   List persons = operation.object.persons;
+  final formatter = DateFormat('yyyy/MM/dd - HH:mm');
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
+          // Accident date and time
+          Text(
+            '${AppLocalizations.of(context).translate('dataDetails_AccidentTime')} ${formatter.format(operation.addDate.toLocal())}',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 10,
+          ),
           // cars titel
           cars.length != 0
               ? Text(
@@ -574,6 +563,7 @@ Widget accidentTable(BuildContext context, operation) {
                 )
               : SizedBox.shrink(),
         ] +
+        // cars list
         cars.map((e) {
           int index = cars.indexOf(e);
           return ExpansionTile(
@@ -584,7 +574,7 @@ Widget accidentTable(BuildContext context, operation) {
               children: [carTable(context, e)]);
         }).toList() +
         [
-          // cars titel
+          // persons titel
           persons.length != 0
               ? Text(
                   AppLocalizations.of(context)
@@ -593,6 +583,7 @@ Widget accidentTable(BuildContext context, operation) {
                 )
               : SizedBox.shrink()
         ] +
+        // persons list
         persons.map((e) {
           int index = persons.indexOf(e);
           return ExpansionTile(

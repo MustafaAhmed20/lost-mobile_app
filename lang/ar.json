@@ -16,8 +16,8 @@
     "homeData_Name": "الاسم: ",
     "homeData_Age": "العمر: ",
 
-    "homeData_cars": "عدد السيارات: ",
-    "homeData_persons": "عدد الاشخاص: ",
+    "homeData_cars": "سيارة",
+    "homeData_persons": "شخص",
 
     "dataDetails_noPhotos" : "لا يوجد صور..!",
     "dataDetails_noLocation" : "لا يوجد موقع..!",
@@ -31,6 +31,8 @@
 
     "dataDetails_CarsInvolved" : "السيارات التي في الحادث: ",
     "dataDetails_PersonsInvolved" : "الاشخاص في الحادث: ",
+
+    "dataDetails_AccidentTime" : "وقت الحادث:",
 
     "map_location": "اختيار هذا الموقع",
 
@@ -119,7 +121,7 @@
 
    "menu_people" : "الأشخاص",
    "menu_cars" : "السيارات",
-   "menu_accident": "الحوادث",
+   "menu_accident": "حوادث السير",
 
 
    "typeOperation_lost": "مفقود",
