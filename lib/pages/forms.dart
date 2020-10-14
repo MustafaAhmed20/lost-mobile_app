@@ -64,11 +64,6 @@ class _OperatioFormState extends State<OperatioForm> {
 
     data = {};
 
-    // the accident form only use two forms
-    if (widget.accident) {
-      stage = 2;
-    }
-
     // data needed to post from provider
     envData = {
       'country_id': Provider.of<CountryData>(context, listen: false)
@@ -78,8 +73,11 @@ class _OperatioFormState extends State<OperatioForm> {
     };
 
     if (widget.accident) {
+      // the accident form only use two forms
+      stage = 2;
+
       // the default data unique to 'Accident' object
-      envData.addAll({
+      data.addAll({
         'object_type': Provider.of<AppSettings>(context, listen: false)
             .selectedObject
             .toString(),
@@ -282,18 +280,20 @@ Widget chooseObjectForm(context, formKey, data, accident) {
   String object = data['object_type'] ?? '';
   if (accident) {
     // accident form
-    return FormAccident(formKey: formKey);
+    return FormAccident(formKey: formKey, data: data);
   } else if (object == 'Person') {
-    return formPerson(context, formKey);
+    return formPerson(context, formKey, data);
   } else if (object == 'Car') {
-    return formCar(context, formKey);
+    return formCar(context, formKey, data);
+  } else if (object == 'PersonalBelongings') {
+    return FormPersonalBelongings(formKey: formKey);
   }
 
   // default form if the user not select a form yet
-  return formPerson(context, formKey);
+  return formPerson(context, formKey, data);
 }
 
-Widget formPerson(context, formKey, {Function onChange}) {
+Widget formPerson(context, formKey, data, {Function onChange}) {
   // the ages ranges - for 'person' object
   List ages = Provider.of<AgeData>(context, listen: false).ages;
 
@@ -303,6 +303,13 @@ Widget formPerson(context, formKey, {Function onChange}) {
   // list of genders
   Map genders =
       Provider.of<AppSettings>(context, listen: false).availableGenders;
+
+  // bool if true mean show the shelter - show shelter if selected type is 'found'
+  List types =
+      Provider.of<TypeOperationData>(context, listen: false).typeOperation;
+
+  bool showShelter =
+      types.firstWhere((e) => e.name == 'found').id == data['type_id'];
 
   return FormBuilder(
     onChanged: onChange != null ? (val) => onChange() : null,
@@ -323,8 +330,8 @@ Widget formPerson(context, formKey, {Function onChange}) {
       ),
       // gender
       FormBuilderRadioGroup(
-        activeColor: Colors.blue,
-        orientation: GroupedRadioOrientation.vertical,
+        activeColor: Colors.black,
+        direction: Axis.vertical,
         attribute: "gender",
         decoration: InputDecoration(
           labelText:
@@ -349,8 +356,10 @@ Widget formPerson(context, formKey, {Function onChange}) {
         decoration: InputDecoration(
             labelText:
                 AppLocalizations.of(context).translate('operatioForm_age')),
-        hint: Text(
-            AppLocalizations.of(context).translate('operatioForm_AgeRange')),
+        // hint: Text(
+        //   AppLocalizations.of(context).translate('operatioForm_AgeRange'),
+        //   style: TextStyle(fontSize: 10),
+        // ),
         validators: [
           FormBuilderValidators.required(
               errorText: AppLocalizations.of(context)
@@ -367,8 +376,8 @@ Widget formPerson(context, formKey, {Function onChange}) {
         decoration: InputDecoration(
           labelText: AppLocalizations.of(context).translate('personForm_skin'),
         ),
-        hint: Text(
-            AppLocalizations.of(context).translate('personForm_skinApprox')),
+        // hint: Text(
+        //     AppLocalizations.of(context).translate('personForm_skinApprox')),
         items: skins
             .map((skin) => DropdownMenuItem(
                 value: skins.indexOf(skin) + 1,
@@ -386,13 +395,55 @@ Widget formPerson(context, formKey, {Function onChange}) {
                 )))
             .toList(),
       ),
+      // shelter
+      Visibility(
+        visible: showShelter,
+        child: FormBuilderCheckbox(
+          attribute: 'shelter',
+          initialValue: false,
+          label: Text('shelter', style: TextStyle(fontSize: 14)),
+          checkColor: Colors.black,
+          valueTransformer: (value) {
+            // the true value will be 'true' - false value will be empty string
+            // this will solve bug of sending boolean in the form
+            if (!value) {
+              return '';
+            } else {
+              return 'true';
+            }
+          },
+        ),
+      ),
+      //details
+      Visibility(
+        // not show if use Accident object
+        visible: data['object_type'] != 'Accident',
+        child: Container(
+          height: 200,
+          width: double.infinity,
+          child: FormBuilderTextField(
+            maxLines: 8,
+            attribute: 'details',
+            //initialValue: data['details'] ?? null,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.greenAccent, width: 0.8),
+                //borderRadius: BorderRadius.circular(18.0),
+              ),
+              labelText: AppLocalizations.of(context)
+                  .translate('operatioForm_details'),
+              alignLabelWithHint: true,
+            ),
+          ),
+        ),
+      ),
     ]),
   );
 }
 
-Widget formCar(context, formKey, {Function onChange}) {
+Widget formCar(context, formKey, data, {Function onChange}) {
   // the emoji used - get it from provider
-  List cars = Provider.of<AppSettings>(context, listen: false).cars;
+  //List cars = Provider.of<AppSettings>(context, listen: false).cars;
   return FormBuilder(
     onChanged: onChange != null ? (val) => onChange() : null,
     key: formKey,
@@ -518,8 +569,142 @@ Widget formCar(context, formKey, {Function onChange}) {
           )
         ],
       ),
+
+      //details
+      Visibility(
+        // not show if use Accident object
+        visible: data['object_type'] != 'Accident',
+        child: Container(
+          height: 200,
+          width: double.infinity,
+          child: FormBuilderTextField(
+            maxLines: 8,
+            attribute: 'details',
+            //initialValue: data['details'] ?? null,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.greenAccent, width: 0.8),
+                //borderRadius: BorderRadius.circular(18.0),
+              ),
+              labelText: AppLocalizations.of(context)
+                  .translate('operatioForm_details'),
+              alignLabelWithHint: true,
+            ),
+          ),
+        ),
+      ),
     ]),
   );
+}
+
+class FormPersonalBelongings extends StatefulWidget {
+  final GlobalKey<FormBuilderState> formKey;
+
+  final Function onChange;
+
+  FormPersonalBelongings({this.formKey, this.onChange});
+  @override
+  _FormPersonalBelongingsState createState() => _FormPersonalBelongingsState();
+}
+
+class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
+  // this bool used to hide the subtype dropdwon
+  bool hideSubtype = false;
+  // the list of items in the subtype
+  List<DropdownMenuItem> subtypeList;
+
+  @override
+  Widget build(BuildContext context) {
+    List<List> types = Provider.of<AppSettings>(context, listen: false)
+        .availablePersonalBelongingsTypes;
+    return FormBuilder(
+      onChanged: widget.onChange != null ? (val) => widget.onChange() : null,
+      key: widget.formKey,
+      autovalidate: true,
+      child: Column(children: [
+        // car Details
+        Text(
+          AppLocalizations.of(context).translate('menu_PersonalBelongings'),
+          style: TextStyle(fontSize: 20),
+        ),
+        // type
+        FormBuilderDropdown(
+          attribute: "personal_belongings_type",
+          decoration: InputDecoration(
+              labelText: AppLocalizations.of(context)
+                  .translate('belongingsForm_type')),
+          validators: [
+            FormBuilderValidators.required(
+                errorText: AppLocalizations.of(context)
+                    .translate('operatioForm_requiredError')),
+          ],
+          onChanged: (val) {
+            // set the subtype if any
+            List item = types[val - 1];
+            List subtype = item[1];
+            if (subtype.length > 0) {
+              setState(() {
+                hideSubtype = true;
+                subtypeList = subtype.map((e) {
+                  return DropdownMenuItem(
+                    value: subtype.indexOf(e) + 1,
+                    child: Text(AppLocalizations.of(context).translate(e)),
+                  );
+                }).toList();
+              });
+            } else {
+              // no subtypes
+              setState(() {
+                hideSubtype = false;
+                subtypeList = null;
+              });
+            }
+          },
+          items: types.map((e) {
+            return DropdownMenuItem(
+              value: types.indexOf(e) + 1,
+              child: Text(AppLocalizations.of(context).translate(e[0])),
+            );
+          }).toList(),
+        ),
+        // subtype
+        Visibility(
+          visible: hideSubtype,
+          child: FormBuilderDropdown(
+            attribute: "personal_belongings_subtype",
+            decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)
+                    .translate('belongingsForm_subtype')),
+            validators: [
+              FormBuilderValidators.required(
+                  errorText: AppLocalizations.of(context)
+                      .translate('operatioForm_requiredError')),
+            ],
+            items: subtypeList,
+          ),
+        ),
+        //details
+        Container(
+          height: 200,
+          width: double.infinity,
+          child: FormBuilderTextField(
+            maxLines: 8,
+            attribute: 'details',
+            //initialValue: data['details'] ?? null,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.greenAccent, width: 0.8),
+                //borderRadius: BorderRadius.circular(18.0),
+              ),
+              labelText: AppLocalizations.of(context)
+                  .translate('operatioForm_details'),
+              alignLabelWithHint: true,
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
 }
 
 Widget form0(context, formKey, data) {
@@ -674,6 +859,7 @@ Widget form2(context, formKey, data) {
                       .translate('operatioForm_requiredError')),
             ]),
         // details
+        /*
         FormBuilderTextField(
           attribute: 'details',
           initialValue: data['details'] ?? null,
@@ -683,6 +869,7 @@ Widget form2(context, formKey, data) {
             alignLabelWithHint: true,
           ),
         ),
+        */
         // photos
         FormBuilderImagePicker(
           initialValue: data['photos'] ?? null,
@@ -776,7 +963,9 @@ Widget form2(context, formKey, data) {
 class FormAccident extends StatefulWidget {
   final GlobalKey<FormBuilderState> formKey;
 
-  FormAccident({this.formKey});
+  final Map data;
+
+  FormAccident({this.formKey, this.data});
 
   @override
   _FormAccidentState createState() => _FormAccidentState();
@@ -843,52 +1032,6 @@ class _FormAccidentState extends State<FormAccident> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-            // not visble form with the main form key
-            // this will control the submit to the main form
-            Offstage(
-              offstage: true,
-              child: FormBuilder(
-                key: widget.formKey,
-                child: Column(
-                  children: [
-                    FormBuilderTextField(
-                      attribute: 'cars',
-                      validators: [
-                        (val) {
-                          if (val == null || val == '') {
-                            // the other field must not be null
-                            var other = widget.formKey.currentState
-                                .fields['persons'].currentState.value;
-                            if (other == null || other == '') {
-                              return 'error';
-                            }
-                          }
-
-                          return null;
-                        }
-                      ],
-                    ),
-                    FormBuilderTextField(
-                      attribute: 'persons',
-                      validators: [
-                        (val) {
-                          if (val == null || val == '') {
-                            // the other field must not be null
-                            var other = widget.formKey.currentState
-                                .fields['cars'].currentState.value;
-                            if (other == null || other == '') {
-                              return 'error';
-                            }
-                          }
-
-                          return null;
-                        }
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
             // title
             Text(
               AppLocalizations.of(context).translate('accidentForm_details'),
@@ -945,7 +1088,8 @@ class _FormAccidentState extends State<FormAccident> {
                     GlobalKey<FormBuilderState> key =
                         GlobalKey<FormBuilderState>();
                     carsFormsKeys.add(key);
-                    cars.add(formCar(context, key, onChange: collectData));
+                    cars.add(formCar(context, key, widget.data,
+                        onChange: collectData));
                   });
                 }),
             Divider(),
@@ -997,10 +1141,82 @@ class _FormAccidentState extends State<FormAccident> {
                     GlobalKey<FormBuilderState> key =
                         GlobalKey<FormBuilderState>();
                     personsFormsKeys.add(key);
-                    persons
-                        .add(formPerson(context, key, onChange: collectData));
+                    persons.add(formPerson(context, key, widget.data,
+                        onChange: collectData));
                   });
                 }),
+
+            // not visble form with the main form key
+            // this will control the submit to the main form
+            FormBuilder(
+              key: widget.formKey,
+              child: Column(
+                children: [
+                  // cars json
+                  Offstage(
+                    offstage: true,
+                    child: FormBuilderTextField(
+                      attribute: 'cars',
+                      validators: [
+                        (val) {
+                          if (val == null || val == '') {
+                            // the other field must not be null
+                            var other = widget.formKey.currentState
+                                .fields['persons'].currentState.value;
+                            if (other == null || other == '') {
+                              return 'error';
+                            }
+                          }
+
+                          return null;
+                        }
+                      ],
+                    ),
+                  ),
+                  // persons json
+                  Offstage(
+                    offstage: true,
+                    child: FormBuilderTextField(
+                      attribute: 'persons',
+                      validators: [
+                        (val) {
+                          if (val == null || val == '') {
+                            // the other field must not be null
+                            var other = widget.formKey.currentState
+                                .fields['cars'].currentState.value;
+                            if (other == null || other == '') {
+                              return 'error';
+                            }
+                          }
+
+                          return null;
+                        }
+                      ],
+                    ),
+                  ),
+                  //details
+                  Container(
+                    height: 200,
+                    width: double.infinity,
+                    child: FormBuilderTextField(
+                      maxLines: 8,
+                      attribute: 'details',
+                      //initialValue: data['details'] ?? null,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.greenAccent, width: 0.8),
+                          //borderRadius: BorderRadius.circular(18.0),
+                        ),
+                        labelText: AppLocalizations.of(context)
+                            .translate('operatioForm_details'),
+                        alignLabelWithHint: true,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
     );
   }

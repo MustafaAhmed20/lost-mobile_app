@@ -15,6 +15,7 @@
 
     "homeData_Name": "الاسم: ",
     "homeData_Age": "العمر: ",
+    "homeData_inShelter": "داخل ملجأ",
 
     "homeData_cars": "سيارة",
     "homeData_persons": "شخص",
@@ -106,6 +107,9 @@
     "accidentForm_person" : "الشخص",
     "accidentForm_add" : "اضافة",
 
+    "belongingsForm_type" : "نوع المتعلقات",
+    "belongingsForm_subtype" : "نوع المتعلقات الفرعي",
+
    "validation_mustDigits" : "الرقم السري يجب ان يحتوي على ارقام.",
    "validation_mustEnglish" : "الرقم السري يجب ان يحتوي على حروف انجليزية.",
    "validation_notValidPhone" : "هذا الرقم غير صالح لهذه الدولة!",
@@ -122,6 +126,7 @@
    "menu_people" : "الأشخاص",
    "menu_cars" : "السيارات",
    "menu_accident": "حوادث السير",
+   "menu_PersonalBelongings":"المتعلقات الشخصية",
 
 
    "typeOperation_lost": "مفقود",
@@ -137,5 +142,16 @@
    "skin_mediumLight": "متوسط فاتح",
    "skin_medium": "متوسط",
    "skin_mediumDark": "متوسط غامق",
-   "skin_dark": "غامق"
+   "skin_dark": "غامق",
+
+   "BelongingsTypes_wallet" : "المحفظة",
+   "BelongingsTypes_wallet_subtype_id" : "بطاقة شخصية",
+   "BelongingsTypes_wallet_subtype_passport" : "جواز سفر",
+   "BelongingsTypes_wallet_subtype_drivingLicense" : "رخصة قيادة",
+   "BelongingsTypes_wallet_subtype_visa" : "بطاقة فيزا",
+   
+   "BelongingsTypes_mobile" : "موبايل",
+   "BelongingsTypes_bag" : "حقيبة",
+   "BelongingsTypes_papers" : "اوراق ومستندات",
+   "BelongingsTypes_other" : "أخرى"
 }

@@ -102,8 +102,11 @@ class _DataDetailsState extends State<DataDetails> {
                             : selectedObject == 'Car'
                                 ? AppLocalizations.of(context)
                                     .translate('carForm_operatioDetails')
-                                : AppLocalizations.of(context)
-                                    .translate('accidentForm_details'),
+                                : selectedObject == 'Accident'
+                                    ? AppLocalizations.of(context)
+                                        .translate('accidentForm_details')
+                                    : AppLocalizations.of(context)
+                                        .translate('dataDetails_details'),
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -118,7 +121,10 @@ class _DataDetailsState extends State<DataDetails> {
                           ? personTable(context, operation.object)
                           : selectedObject == 'Car'
                               ? carTable(context, operation.object)
-                              : accidentTable(context, operation),
+                              : selectedObject == 'Accident'
+                                  ? accidentTable(context, operation)
+                                  : personalBelongingsTable(
+                                      context, operation.object),
 
                       // operation Title
                       Padding(
@@ -594,5 +600,43 @@ Widget accidentTable(BuildContext context, operation) {
                   style: TextStyle(color: Colors.black)),
               children: [personTable(context, e)]);
         }).toList(),
+  );
+}
+
+Widget personalBelongingsTable(BuildContext context, object) {
+  List<List> types = Provider.of<AppSettings>(context, listen: false)
+      .availablePersonalBelongingsTypes;
+  var selectedType = types[object.type - 1];
+
+  return Table(
+    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+    border: TableBorder.symmetric(inside: BorderSide(width: 0.08)),
+    children: [
+      // type
+      TableRow(children: [
+        Text(
+          AppLocalizations.of(context).translate('belongingsForm_type'),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        Text(
+          AppLocalizations.of(context).translate(selectedType[0]),
+          style: TextStyle(fontSize: 20),
+        ),
+      ]),
+      // subtype
+      TableRow(children: [
+        Text(
+          AppLocalizations.of(context).translate('belongingsForm_subtype'),
+          style: TextStyle(fontSize: 20),
+        ),
+        Text(
+          selectedType[1].length > 0
+              ? AppLocalizations.of(context)
+                  .translate(selectedType[1][object.subtype - 1])
+              : '',
+          style: TextStyle(fontSize: 18),
+        ),
+      ]),
+    ],
   );
 }

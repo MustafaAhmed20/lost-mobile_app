@@ -35,6 +35,7 @@ class Menu extends StatelessWidget {
               Expanded(child: Divider()),
             ],
           ),
+          //accident
           ListTile(
             leading: Image.asset(
               'imeges/accident.png',
@@ -49,6 +50,7 @@ class Menu extends StatelessWidget {
                   .changeObject('Accident');
             },
           ),
+          //people
           ListTile(
             leading: Icon(
               Icons.people,
@@ -61,6 +63,7 @@ class Menu extends StatelessWidget {
                   .changeObject('Person');
             },
           ),
+          //cars
           ListTile(
             leading: Icon(Icons.directions_car),
             title: Text(AppLocalizations.of(context).translate('menu_cars')),
@@ -69,6 +72,18 @@ class Menu extends StatelessWidget {
               // change the object selected
               Provider.of<AppSettings>(context, listen: false)
                   .changeObject('Car');
+            },
+          ),
+          //PersonalBelongings
+          ListTile(
+            leading: Icon(Icons.phone_android),
+            title: Text(AppLocalizations.of(context)
+                .translate('menu_PersonalBelongings')),
+            onTap: () {
+              Navigator.of(context).pop();
+              // change the object selected
+              Provider.of<AppSettings>(context, listen: false)
+                  .changeObject('PersonalBelongings');
             },
           ),
           // Divider with text in middel

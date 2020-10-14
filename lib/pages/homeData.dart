@@ -103,10 +103,15 @@ class _HomeDataState extends State<HomeData> {
                                     // if the object is car
                                     operation: operations[index],
                                   )
-                                : DataCardAccident(
-                                    // if the object is accident
-                                    operation: operations[index],
-                                  ),
+                                : operations[index].objectType == 'Accident'
+                                    ? DataCardAccident(
+                                        // if the object is accident
+                                        operation: operations[index],
+                                      )
+                                    : DataCardPersonalBelongings(
+                                        // if the object is Personal Belongings
+                                        operation: operations[index],
+                                      ),
                       ),
                     );
                   },
@@ -145,6 +150,10 @@ class DataCardPerson extends StatelessWidget {
       subtitle: Text(AppLocalizations.of(context).translate('homeData_Age') +
           '${age.minAge} - ${age.maxAge}'),
       isThreeLine: true,
+      trailing: operation.object.shelter == true
+          ? Text(AppLocalizations.of(context).translate('homeData_inShelter'),
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
+          : SizedBox.shrink(),
     );
   }
 }
@@ -222,6 +231,47 @@ class DataCardAccident extends StatelessWidget {
           '${cars.length} ${AppLocalizations.of(context).translate('homeData_cars')} - ${persons.length} ${AppLocalizations.of(context).translate('homeData_persons')}'),
       // the time is utc - convarte it to local
       subtitle: Text(formatter.format(operation.addDate.toLocal())),
+      isThreeLine: true,
+    );
+  }
+}
+
+class DataCardPersonalBelongings extends StatelessWidget {
+  final Operations operation;
+
+  DataCardPersonalBelongings({this.operation});
+
+  @override
+  Widget build(BuildContext context) {
+    // photos
+    List photos = operation.photos;
+
+    List<List> types = Provider.of<AppSettings>(context, listen: false)
+        .availablePersonalBelongingsTypes;
+
+    var selectedType = types[operation.object.type - 1];
+
+    return ListTile(
+      leading: Hero(
+        tag: operation.id.toString(),
+        child: CircleAvatar(
+          backgroundColor: Colors.white,
+          radius: 30,
+          backgroundImage: photos == null || photos.isEmpty
+              ? AssetImage(
+                  'imeges/belongings.png',
+                )
+              : NetworkImage(
+                  photos[0],
+                ),
+        ),
+      ),
+      title: Text(
+          AppLocalizations.of(context).translate(selectedType[0].toString())),
+      subtitle: selectedType[1].length > 0
+          ? Text(AppLocalizations.of(context).translate(
+              selectedType[1][operation.object.subtype - 1].toString()))
+          : SizedBox.shrink(),
       isThreeLine: true,
     );
   }

@@ -15,6 +15,7 @@ import 'person.dart';
 import 'user.dart';
 import 'car.dart';
 import 'accident.dart';
+import 'personalBelongings.dart';
 
 import 'package:path/path.dart';
 
@@ -254,6 +255,8 @@ class OperationData extends ChangeNotifier {
                 operation.object = Car.fromJson(item['object']);
               } else if (object == 'Accident') {
                 operation.object = Accident.fromJson(item['object']);
+              } else if (object == 'PersonalBelongings') {
+                operation.object = PersonalBelongings.fromJson(item['object']);
               }
 
               return operation;
@@ -650,9 +653,13 @@ class UserPermissionData extends ChangeNotifier {
 class PostData extends ChangeNotifier {
   // this class for posting new data
 
-  Future<String> addOperation(Map data, String userToken) async {
+  Future<String> addOperation(
+      Map<dynamic, dynamic> passedData, String userToken) async {
     // add new operation through post api
     // return null if add correctly - return error massege if any
+
+    // create local copy from the data
+    Map<dynamic, dynamic> data = Map<dynamic, dynamic>()..addAll(passedData);
 
     List photos = data['photos'];
     data.remove('photos');
@@ -663,6 +670,10 @@ class PostData extends ChangeNotifier {
       data.remove('location');
     }
 
+    // any field with value null will be deleted
+    data.removeWhere((key, value) => value == null);
+
+    // convarte all values to string
     data.updateAll((key, value) => value.toString());
     data = Map<String, String>.from(data);
 
@@ -743,7 +754,8 @@ class AppSettings extends ChangeNotifier {
   Map availableObjects = {
     'Accident': 'menu_accident',
     'Person': 'menu_people',
-    'Car': 'menu_cars'
+    'Car': 'menu_cars',
+    'PersonalBelongings': 'menu_PersonalBelongings'
   };
   String selectedObject = 'Accident';
   String selectedObjectString;
@@ -751,17 +763,18 @@ class AppSettings extends ChangeNotifier {
   // main screen(Home) snkebar - if have value then the home page will show snakbar
   String homeSnakeBar;
 
-  // person available skin colors (Emoji - name)
-  // the emoji used
-  //Emoji boy = Emoji.byChar(Emojis.boy);
-  List skins;
+  // person available skin colors (image - name)
+  List<List> skins;
 
   // person available genders
   Map availableGenders = {'male': 'gender_male', "female": "gender_female"};
 
   // car available types (Emoji - name)
-  // the emoji used
-  List cars;
+  List<List> cars;
+
+  // available types of 'PersonalBelongings' object
+  // its list of list [name of type, [list of its subtype if any]]
+  List<List> availablePersonalBelongingsTypes;
 
   AppSettings() {
     this.selectedObjectString = availableObjects[this.selectedObject];
@@ -791,8 +804,22 @@ class AppSettings extends ChangeNotifier {
       [Emoji.byChar(Emojis.automobile), 'light'],
       [Emoji.byChar(Emojis.tramCar), 'mediumLight'],
       [Emoji.byChar(Emojis.minibus), 'medium'],
-      //[Emoji.byChar(Emojis.pickup), 'mediumDark'],
-      //[Emoji.byChar(Emojis.automobile), 'dark']
+    ];
+
+    availablePersonalBelongingsTypes = [
+      [
+        'BelongingsTypes_wallet',
+        [
+          'BelongingsTypes_wallet_subtype_id',
+          'BelongingsTypes_wallet_subtype_passport',
+          'BelongingsTypes_wallet_subtype_drivingLicense',
+          'BelongingsTypes_wallet_subtype_visa'
+        ]
+      ],
+      ['BelongingsTypes_mobile', []],
+      ['BelongingsTypes_bag', []],
+      ['BelongingsTypes_papers', []],
+      ['BelongingsTypes_other', []],
     ];
   }
 

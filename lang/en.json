@@ -15,6 +15,7 @@
 
     "homeData_Name": "Name: ",
     "homeData_Age": "Age: ",
+    "homeData_inShelter": "In-Shelter",
     
     "homeData_cars": "cars",
     "homeData_persons": "persons",
@@ -107,6 +108,9 @@
     "accidentForm_car" : "car",
     "accidentForm_person" : "person",
     "accidentForm_add" : "Add",
+    
+    "belongingsForm_type" : "Belongings type",
+    "belongingsForm_subtype" : "Belongings subtype",
 
    "validation_mustDigits" : "The password must include digits.",
    "validation_mustEnglish" : "The password must include English characters.",
@@ -124,6 +128,7 @@
    "menu_people" : "People",
    "menu_cars" : "Cars",
    "menu_accident": "car Accidents",
+   "menu_PersonalBelongings":"Personal Belongings",
 
    "typeOperation_lost": "lost",
    "typeOperation_found": "found",
@@ -138,5 +143,16 @@
    "skin_mediumLight": "medium Light",
    "skin_medium": "medium",
    "skin_mediumDark": "medium dark",
-   "skin_dark": "dark"
+   "skin_dark": "dark",
+
+   "BelongingsTypes_wallet" : "wallet",
+   "BelongingsTypes_wallet_subtype_id" : "ID card",
+   "BelongingsTypes_wallet_subtype_passport" : "Passport",
+   "BelongingsTypes_wallet_subtype_drivingLicense" : "Driving License",
+   "BelongingsTypes_wallet_subtype_visa" : "visa card",
+   
+   "BelongingsTypes_mobile" : "mobile",
+   "BelongingsTypes_bag" : "bag",
+   "BelongingsTypes_papers" : "papers and documents",
+   "BelongingsTypes_other" : "other"
 }

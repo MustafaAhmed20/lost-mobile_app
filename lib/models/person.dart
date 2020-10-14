@@ -16,7 +16,11 @@ class Person {
   // skin color - range from (1 - 5)
   int skin;
 
-  Person({this.id, this.name, this.ageId, this.gender, this.skin});
+  // if this person now is resident in shelter or some special place
+  bool shelter;
+
+  Person(
+      {this.id, this.name, this.ageId, this.gender, this.skin, this.shelter});
 
   factory Person.fromJson(Map<String, dynamic> json) => _$PersonFromJson(json);
 

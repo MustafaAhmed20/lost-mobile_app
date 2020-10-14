@@ -13,6 +13,7 @@ Person _$PersonFromJson(Map<String, dynamic> json) {
     ageId: json['age_id'] as int,
     gender: json['gender'] as String,
     skin: json['skin'] as int,
+    shelter: json['shelter'] as bool,
   );
 }
 
@@ -22,6 +23,7 @@ Map<String, dynamic> _$PersonToJson(Person instance) => <String, dynamic>{
       'age_id': instance.ageId,
       'gender': instance.gender,
       'skin': instance.skin,
+      'shelter': instance.shelter,
     };
 
 Age _$AgeFromJson(Map<String, dynamic> json) {
