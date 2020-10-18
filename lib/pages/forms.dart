@@ -95,6 +95,60 @@ class _OperatioFormState extends State<OperatioForm> {
     // the current logged in user
     String userToken = Provider.of<UserData>(context, listen: false).token;
 
+    // the logic to continue in the steps
+    // i Separates it to be able to use it inside the form
+    void continueSteps() {
+      var formKey = formsKeys[stage];
+      // validate the currnt form
+      if (formKey.currentState.saveAndValidate()) {
+        // valid state form
+
+        // add the form data to the global data var
+        data.addAll(formKey.currentState.value);
+
+        if (stage < 3) {
+          // mean the form stages not completed
+          setState(() {
+            stage += 1;
+          });
+          return;
+        }
+
+        // now done with the forms
+        // send the form
+
+        //disable the button and wait
+        setState(() {
+          formWait = true;
+        });
+
+        // add the env data
+        data.addAll(envData);
+
+        try {
+          Provider.of<PostData>(context, listen: false)
+              .addOperation(data, userToken)
+              .then((value) {
+            // stop waiting
+            setState(() {
+              formWait = false;
+            });
+            if (value != null) {
+              print(value);
+            } else {
+              Navigator.of(context).pop();
+            }
+          });
+        } catch (e) {
+          // stop waiting
+          setState(() {
+            formWait = false;
+          });
+          throw e;
+        }
+      }
+    }
+
     List<Step> steps = [
       Step(
         title: SizedBox.shrink(),
@@ -106,7 +160,8 @@ class _OperatioFormState extends State<OperatioForm> {
                 borderRadius: BorderRadius.circular(25)),
             padding: EdgeInsets.all(8),
             margin: EdgeInsets.only(top: 60),
-            child: form0(context, formsKeys[0], data)),
+            child:
+                form0(context, formsKeys[0], data, autoSubmit: continueSteps)),
       ),
       Step(
         title: SizedBox.shrink(),
@@ -118,7 +173,8 @@ class _OperatioFormState extends State<OperatioForm> {
             decoration: BoxDecoration(
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(25)),
-            child: form1(context, formsKeys[1], data)),
+            child:
+                form1(context, formsKeys[1], data, autoSubmit: continueSteps)),
       ),
       Step(
         title: SizedBox.shrink(),
@@ -157,11 +213,7 @@ class _OperatioFormState extends State<OperatioForm> {
         type: StepperType.horizontal,
         currentStep: stage,
         steps: steps,
-        onStepContinue: () {
-          setState(() {
-            stage += 1;
-          });
-        },
+        onStepContinue: () {},
         onStepCancel: () {
           if (widget.accident && stage == 2) {
             // don't back from stage 3(index 2)
@@ -198,53 +250,7 @@ class _OperatioFormState extends State<OperatioForm> {
                           style: TextStyle(color: Colors.white),
                         ),
                         onPressed: () {
-                          var formKey = formsKeys[stage];
-                          // validate the currnt form
-                          if (formKey.currentState.saveAndValidate()) {
-                            // valid state form
-
-                            // add the form data to the global data var
-                            data.addAll(formKey.currentState.value);
-
-                            if (stage < 3) {
-                              // mean the form stages not completed
-                              onStepContinue();
-                              return;
-                            }
-
-                            // now done with the forms
-                            // send the form
-
-                            //disable the button and wait
-                            setState(() {
-                              formWait = true;
-                            });
-
-                            // add the env data
-                            data.addAll(envData);
-
-                            try {
-                              Provider.of<PostData>(context, listen: false)
-                                  .addOperation(data, userToken)
-                                  .then((value) {
-                                // stop waiting
-                                setState(() {
-                                  formWait = false;
-                                });
-                                if (value != null) {
-                                  print(value);
-                                } else {
-                                  Navigator.of(context).pop();
-                                }
-                              });
-                            } catch (e) {
-                              // stop waiting
-                              setState(() {
-                                formWait = false;
-                              });
-                              throw e;
-                            }
-                          }
+                          continueSteps();
                         },
                       ),
               ),
@@ -331,7 +337,7 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
       // gender
       FormBuilderRadioGroup(
         activeColor: Colors.black,
-        direction: Axis.vertical,
+        orientation: GroupedRadioOrientation.vertical,
         attribute: "gender",
         decoration: InputDecoration(
           labelText:
@@ -707,7 +713,7 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
   }
 }
 
-Widget form0(context, formKey, data) {
+Widget form0(context, formKey, data, {Function autoSubmit}) {
   // the types of operations
   List typeOperation =
       Provider.of<TypeOperationData>(context, listen: false).typeOperation;
@@ -715,6 +721,8 @@ Widget form0(context, formKey, data) {
   Map names = Provider.of<TypeOperationData>(context, listen: false).names;
   return FormBuilder(
     key: formKey,
+    // auto submit with the click
+    onChanged: autoSubmit != null ? (val) => autoSubmit() : null,
     autovalidate: true,
     child: Column(
       children: [
@@ -751,7 +759,7 @@ Widget form0(context, formKey, data) {
   );
 }
 
-Widget form1(context, formKey, data) {
+Widget form1(context, formKey, data, {Function autoSubmit}) {
   // the list of available objects
   Map objects =
       Provider.of<AppSettings>(context, listen: false).availableObjects;
@@ -760,6 +768,7 @@ Widget form1(context, formKey, data) {
 
   return FormBuilder(
     key: formKey,
+    onChanged: autoSubmit != null ? (val) => autoSubmit() : null,
     autovalidate: true,
     child: Column(
       children: [
