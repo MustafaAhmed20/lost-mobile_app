@@ -77,7 +77,7 @@ class _HomeState extends State<Home> {
       showSnake(context, massege, _scaffoldKey);
     });
 
-    // use defalt value of 'Accident' object string - this is a fix for a bug that somtimes apper
+    // use default value of 'Accident' object string - this is a fix for a bug that somtimes apper
     String selectedObject =
         Provider.of<AppSettings>(context, listen: true).selectedObjectString ??
             'menu_accident';
@@ -191,6 +191,8 @@ class _HomeState extends State<Home> {
                     )
                   : // all the objects
                   PageView.builder(
+                      // use the 'selectedObject' as key to force the pageView to rebuild if the object changed.
+                      key: ValueKey(selectedObject),
                       controller: _pageController,
                       onPageChanged: (index) {
                         setState(() {

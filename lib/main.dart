@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:lost/constants.dart';
 
 import 'package:lost/pages/loading.dart';
 import 'package:lost/pages/login.dart';
@@ -49,10 +50,12 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        fontFamily: 'theSans',
         // This is the theme of your application.
 
         //primaryColor: Colors.purple[800],
-        primaryColor: Colors.orange[800],
+        // primaryColor: Colors.orange[800],
+        primaryColor: scaffoldColor,
 
         //accentColor: Colors.purpleAccent[300],
         accentColor: Colors.white,

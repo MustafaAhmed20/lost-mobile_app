@@ -320,7 +320,7 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
   return FormBuilder(
     onChanged: onChange != null ? (val) => onChange() : null,
     key: formKey,
-    autovalidate: true,
+    autovalidateMode: AutovalidateMode.always,
     child: Column(children: [
       // person Details
       Text(
@@ -453,7 +453,7 @@ Widget formCar(context, formKey, data, {Function onChange}) {
   return FormBuilder(
     onChanged: onChange != null ? (val) => onChange() : null,
     key: formKey,
-    autovalidate: true,
+    autovalidateMode: AutovalidateMode.always,
     child: Column(children: [
       // car Details
       Text(
@@ -626,7 +626,7 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
     return FormBuilder(
       onChanged: widget.onChange != null ? (val) => widget.onChange() : null,
       key: widget.formKey,
-      autovalidate: true,
+      autovalidateMode: AutovalidateMode.always,
       child: Column(children: [
         // car Details
         Text(
@@ -723,7 +723,7 @@ Widget form0(context, formKey, data, {Function autoSubmit}) {
     key: formKey,
     // auto submit with the click
     onChanged: autoSubmit != null ? (val) => autoSubmit() : null,
-    autovalidate: true,
+    autovalidateMode: AutovalidateMode.always,
     child: Column(
       children: [
         Text(
@@ -769,7 +769,7 @@ Widget form1(context, formKey, data, {Function autoSubmit}) {
   return FormBuilder(
     key: formKey,
     onChanged: autoSubmit != null ? (val) => autoSubmit() : null,
-    autovalidate: true,
+    autovalidateMode: AutovalidateMode.always,
     child: Column(
       children: [
         Text(
@@ -810,7 +810,7 @@ Widget form2(context, formKey, data) {
   var formatter = new DateFormat('yyyy-MM-dd');
   return FormBuilder(
     key: formKey,
-    autovalidate: true,
+    autovalidateMode: AutovalidateMode.always,
     child: Column(
       children: [
         Text(

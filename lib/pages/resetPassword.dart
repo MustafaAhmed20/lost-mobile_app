@@ -97,7 +97,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 ),
                 FormBuilder(
                   key: _fbKey,
-                  autovalidate: true,
+                  autovalidateMode: AutovalidateMode.always,
                   child: Column(
                     children: <Widget>[
                       FormBuilderTextField(

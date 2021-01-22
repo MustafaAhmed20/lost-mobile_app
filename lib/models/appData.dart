@@ -230,7 +230,7 @@ class OperationData extends ChangeNotifier {
       }
 
       try {
-        var uri = Uri.http(
+        var uri = Uri.https(
             AppData().serverName, AppData().apiSec + '/getoperation', temp);
 
         http.Response response = await http.get(uri.toString());
@@ -682,7 +682,7 @@ class PostData extends ChangeNotifier {
       Map<String, String> headers = {'token': userToken.toString()};
 
       var uri =
-          Uri.http(AppData().serverName, AppData().apiSec + '/addoperation');
+          Uri.https(AppData().serverName, AppData().apiSec + '/addoperation');
       var request = http.MultipartRequest('POST', uri);
       request.fields.addAll(data);
 
@@ -785,8 +785,8 @@ class AppSettings extends ChangeNotifier {
       if (language != null) {
         selectedLanguage = Locale(language);
       } else {
-        // no language selected
-        selectedLanguage = Locale('en');
+        // no language selected - default is Arabic
+        selectedLanguage = Locale('ar');
       }
     }
 

@@ -4,6 +4,9 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:lost/models/appData.dart';
 
+// the 'show once' menu page
+import 'package:lost/pages/menu_once/mainMenuOnce.dart';
+
 import 'package:provider/provider.dart';
 
 import 'package:flutter/services.dart';
@@ -86,13 +89,20 @@ class _LoadingState extends State<Loading> {
 
         // load country data
         bool country = await countryData();
-        if (country) {
-          // home page
-          Navigator.pushReplacementNamed(context, '/home');
-        } else {
-          // send him to choose
-          Navigator.pushReplacementNamed(context, '/choose');
-        }
+
+        // new home once page
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (c) => MainMenuOnce(
+                  // show the country choose page if there is not selected country
+                  showCountryPage: !country,
+                )));
+        // if (country) {
+        //   // home page
+        //   Navigator.pushReplacementNamed(context, '/home');
+        // } else {
+        //   // send him to choose
+        //   Navigator.pushReplacementNamed(context, '/choose');
+        // }
       } else {
         showAlertDialog(context);
       }
