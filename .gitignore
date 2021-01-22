@@ -1,6 +1,5 @@
 android/app/src/main/AndroidManifest.xml
-# imeges file
-imeges/
+
 lib/pages/secrets.dart
 # Miscellaneous
 *.class
