@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lost/models/appData.dart';
+import 'package:lost/pages/menu_once/design.dart';
 
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,9 @@ import 'validators.dart';
 
 // use json
 import 'dart:convert';
+
+// the colors
+import 'package:lost/constants.dart';
 
 class OperatioForm extends StatefulWidget {
   // if object selected is accident
@@ -149,17 +153,27 @@ class _OperatioFormState extends State<OperatioForm> {
       }
     }
 
+    // the steps Decoration
+    BoxDecoration stepsBoxDecoration = BoxDecoration(
+      // color: Colors.grey[200],
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(25),
+    );
+
+    EdgeInsets stepsPadding = EdgeInsets.all(8);
+    // EdgeInsets stepsPadding = EdgeInsets.zero;
+    EdgeInsets stepsMargin = EdgeInsets.only(top: 60);
+    // EdgeInsets stepsMargin = EdgeInsets.zero;
+
     List<Step> steps = [
       Step(
         title: SizedBox.shrink(),
         isActive: stage == 0,
         state: stage > 0 ? StepState.complete : StepState.indexed,
         content: Container(
-            decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(25)),
-            padding: EdgeInsets.all(8),
-            margin: EdgeInsets.only(top: 60),
+            decoration: stepsBoxDecoration,
+            padding: stepsPadding,
+            margin: stepsMargin,
             child:
                 form0(context, formsKeys[0], data, autoSubmit: continueSteps)),
       ),
@@ -168,11 +182,9 @@ class _OperatioFormState extends State<OperatioForm> {
         isActive: stage == 1,
         state: stage > 1 ? StepState.complete : StepState.indexed,
         content: Container(
-            padding: EdgeInsets.all(8),
-            margin: EdgeInsets.only(top: 60),
-            decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(25)),
+            padding: stepsPadding,
+            margin: stepsMargin,
+            decoration: stepsBoxDecoration,
             child:
                 form1(context, formsKeys[1], data, autoSubmit: continueSteps)),
       ),
@@ -181,10 +193,8 @@ class _OperatioFormState extends State<OperatioForm> {
         isActive: stage == 2,
         state: stage > 2 ? StepState.complete : StepState.indexed,
         content: Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(25)),
+            padding: stepsPadding,
+            decoration: stepsBoxDecoration,
             child: form2(context, formsKeys[2], data)),
       ),
       Step(
@@ -192,91 +202,136 @@ class _OperatioFormState extends State<OperatioForm> {
         isActive: stage == 3,
         state: stage > 3 ? StepState.complete : StepState.indexed,
         content: Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(25)),
+            padding: stepsPadding,
+            decoration: stepsBoxDecoration,
             child:
                 chooseObjectForm(context, formsKeys[3], data, widget.accident)),
       ),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-          leading: FlatButton(
-        child: Icon(Icons.close, color: Colors.white),
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      )),
-      body: Stepper(
-        type: StepperType.horizontal,
-        currentStep: stage,
-        steps: steps,
-        onStepContinue: () {},
-        onStepCancel: () {
-          if (widget.accident && stage == 2) {
-            // don't back from stage 3(index 2)
-            Navigator.pop(context);
-          }
+    Size screenSize = MediaQuery.of(context).size;
 
-          if (stage > 0) {
-            setState(() {
-              stage -= 1;
-            });
-          } else {
-            Navigator.pop(context);
-          }
-        },
-        controlsBuilder: (context,
-            {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              // wait
-              formWait ? wait(context) : SizedBox.shrink(),
-              // Submit
-              Expanded(
-                child: formWait
-                    ? SizedBox.shrink()
-                    : MaterialButton(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18.0),
-                        ),
-                        color: Theme.of(context).primaryColor,
-                        child: Text(
-                          AppLocalizations.of(context)
-                              .translate('operatioForm_Submit'),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () {
-                          continueSteps();
-                        },
-                      ),
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(children: [
+          // the image in the back
+          BackgrounDesign(),
+
+          // the Top close icon
+          Positioned(
+              top: 5,
+              // right: 2,
+              child: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    size: 35,
+                    color: Colors.red,
+                  ))),
+
+          // the BIG Tiltel
+          Positioned(
+            top: 40,
+            child: Container(
+              width: screenSize.width,
+              child: Center(
+                child: Text(
+                  'إضافة',
+                  style: TextStyle(
+                      color: mainTextColor,
+                      fontSize: 42,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
-              // cancel
-              Expanded(
-                child: formWait
-                    ? SizedBox.shrink()
-                    : MaterialButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
-                            side: BorderSide(color: Colors.red)),
-                        color: Colors.red,
-                        child: Text(
-                          AppLocalizations.of(context)
-                              .translate('operatioForm_Cancel'),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () {
-                          //_fbKey.currentState.reset();
-                          onStepCancel();
-                        },
-                      ),
-              ),
-            ],
-          );
-        },
+            ),
+          ),
+
+          // the data
+          Container(
+            margin: EdgeInsets.only(top: 130, bottom: 10, right: 10, left: 10),
+            padding: EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              // color: Colors.white,
+              // color: liteBackground,
+              color: mainDarkColor.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(25),
+            ),
+            clipBehavior: Clip.hardEdge,
+            width: screenSize.width,
+            height: screenSize.height,
+            child: Stepper(
+              type: StepperType.horizontal,
+              currentStep: stage,
+              steps: steps,
+              onStepContinue: () {},
+              onStepCancel: () {
+                if (widget.accident && stage == 2) {
+                  // don't back from stage 3(index 2)
+                  Navigator.pop(context);
+                }
+
+                if (stage > 0) {
+                  setState(() {
+                    stage -= 1;
+                  });
+                } else {
+                  Navigator.pop(context);
+                }
+              },
+              controlsBuilder: (context,
+                  {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    // wait
+                    formWait ? wait(context) : SizedBox.shrink(),
+                    // Submit
+                    Expanded(
+                      child: formWait
+                          ? SizedBox.shrink()
+                          : MaterialButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0),
+                              ),
+                              color: Theme.of(context).primaryColor,
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('operatioForm_Submit'),
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () {
+                                continueSteps();
+                              },
+                            ),
+                    ),
+                    // cancel
+                    Expanded(
+                      child: formWait
+                          ? SizedBox.shrink()
+                          : MaterialButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18.0),
+                                  side: BorderSide(color: Colors.red)),
+                              color: Colors.red,
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('operatioForm_Cancel'),
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () {
+                                //_fbKey.currentState.reset();
+                                onStepCancel();
+                              },
+                            ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ]),
       ),
     );
   }
@@ -734,6 +789,7 @@ Widget form0(context, formKey, data, {Function autoSubmit}) {
         Padding(
           padding: EdgeInsets.all(8.0),
           child: FormBuilderChoiceChip(
+            decoration: InputDecoration(border: InputBorder.none),
             attribute: "type_id",
             initialValue: data['type_id'] ?? null,
             direction: Axis.vertical,
@@ -778,6 +834,7 @@ Widget form1(context, formKey, data, {Function autoSubmit}) {
         ),
         // stage 1 - the object type
         FormBuilderChoiceChip(
+          decoration: InputDecoration(border: InputBorder.none),
           attribute: "object_type",
           initialValue: data['object_type'] ?? null,
           direction: Axis.vertical,
@@ -839,34 +896,48 @@ Widget form2(context, formKey, data) {
             return value;
           },
         ),
-        // state
-        FormBuilderTextField(
-            attribute: 'state',
-            initialValue: data['state'] ?? null,
-            decoration: InputDecoration(
-              labelText:
-                  AppLocalizations.of(context).translate('operatioForm_state'),
-              alignLabelWithHint: true,
+
+        Row(
+          children: [
+            // state
+
+            Expanded(
+              child: FormBuilderTextField(
+                  attribute: 'state',
+                  initialValue: data['state'] ?? null,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: AppLocalizations.of(context)
+                        .translate('operatioForm_state'),
+                    alignLabelWithHint: true,
+                  ),
+                  validators: [
+                    FormBuilderValidators.required(
+                        errorText: AppLocalizations.of(context)
+                            .translate('operatioForm_requiredError')),
+                  ]),
             ),
-            validators: [
-              FormBuilderValidators.required(
-                  errorText: AppLocalizations.of(context)
-                      .translate('operatioForm_requiredError')),
-            ]),
-        // city
-        FormBuilderTextField(
-            attribute: 'city',
-            initialValue: data['city'] ?? null,
-            decoration: InputDecoration(
-              labelText:
-                  AppLocalizations.of(context).translate('operatioForm_city'),
-              alignLabelWithHint: true,
+
+            // city
+            Expanded(
+              child: FormBuilderTextField(
+                  attribute: 'city',
+                  initialValue: data['city'] ?? null,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: AppLocalizations.of(context)
+                        .translate('operatioForm_city'),
+                    alignLabelWithHint: true,
+                  ),
+                  validators: [
+                    FormBuilderValidators.required(
+                        errorText: AppLocalizations.of(context)
+                            .translate('operatioForm_requiredError')),
+                  ]),
             ),
-            validators: [
-              FormBuilderValidators.required(
-                  errorText: AppLocalizations.of(context)
-                      .translate('operatioForm_requiredError')),
-            ]),
+          ],
+        ),
+
         // details
         /*
         FormBuilderTextField(
@@ -882,6 +953,7 @@ Widget form2(context, formKey, data) {
         // photos
         FormBuilderImagePicker(
           initialValue: data['photos'] ?? null,
+          decoration: InputDecoration(border: InputBorder.none),
           labelText:
               AppLocalizations.of(context).translate('operatioForm_photos'),
           imageQuality: 70,
@@ -894,72 +966,84 @@ Widget form2(context, formKey, data) {
             attribute: 'location',
             formField: FormField(
               enabled: true,
-              builder: (FormFieldState<dynamic> field) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  RaisedButton(
-                    child: Text(AppLocalizations.of(context)
-                        .translate('operatioForm_Chooselocation')),
-                    onPressed: () async {
-                      // first check the Gps
-                      bool gps = false;
-                      await checkGps().then((value) => gps = value);
-                      if (!gps) {
-                        // no gps - show alert massege
-                        showDialog(
-                          //barrierDismissible: false,
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Dialog(
-                              child: AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(32.0))),
-                                actionsPadding:
-                                    EdgeInsets.symmetric(horizontal: 50),
-                                title: Text(AppLocalizations.of(context)
-                                    .translate('operatioForm_ActivateGps')),
-                                content: Container(
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: <Widget>[
-                                      Text(AppLocalizations.of(context)
-                                          .translate(
-                                              'operatioForm_PleaseActivate')),
-                                      RaisedButton(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18.0),
-                                        ),
-                                        color: Theme.of(context).primaryColor,
-                                        textColor: Colors.white,
-                                        child: Text("OK"),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        await Navigator.pushNamed(context, '/map')
-                            .then((value) {
-                          field.didChange(value);
-                        });
-                      }
-                    },
+              builder: (FormFieldState<dynamic> field) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // the labelText
+                  Text(
+                    'اختر الموقع:',
                   ),
-                  Icon(
-                    field.value == null ? null : Icons.check_circle,
-                    color: field.value == null ? null : Colors.green,
+
+                  // the button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      RaisedButton(
+                        child: Text(AppLocalizations.of(context)
+                            .translate('operatioForm_Chooselocation')),
+                        onPressed: () async {
+                          // first check the Gps
+                          bool gps = false;
+                          await checkGps().then((value) => gps = value);
+                          if (!gps) {
+                            // no gps - show alert massege
+                            showDialog(
+                              //barrierDismissible: false,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Dialog(
+                                  child: AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(32.0))),
+                                    actionsPadding:
+                                        EdgeInsets.symmetric(horizontal: 50),
+                                    title: Text(AppLocalizations.of(context)
+                                        .translate('operatioForm_ActivateGps')),
+                                    content: Container(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: <Widget>[
+                                          Text(AppLocalizations.of(context)
+                                              .translate(
+                                                  'operatioForm_PleaseActivate')),
+                                          RaisedButton(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(18.0),
+                                            ),
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            textColor: Colors.white,
+                                            child: Text("OK"),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            await Navigator.pushNamed(context, '/map')
+                                .then((value) {
+                              field.didChange(value);
+                            });
+                          }
+                        },
+                      ),
+                      Icon(
+                        field.value == null ? null : Icons.check_circle,
+                        color: field.value == null ? null : Colors.green,
+                      ),
+                    ],
                   ),
                 ],
               ),

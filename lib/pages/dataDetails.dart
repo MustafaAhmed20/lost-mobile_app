@@ -10,6 +10,9 @@ import 'package:lost/models/person.dart';
 // use formatter
 import 'package:intl/intl.dart';
 
+// the buttons
+import 'package:lost/widgets/buttons.dart';
+
 import 'package:provider/provider.dart';
 import 'package:lost/models/appData.dart';
 
@@ -21,6 +24,11 @@ import 'secrets.dart';
 
 //language support
 import 'package:lost/app_localizations.dart';
+
+// the colors
+import 'package:lost/constants.dart';
+
+import 'package:url_launcher/url_launcher.dart';
 
 List photos;
 
@@ -54,6 +62,12 @@ class _DataDetailsState extends State<DataDetails> {
 
     dynamic country =
         Provider.of<CountryData>(context, listen: false).selectedCountry;
+
+    // login state - true if user logged-in
+    bool logged = Provider.of<UserData>(context, listen: true).token == null
+        ? false
+        : true;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -85,8 +99,10 @@ class _DataDetailsState extends State<DataDetails> {
             Container(
               width: double.infinity,
               margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              padding: EdgeInsets.only(right: 10),
               decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  // color: Colors.grey[200],
+                  color: liteBackground,
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.all(
                     Radius.circular(25.0),
@@ -95,6 +111,53 @@ class _DataDetailsState extends State<DataDetails> {
                   padding: EdgeInsets.only(top: 15, left: 20, bottom: 8),
                   child: Column(
                     children: [
+                      // contact box
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 30),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // messages button
+                            Container(
+                              width: 100,
+                              child: Button50HBig(
+                                function: (c) {},
+                                color: mainLiteColor,
+                                text: 'التعليقات',
+                                textColor: Colors.white,
+                                textSize: 14,
+                                image: 'imeges/chat.png',
+                                iconSize: 25,
+                              ),
+                            ),
+
+                            // phone button
+                            Container(
+                              width: 100,
+                              child: Button50HBig(
+                                function: (c) {
+                                  // open phone call if the user logged-in
+                                  logged
+                                      ? launch("tel://0${operation.user.phone}")
+                                      :
+                                      // go to login page
+                                      Navigator.pushNamed(context, '/login',
+                                          arguments: {'showAlert': true});
+                                },
+                                color: mainLiteColor,
+                                text: 'اتصال',
+                                textColor: Colors.white,
+                                textSize: 14,
+                                image: 'imeges/call.png',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // some space
+                      SizedBox(height: 10),
+
                       // object Title
                       Text(
                         selectedObject == 'Person'
@@ -109,7 +172,10 @@ class _DataDetailsState extends State<DataDetails> {
                                     : AppLocalizations.of(context)
                                         .translate('dataDetails_details'),
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          // color: otherTextColor,
+                        ),
                       ),
 
                       Padding(

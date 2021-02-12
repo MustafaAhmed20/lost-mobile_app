@@ -196,7 +196,7 @@ class DataCardPerson extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // this for 'Person' object
-    List ages = Provider.of<AgeData>(context, listen: true).ages;
+    List ages = Provider.of<AgeData>(context, listen: true).ages ?? [];
     Age age =
         ages.firstWhere((element) => element.id == operation.object.ageId);
 

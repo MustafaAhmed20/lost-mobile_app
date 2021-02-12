@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Flutter Demo',
       theme: ThemeData(
         fontFamily: 'theSans',
-        canvasColor: Colors.transparent,
+
         // This is the theme of your application.
 
         //primaryColor: Colors.purple[800],
@@ -64,8 +64,8 @@ class _MyAppState extends State<MyApp> {
         //backgroundColor: Colors.purple[100],
 
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          //backgroundColor: Colors.deepPurple[800],
-          backgroundColor: Colors.orange[800],
+          backgroundColor: Colors.deepPurple[800],
+          // backgroundColor: Colors.orange[800],
           foregroundColor: Colors.white,
         ),
 
