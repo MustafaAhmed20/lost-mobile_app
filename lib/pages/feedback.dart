@@ -29,6 +29,7 @@ class _FeedBackState extends State<FeedBack> {
     String userToken = Provider.of<UserData>(context, listen: false).token;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).translate('home_FeedBack')),
       ),

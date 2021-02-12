@@ -371,7 +371,3 @@ class LanguageButton extends StatelessWidget {
     );
   }
 }
-
-Widget getIcon() => FlutterLogo(
-      size: 100,
-    );

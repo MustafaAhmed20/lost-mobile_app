@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class BackgrounDesign extends StatelessWidget {
+  bool useDesign2;
+  BackgrounDesign({this.useDesign2 = false});
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -11,7 +13,9 @@ class BackgrounDesign extends StatelessWidget {
           width: screenWidth,
           height: MediaQuery.of(context).size.height,
           child: Image(
-            image: AssetImage('imeges/background.jpg'),
+            image: AssetImage(useDesign2
+                ? 'imeges/background2.jpg'
+                : 'imeges/background.jpg'),
             fit: BoxFit.fill,
           ),
         ),

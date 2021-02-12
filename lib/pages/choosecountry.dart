@@ -85,6 +85,8 @@ class _ChooseCountryState extends State<ChooseCountry> {
                                   .map((e) => e.isoName.toString())
                                   .toList(),
                             ),
+
+                            // the lang
                             FormBuilderChoiceChip(
                               alignment: WrapAlignment.center,
                               decoration: InputDecoration(
@@ -102,16 +104,16 @@ class _ChooseCountryState extends State<ChooseCountry> {
                                 },
                               ],
                               options: [
-                                FormBuilderFieldOption(
-                                  value: 'en',
-                                  child: Text(
-                                    'English',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                ),
+                                // FormBuilderFieldOption(
+                                //   value: 'en',
+                                //   child: Text(
+                                //     'English',
+                                //     style: TextStyle(
+                                //       fontWeight: FontWeight.bold,
+                                //       fontSize: 20,
+                                //     ),
+                                //   ),
+                                // ),
                                 FormBuilderFieldOption(
                                   value: 'ar',
                                   child: Text(

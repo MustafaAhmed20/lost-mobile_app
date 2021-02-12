@@ -1,6 +1,7 @@
 // the main part of the home page
 
 import 'package:flutter/material.dart';
+import 'package:lost/constants.dart';
 
 import 'wait.dart';
 import 'package:lost/models/operation.dart';
@@ -56,104 +57,187 @@ class _HomeDataState extends State<HomeData> {
     String selectedObject =
         Provider.of<AppSettings>(context, listen: true).selectedObject;
 
-    return RefreshIndicator(
-      onRefresh: () {
-        return Provider.of<OperationData>(context, listen: false).reLoad({});
-      },
-      child: isLoading
-          ? wait(context)
-          : operations.isEmpty
-              ? ListView(
-                  // use list view to be able to refrsh with pull
-                  children: [noData(context)],
-                )
-              : ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemCount: operations.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/details', arguments: {
-                          'operation': operations[index],
-                          'age': selectedObject != 'Person'
-                              ? null
-                              : ages.firstWhere((element) =>
-                                  element.id == operations[index].object.ageId)
-                        });
+    return Container(
+      margin: EdgeInsets.only(top: 20),
+      padding: EdgeInsets.only(bottom: 80),
+      // color: Colors.red,
+      child: RefreshIndicator(
+        onRefresh: () {
+          return Provider.of<OperationData>(context, listen: false).reLoad({});
+        },
+        child: isLoading
+            ? wait(context)
+            : operations.isEmpty
+                ? ListView(
+                    // use list view to be able to refrsh with pull
+                    children: [noData(context)],
+                  )
+                : Container(
+                    // margin: EdgeInsets.only(top: 20),
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: operations.length,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/details',
+                                arguments: {
+                                  'operation': operations[index],
+                                  'age': selectedObject != 'Person'
+                                      ? null
+                                      : ages.firstWhere((element) =>
+                                          element.id ==
+                                          operations[index].object.ageId)
+                                });
+                          },
+                          child: Container(
+                            color: liteBackground,
+                            // decoration: BoxDecoration(
+                            //   border: Border.symmetric(
+                            //       vertical: BorderSide(
+                            //     color: Colors.grey,
+                            //     width: 0.2,
+                            //   )),
+                            // ),
+                            margin: EdgeInsets.only(bottom: 8),
+                            child: DataCard(
+                              operation: operations[index],
+                            ),
+                          ),
+                        );
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.symmetric(
-                              vertical: BorderSide(
-                            color: Colors.grey,
-                            width: 0.2,
-                          )),
-                        ),
-                        child: operations[index].objectType == 'Person'
-                            ? DataCardPerson(
-                                // if the object is person
-                                operation: operations[index],
-                                age: ages.firstWhere((element) =>
-                                    element.id ==
-                                    operations[index].object.ageId),
-                              )
-                            : operations[index].objectType == 'Car'
-                                ? DataCardCar(
-                                    // if the object is car
-                                    operation: operations[index],
-                                  )
-                                : operations[index].objectType == 'Accident'
-                                    ? DataCardAccident(
-                                        // if the object is accident
-                                        operation: operations[index],
-                                      )
-                                    : DataCardPersonalBelongings(
-                                        // if the object is Personal Belongings
-                                        operation: operations[index],
-                                      ),
-                      ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+      ),
+    );
+  }
+}
+
+class DataCard extends StatelessWidget {
+  final Operations operation;
+  String objectType;
+  DataCard({
+    @required this.operation,
+  }) {
+    objectType = operation.objectType;
+  }
+  @override
+  Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
+    List photos = operation.photos;
+    return Container(
+      width: screenSize.width,
+      height: 70,
+      padding: EdgeInsets.only(right: 5, top: 5, bottom: 5),
+      // color: Colors.red,
+      child: Row(
+        children: [
+          // the photo
+          Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+              border: Border.all(color: mainDarkColor),
+            ),
+            child: Image(
+              fit: BoxFit.fill,
+              image: photos == null || photos.isEmpty
+                  ? AssetImage(
+                      objectType == 'Person'
+                          ? 'imeges/profile.png'
+                          : objectType == 'Car'
+                              ? 'imeges/car.png'
+                              : objectType == 'Accident'
+                                  ? 'imeges/accident.png'
+                                  :
+                                  //Personal Belongings
+                                  'imeges/belongings.png',
+                    )
+                  : NetworkImage(
+                      photos[0],
+                    ),
+            ),
+          ),
+
+          // the rest of the data
+          Expanded(
+            child: objectType == 'Person'
+                ? DataCardPerson(
+                    operation: operation,
+                  )
+                : objectType == 'Car'
+                    ? DataCardCar(
+                        operation: operation,
+                      )
+                    : objectType == 'Accident'
+                        ? DataCardAccident(
+                            operation: operation,
+                          )
+                        :
+                        //Personal Belongings
+                        DataCardPersonalBelongings(
+                            operation: operation,
+                          ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class DataCardPerson extends StatelessWidget {
   final Operations operation;
-  final Age age;
 
-  DataCardPerson({this.operation, this.age});
-
+  DataCardPerson({
+    @required this.operation,
+  });
+  final formatter = DateFormat('yyyy/MM/dd - HH:mm');
   @override
   Widget build(BuildContext context) {
-    // photos
-    List photos = operation.photos;
+    // this for 'Person' object
+    List ages = Provider.of<AgeData>(context, listen: true).ages;
+    Age age =
+        ages.firstWhere((element) => element.id == operation.object.ageId);
 
-    return ListTile(
-      leading: Hero(
-        tag: operation.id.toString(),
-        child: CircleAvatar(
-          radius: 30,
-          backgroundImage: photos == null || photos.isEmpty
-              ? AssetImage(
-                  'imeges/profile.png',
-                )
-              : NetworkImage(
-                  photos[0],
-                ),
-        ),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // name & age
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // name
+
+              Text(AppLocalizations.of(context).translate('homeData_Name') +
+                  '${operation.object.name}'),
+
+              // age
+              Text(AppLocalizations.of(context).translate('homeData_Age') +
+                  '${age.minAge} - ${age.maxAge}'),
+            ],
+          ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // the time is utc - convarte it to local
+              Text(formatter.format(operation.addDate.toLocal())),
+
+              // is in shelter
+              operation.object.shelter == true
+                  ? Text(
+                      AppLocalizations.of(context)
+                          .translate('homeData_inShelter'),
+                      style: TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold))
+                  : SizedBox.shrink(),
+            ],
+          ),
+        ],
       ),
-      title: Text(AppLocalizations.of(context).translate('homeData_Name') +
-          '${operation.object.name}'),
-      subtitle: Text(AppLocalizations.of(context).translate('homeData_Age') +
-          '${age.minAge} - ${age.maxAge}'),
-      isThreeLine: true,
-      trailing: operation.object.shelter == true
-          ? Text(AppLocalizations.of(context).translate('homeData_inShelter'),
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
-          : SizedBox.shrink(),
     );
   }
 }
@@ -161,37 +245,39 @@ class DataCardPerson extends StatelessWidget {
 class DataCardCar extends StatelessWidget {
   final Operations operation;
 
-  DataCardCar({this.operation});
+  DataCardCar({@required this.operation});
+
+  final formatter = DateFormat('yyyy/MM/dd - HH:mm');
 
   @override
   Widget build(BuildContext context) {
-    // photos
-    List photos = operation.photos;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(AppLocalizations.of(context).translate('carForm_model') +
+                  (operation.object.model != null
+                      ? ': ${operation.object.model}'
+                      : ": ")),
+              Text(AppLocalizations.of(context).translate('carForm_brand') +
+                  (operation.object.brand != null
+                      ? ': ${operation.object.brand}'
+                      : ": ")),
+            ],
+          ),
 
-    return ListTile(
-      leading: Hero(
-        tag: operation.id.toString(),
-        child: CircleAvatar(
-          backgroundColor: Colors.white,
-          radius: 30,
-          backgroundImage: photos == null || photos.isEmpty
-              ? AssetImage(
-                  'imeges/car.png',
-                )
-              : NetworkImage(
-                  photos[0],
-                ),
-        ),
+          // date
+          Row(
+            children: [
+              // the time is utc - convarte it to local
+              Text(formatter.format(operation.addDate.toLocal())),
+            ],
+          ),
+        ],
       ),
-      title: Text(AppLocalizations.of(context).translate('carForm_model') +
-          (operation.object.model != null
-              ? ': ${operation.object.model}'
-              : ": ")),
-      subtitle: Text(AppLocalizations.of(context).translate('carForm_brand') +
-          (operation.object.brand != null
-              ? ': ${operation.object.brand}'
-              : ": ")),
-      isThreeLine: true,
     );
   }
 }
@@ -199,80 +285,77 @@ class DataCardCar extends StatelessWidget {
 class DataCardAccident extends StatelessWidget {
   final Operations operation;
 
-  DataCardAccident({this.operation});
+  DataCardAccident({@required this.operation});
 
   final formatter = DateFormat('yyyy/MM/dd - HH:mm');
 
   @override
   Widget build(BuildContext context) {
-    // photos
-    List photos = operation.photos;
-
     var cars = operation.object.cars;
 
     var persons = operation.object.persons;
 
-    return ListTile(
-      leading: Hero(
-        tag: operation.id.toString(),
-        child: CircleAvatar(
-          backgroundColor: Colors.white,
-          radius: 30,
-          backgroundImage: photos == null || photos.isEmpty
-              ? AssetImage(
-                  'imeges/accident.png',
-                )
-              : NetworkImage(
-                  photos[0],
-                ),
-        ),
-      ),
-      title: Text(
-          '${cars.length} ${AppLocalizations.of(context).translate('homeData_cars')} - ${persons.length} ${AppLocalizations.of(context).translate('homeData_persons')}'),
-      // the time is utc - convarte it to local
-      subtitle: Text(formatter.format(operation.addDate.toLocal())),
-      isThreeLine: true,
+    return Column(
+      children: [
+        // the date
+        // the time is utc - convarte it to local
+        Text(formatter.format(operation.addDate.toLocal())),
+
+        // the cars & persons numbrt
+        Text(
+            '${cars.length} ${AppLocalizations.of(context).translate('homeData_cars')} - ${persons.length} ${AppLocalizations.of(context).translate('homeData_persons')}'),
+      ],
     );
+
+    // ListTile(
+    //   title: Text(
+    //       '${cars.length} ${AppLocalizations.of(context).translate('homeData_cars')} - ${persons.length} ${AppLocalizations.of(context).translate('homeData_persons')}'),
+    //   // the time is utc - convarte it to local
+    //   subtitle: Text(formatter.format(operation.addDate.toLocal())),
+    //   isThreeLine: true,
+    // );
   }
 }
 
 class DataCardPersonalBelongings extends StatelessWidget {
   final Operations operation;
 
-  DataCardPersonalBelongings({this.operation});
+  DataCardPersonalBelongings({@required this.operation});
+
+  final formatter = DateFormat('yyyy/MM/dd - HH:mm');
 
   @override
   Widget build(BuildContext context) {
-    // photos
-    List photos = operation.photos;
-
     List<List> types = Provider.of<AppSettings>(context, listen: false)
         .availablePersonalBelongingsTypes;
 
     var selectedType = types[operation.object.type - 1];
 
-    return ListTile(
-      leading: Hero(
-        tag: operation.id.toString(),
-        child: CircleAvatar(
-          backgroundColor: Colors.white,
-          radius: 30,
-          backgroundImage: photos == null || photos.isEmpty
-              ? AssetImage(
-                  'imeges/belongings.png',
-                )
-              : NetworkImage(
-                  photos[0],
-                ),
-        ),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(AppLocalizations.of(context)
+                  .translate(selectedType[0].toString())),
+              selectedType[1].length > 0
+                  ? Text('/' +
+                      AppLocalizations.of(context).translate(selectedType[1]
+                              [operation.object.subtype - 1]
+                          .toString()))
+                  : SizedBox.shrink(),
+            ],
+          ),
+          Row(
+            children: [
+              // the date
+              // the time is utc - convarte it to local
+              Text(formatter.format(operation.addDate.toLocal())),
+            ],
+          ),
+        ],
       ),
-      title: Text(
-          AppLocalizations.of(context).translate(selectedType[0].toString())),
-      subtitle: selectedType[1].length > 0
-          ? Text(AppLocalizations.of(context).translate(
-              selectedType[1][operation.object.subtype - 1].toString()))
-          : SizedBox.shrink(),
-      isThreeLine: true,
     );
   }
 }

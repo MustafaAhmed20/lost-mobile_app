@@ -83,13 +83,13 @@ class _MainMenuOnceState extends State<MainMenuOnce> {
               BackgrounDesign(),
 
               // the Top menu icon
-              Positioned(
-                  top: 7,
-                  right: 4,
-                  child: Icon(
-                    Icons.menu,
-                    size: 35,
-                  )),
+              // Positioned(
+              //     top: 7,
+              //     right: 4,
+              //     child: Icon(
+              //       Icons.menu,
+              //       size: 35,
+              //     )),
 
               // the BIG Tiltel
               Positioned(
@@ -109,15 +109,15 @@ class _MainMenuOnceState extends State<MainMenuOnce> {
               ),
 
               // the rigth bottom sttings icon
-              Positioned(
-                bottom: 7,
-                right: 7,
-                child: Icon(
-                  Icons.settings_outlined,
-                  color: mainTextColor,
-                  size: 40,
-                ),
-              ),
+              // Positioned(
+              //   bottom: 7,
+              //   right: 7,
+              //   child: Icon(
+              //     Icons.settings_outlined,
+              //     color: mainTextColor,
+              //     size: 40,
+              //   ),
+              // ),
 
               // the Three Big Buttons
               Container(

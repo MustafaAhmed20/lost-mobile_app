@@ -55,6 +55,7 @@ class _DataDetailsState extends State<DataDetails> {
     dynamic country =
         Provider.of<CountryData>(context, listen: false).selectedCountry;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title:
             Text(AppLocalizations.of(context).translate('dataDetails_details')),

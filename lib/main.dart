@@ -51,6 +51,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Flutter Demo',
       theme: ThemeData(
         fontFamily: 'theSans',
+        canvasColor: Colors.transparent,
         // This is the theme of your application.
 
         //primaryColor: Colors.purple[800],
@@ -86,7 +87,7 @@ class _MyAppState extends State<MyApp> {
       },
       // List all of the app's supported locales here
       supportedLocales: [
-        Locale('en', ''),
+        // Locale('en', ''),
         Locale('ar', ''),
       ],
       locale: selectedLanguage,
