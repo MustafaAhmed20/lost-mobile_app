@@ -42,6 +42,10 @@ class Operations {
 
   List<String> photos;
 
+  // the comments on this Operation - loaded manually
+  @JsonKey(ignore: true)
+  List<Comment> comments;
+
   Operations(
       {this.id,
       this.date,
@@ -58,6 +62,31 @@ class Operations {
       _$OperationsFromJson(json);
 
   Map<String, dynamic> toJson() => _$OperationsToJson(this);
+}
+
+@JsonSerializable()
+class Comment {
+  int id;
+
+  @JsonKey(name: 'operation_id')
+  int operationId;
+
+  DateTime time;
+  Users user;
+  String text;
+
+  Comment({
+    this.id,
+    this.operationId,
+    this.time,
+    this.user,
+    this.text,
+  });
+
+  factory Comment.fromJson(Map<String, dynamic> json) =>
+      _$CommentFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CommentToJson(this);
 }
 
 @JsonSerializable()

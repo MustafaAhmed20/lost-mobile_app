@@ -16,6 +16,10 @@ import 'package:lost/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class HomeData extends StatefulWidget {
+  // lost or found
+  int typeId;
+  HomeData({this.typeId});
+
   @override
   _HomeDataState createState() => _HomeDataState();
 }
@@ -33,7 +37,15 @@ class _HomeDataState extends State<HomeData> {
     // get the selected object
     String selectedObject =
         Provider.of<AppSettings>(context, listen: false).selectedObject;
+
     filters['object'] = selectedObject;
+
+    // the country
+    filters['country_id'] =
+        Provider.of<CountryData>(context, listen: false).selectedCountry?.id;
+
+    // the type(lost or flund) if any
+    if (widget.typeId != null) filters['type_id'] = widget.typeId;
 
     // load the operations with the filters
     Provider.of<OperationData>(context, listen: false).loadData(filters);

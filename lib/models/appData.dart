@@ -211,10 +211,12 @@ class OperationData extends ChangeNotifier {
 
   Map<String, String> filters = {};
 
-  OperationData(Map f) {
-    f.updateAll((key, value) => value.toString());
-    this.filters.addAll(Map<String, String>.from(f));
-    isLoading = false;
+  OperationData({Map f}) {
+    if (f != null) {
+      f.updateAll((key, value) => value.toString());
+      this.filters.addAll(Map<String, String>.from(f));
+      isLoading = false;
+    }
   }
 
   Future<void> loadData(Map filters) async {
@@ -289,6 +291,76 @@ class OperationData extends ChangeNotifier {
     notifyListeners();
     await loadData(filters);
   }
+
+  // load the comments
+  Future loadComments(
+      {@required Operations operation, @required String userToken}) async {
+    Future<void> getData() async {
+      Map<String, String> temp = {'operationid': operation.id.toString()};
+
+      try {
+        var uri = Uri.https(
+            AppData().serverName, AppData().apiSec + '/getcomment', temp);
+
+        http.Response response = await http.get(uri.toString());
+        if (response.statusCode != 200) {
+          // throw some error
+          print(response.body);
+        }
+
+        if (response.statusCode == 200) {
+          Map<String, dynamic> body = json.decode(response.body);
+
+          if (body['status'] != 'success') {
+            // error handling
+          } else if (body['status'] == 'success') {
+            operation.comments = (body['data']['comments'] as List)
+                .map((e) => Comment.fromJson(e))
+                .toList();
+          }
+        }
+      } catch (e) {
+        print(e);
+        //throw e;
+      }
+    }
+
+    await getData();
+
+    notifyListeners();
+  }
+
+  Future sendComment(
+      {@required Operations operation,
+      @required String userToken,
+      @required String text}) async {
+    // send Comment - return null if success else string error message
+    try {
+      // headers
+      Map<String, String> headers = {
+        'token': userToken.toString(),
+        "Content-Type": "application/json"
+      };
+      String body = json.encode({'text': text, "operationid": operation.id});
+      http.Response response = await http.post(address + '/sendcomment',
+          body: body, headers: headers);
+
+      if (response.statusCode != 201) {
+        // throw some error
+        Map<String, dynamic> body = json.decode(response.body);
+
+        return body['message'];
+      }
+
+      if (response.statusCode == 201) {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      return Future.value(e.toString());
+    }
+    return Future.value('error');
+  }
 }
 
 class AgeData extends ChangeNotifier {
@@ -332,7 +404,7 @@ class UserData extends ChangeNotifier {
   String phone;
   String token;
 
-  dynamic user;
+  Users user;
 
   Future<bool> checkLoginToken(String token) async {
     // this will check if the token is valid or not
@@ -571,9 +643,9 @@ class UserData extends ChangeNotifier {
         if (body['status'] != 'success') {
           // error handling
         } else if (body['status'] == 'success') {
-          this.user = body['data']['user'].map((item) {
-            return Users.fromJson(item);
-          }).toList()[0];
+          this.user = (body['data']['user'] as List)
+              .map((u) => Users.fromJson((u as Map<String, dynamic>)))
+              .toList()[0];
         }
       }
     } catch (e) {

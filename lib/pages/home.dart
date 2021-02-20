@@ -238,16 +238,18 @@ class _HomeState extends State<Home> {
                     :
                     // if selected object is accident not use pageView
                     selectedObject == 'menu_accident'
-                        ? // Accident object
-                        ChangeNotifierProvider(
-                            create: (context) => OperationData({
-                              'country_id': Provider.of<CountryData>(context,
-                                      listen: false)
-                                  .selectedCountry
-                                  ?.id,
-                            }),
-                            child: HomeData(),
-                          )
+                        ?
+                        // Accident object
+                        HomeData()
+                        // ChangeNotifierProvider(
+                        //     create: (context) => OperationData({
+                        //       'country_id': Provider.of<CountryData>(context,
+                        //               listen: false)
+                        //           .selectedCountry
+                        //           ?.id,
+                        //     }),
+                        //     child: HomeData(),
+                        //   )
                         : // all the objects
                         Column(
                             children: [
@@ -345,17 +347,20 @@ class _HomeState extends State<Home> {
                                   },
                                   itemCount: types?.length ?? 0,
                                   itemBuilder: (context, index) {
-                                    return ChangeNotifierProvider(
-                                      create: (context) => OperationData({
-                                        'country_id': Provider.of<CountryData>(
-                                                context,
-                                                listen: false)
-                                            .selectedCountry
-                                            ?.id,
-                                        'type_id': types[index]?.id,
-                                      }),
-                                      child: HomeData(),
+                                    return HomeData(
+                                      typeId: types[index]?.id,
                                     );
+                                    // ChangeNotifierProvider(
+                                    //   create: (context) => OperationData({
+                                    //     'country_id': Provider.of<CountryData>(
+                                    //             context,
+                                    //             listen: false)
+                                    //         .selectedCountry
+                                    //         ?.id,
+                                    // 'type_id': types[index]?.id,
+                                    //   }),
+                                    //   child: HomeData(),
+                                    // );
                                   },
                                 ),
                               ),

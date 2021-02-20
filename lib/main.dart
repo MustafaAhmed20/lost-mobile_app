@@ -10,6 +10,7 @@ import 'package:lost/pages/choosecountry.dart';
 import 'package:lost/pages/resetPassword.dart';
 import 'package:lost/pages/googlemap.dart';
 import 'package:lost/pages/feedback.dart';
+import 'package:lost/pages/comments.dart';
 
 import 'models/appData.dart';
 
@@ -31,6 +32,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => UserStatusData()),
     ChangeNotifierProvider(create: (context) => UserPermissionData()),
     ChangeNotifierProvider(create: (context) => PostData()),
+    ChangeNotifierProvider(create: (context) => OperationData()),
   ], child: MyApp()));
 }
 

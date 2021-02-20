@@ -10,6 +10,9 @@ import 'package:lost/models/person.dart';
 // use formatter
 import 'package:intl/intl.dart';
 
+// the comments
+import 'package:lost/pages/comments.dart';
+
 // the buttons
 import 'package:lost/widgets/buttons.dart';
 
@@ -42,6 +45,17 @@ class _DataDetailsState extends State<DataDetails> {
   Map arguments;
 
   Operations operation;
+
+  // open the comments page
+  void openComments(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => Comments(
+          operation: operation,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +135,7 @@ class _DataDetailsState extends State<DataDetails> {
                             Container(
                               width: 100,
                               child: Button50HBig(
-                                function: (c) {},
+                                function: openComments,
                                 color: mainLiteColor,
                                 text: 'التعليقات',
                                 textColor: Colors.white,

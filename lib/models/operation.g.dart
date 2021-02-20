@@ -49,6 +49,26 @@ Map<String, dynamic> _$OperationsToJson(Operations instance) =>
       'photos': instance.photos,
     };
 
+Comment _$CommentFromJson(Map<String, dynamic> json) {
+  return Comment(
+    id: json['id'] as int,
+    operationId: json['operation_id'] as int,
+    time: json['time'] == null ? null : DateTime.parse(json['time'] as String),
+    user: json['user'] == null
+        ? null
+        : Users.fromJson(json['user'] as Map<String, dynamic>),
+    text: json['text'] as String,
+  );
+}
+
+Map<String, dynamic> _$CommentToJson(Comment instance) => <String, dynamic>{
+      'id': instance.id,
+      'operation_id': instance.operationId,
+      'time': instance.time?.toIso8601String(),
+      'user': instance.user,
+      'text': instance.text,
+    };
+
 TypeOperation _$TypeOperationFromJson(Map<String, dynamic> json) {
   return TypeOperation(
     json['id'] as int,
