@@ -93,7 +93,12 @@ class _LoginState extends State<Login> {
             if (value.isEmpty) {
               return AppLocalizations.of(context).translate('login_mustPhone');
             }
-            return validatPhone(context, value, selectedCountry);
+            String notValid = validatPhone(context, value, selectedCountry);
+            if (notValid != null) {
+              return '$notValid\n تأكد من الرقم ومن الدولة المختارة';
+            }
+
+            return null;
           },
           passwordValidator: (value) {
             if (value.isEmpty) {

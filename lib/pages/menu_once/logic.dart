@@ -6,6 +6,9 @@ import 'package:lost/models/appData.dart';
 // storage user preferences
 import 'package:shared_preferences/shared_preferences.dart';
 
+//
+// THE welcome massege
+
 Future<bool> showWelcomeMassege() async {
   //  try load the sittings
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -16,6 +19,11 @@ Future<bool> showWelcomeMassege() async {
     return false;
   }
   return true;
+}
+
+void setDontShowWelcomeMassege(bool answer) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool('welcomeMessage', answer);
 }
 
 Future<bool> showLanguageSelector() async {

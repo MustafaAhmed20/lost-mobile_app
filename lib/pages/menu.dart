@@ -9,6 +9,10 @@ import 'package:lost/models/appData.dart';
 // the colors
 import 'package:lost/constants.dart';
 
+// form
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:lost/models/operation.dart';
+
 class Menu extends StatelessWidget {
   // the will be true if the user is loged-in else false
   final bool logged;
@@ -17,6 +21,13 @@ class Menu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
+
+    // the countries
+    List countries = Provider.of<CountryData>(context, listen: true).countries;
+
+    Country selectedCountry =
+        Provider.of<CountryData>(context, listen: true).selectedCountry;
+
     return SafeArea(
       child: Theme(
         data: Theme.of(context).copyWith(
@@ -191,6 +202,44 @@ class Menu extends StatelessWidget {
 
                   // push the icon down
                   Spacer(),
+
+                  // the selected contry
+                  Container(
+                    width: screenSize.width * (2 / 3),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    // color: Colors.blue,
+                    child: Column(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // the lable
+                        Text(
+                          'الدولة المختارة الان',
+                          style: TextStyle(fontSize: 10),
+                        ),
+
+                        // the selected contry
+                        Container(
+                          width: 100,
+                          child: FormBuilderCountryPicker(
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              // labelText: "الدولة الحالية",
+                            ),
+                            attribute: 'country_name',
+                            readOnly: true,
+                            initialValue: selectedCountry?.isoName ??
+                                countries[0].isoName,
+                            dialogTitle: Text(AppLocalizations.of(context)
+                                .translate('Settings_Country')),
+                            // countryFilterByIsoCode: countries
+                            //     .map((e) => e.isoName.toString())
+                            //     .toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                   // the logo
                   getIcon(),

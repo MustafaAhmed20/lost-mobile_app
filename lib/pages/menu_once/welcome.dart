@@ -28,15 +28,36 @@ class Welcome extends StatefulWidget {
 }
 
 class _WelcomeState extends State<Welcome> {
+  // this for info mode - if true mean the user clicked on (don't show again)
+  bool dontShowAgain = false;
+  void changeShowStatus() {
+    setState(() {
+      dontShowAgain = !dontShowAgain;
+    });
+
+    // save the settings
+    setDontShowWelcomeMassege(dontShowAgain);
+  }
+
+  void dismiss() {
+    // in the language mode dont use this
+    if (widget.mode != 'welcome') {
+      return;
+    }
+    widget.onDismiss(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        // in the language mode dont use this
-        if (widget.mode != 'welcome') {
-          return;
+    int sensitivity = 6;
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        if (details.delta.dx > sensitivity || details.delta.dx < -sensitivity) {
+          dismiss();
         }
-        widget.onDismiss(context);
+      },
+      onTap: () {
+        dismiss();
       },
       child: Stack(
         children: [
@@ -48,7 +69,10 @@ class _WelcomeState extends State<Welcome> {
               )),
 
           widget.mode == 'welcome'
-              ? Info()
+              ? Info(
+                  dontShowAgain: dontShowAgain,
+                  onDontShowAgain: changeShowStatus,
+                )
               : widget.mode == 'language'
                   ?
                   // the main screen
@@ -195,6 +219,11 @@ class CountryPage extends StatelessWidget {
 }
 
 class Info extends StatelessWidget {
+  bool dontShowAgain;
+  Function() onDontShowAgain;
+
+  Info({@required this.dontShowAgain, @required this.onDontShowAgain});
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -233,6 +262,45 @@ class Info extends StatelessWidget {
                     fontSize: 18,
                   ),
                 ),
+              ),
+            ),
+          ),
+
+          // don't show this page again button
+          InkWell(
+            onTap: onDontShowAgain,
+            child: Container(
+              width: screenSize.width,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              height: 40,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // the text
+                  Text(
+                    'لا تظهر هذه الرسالة مرة أخرى',
+                    style: TextStyle(
+                      color: mainTextColor,
+                    ),
+                  ),
+
+                  // the check Box
+                  Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      // color: Colors.blue,
+                      border: Border.all(color: mainTextColor),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: dontShowAgain
+                        ? Icon(
+                            Icons.check,
+                            color: mainTextColor,
+                          )
+                        : SizedBox.shrink(),
+                  ),
+                ],
               ),
             ),
           ),

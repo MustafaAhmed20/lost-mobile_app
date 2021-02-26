@@ -5,6 +5,10 @@ import 'design.dart';
 
 import 'package:lost/constants.dart';
 
+// import the app data
+import 'package:lost/models/appData.dart';
+import 'package:provider/provider.dart';
+
 // logic code
 import 'package:lost/pages/menu_once/logic.dart';
 
@@ -46,6 +50,24 @@ class _MainMenuOnceState extends State<MainMenuOnce> {
 
   @override
   void initState() {
+    // load the app settings
+
+    // load tha app data
+    Future fetchData() async {
+      // load the Type Operation
+      Provider.of<TypeOperationData>(context, listen: false).loadData();
+      // load the Status Operation
+      Provider.of<StatusOperationData>(context, listen: false).loadData();
+      // load the age ranges
+      Provider.of<AgeData>(context, listen: false).loadData();
+
+      //user data - Permission & Status
+      Provider.of<UserStatusData>(context, listen: false).loadData();
+      Provider.of<UserPermissionData>(context, listen: false).loadData();
+    }
+
+    fetchData();
+
     // check storeg to show welcome massege
     showWelcomeMassege().then((val) {
       if (val != showWelcome) {
@@ -64,7 +86,7 @@ class _MainMenuOnceState extends State<MainMenuOnce> {
       }
     });
 
-    // shw country bool from the loading page
+    // show country bool from the loading page
     showCountryPage = widget.showCountryPage;
 
     super.initState();
@@ -152,7 +174,8 @@ class _MainMenuOnceState extends State<MainMenuOnce> {
                       onDismiss: dismissWelcome,
                       mode: 'welcome',
                     )
-                  : showLanguag
+                  : false
+                      // showLanguag
                       ? Welcome(
                           onDismiss: dismissLange,
                           mode: 'language',

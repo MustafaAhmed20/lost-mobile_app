@@ -49,21 +49,10 @@ class _HomeState extends State<Home> {
 
     _pageController = PageController(initialPage: 0, keepPage: true);
 
-    // load tha app data
-    Future fetchData() async {
-      // load the Type Operation
-      Provider.of<TypeOperationData>(context, listen: false).loadData();
-      // load the Status Operation
-      Provider.of<StatusOperationData>(context, listen: false).loadData();
-      // load the age ranges
-      Provider.of<AgeData>(context, listen: false).loadData();
-
-      //user data - Permission & Status
-      Provider.of<UserStatusData>(context, listen: false).loadData();
-      Provider.of<UserPermissionData>(context, listen: false).loadData();
-    }
-
-    fetchData();
+    // open the menu
+    Future.delayed(Duration(seconds: 0, milliseconds: 500)).then((val) {
+      _scaffoldKey.currentState.openDrawer();
+    });
   }
 
   @override

@@ -70,46 +70,39 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> {
+  countryData() async {
+    return await Provider.of<CountryData>(context, listen: false).loadData();
+  }
+
+  // check connection
+  void loadData(BuildContext context) async {
+    bool result =
+        await Provider.of<AppData>(context, listen: false).checkConnection();
+
+    if (result == true) {
+      //check loggin
+      Provider.of<UserData>(context, listen: false).checkLogin();
+
+      // load country data
+      bool country = await countryData();
+
+      // new home once page
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (c) => MainMenuOnce(
+                // show the country choose page if there is not selected country
+                showCountryPage: !country,
+              )));
+    } else {
+      showAlertDialog(context);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
-    countryData() async {
-      return await Provider.of<CountryData>(context, listen: false).loadData();
-    }
-
-    // check connection
-    void loadData() async {
-      bool result =
-          await Provider.of<AppData>(context, listen: false).checkConnection();
-
-      if (result == true) {
-        //check loggin
-        Provider.of<UserData>(context, listen: false).checkLogin();
-
-        // load country data
-        bool country = await countryData();
-
-        // new home once page
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (c) => MainMenuOnce(
-                  // show the country choose page if there is not selected country
-                  showCountryPage: !country,
-                )));
-        // if (country) {
-        //   // home page
-        //   Navigator.pushReplacementNamed(context, '/home');
-        // } else {
-        //   // send him to choose
-        //   Navigator.pushReplacementNamed(context, '/choose');
-        // }
-      } else {
-        showAlertDialog(context);
-      }
-    }
-
     // load the data
-    loadData();
+    loadData(context);
   }
 
   @override

@@ -90,11 +90,14 @@ class _ChooseCountryState extends State<ChooseCountry> {
                             FormBuilderChoiceChip(
                               alignment: WrapAlignment.center,
                               decoration: InputDecoration(
+                                border: InputBorder.none,
                                 labelText: AppLocalizations.of(context)
                                     .translate('Settings_language'),
                               ),
                               spacing: 10,
                               attribute: 'lan',
+                              initialValue: 'ar',
+                              readOnly: true,
                               validators: [
                                 (value) {
                                   if (value == null) {
