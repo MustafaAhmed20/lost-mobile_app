@@ -33,7 +33,7 @@ class _HomeState extends State<Home> {
   bool isLoading;
 
   // current page viewed
-  int _currentPage = 0;
+  int _currentPage = 1;
 
   PageController _pageController;
 
@@ -47,12 +47,12 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
 
-    _pageController = PageController(initialPage: 0, keepPage: true);
+    _pageController = PageController(initialPage: 1, keepPage: true);
 
     // open the menu
-    Future.delayed(Duration(seconds: 0, milliseconds: 500)).then((val) {
-      _scaffoldKey.currentState.openDrawer();
-    });
+    // Future.delayed(Duration(seconds: 0, milliseconds: 500)).then((val) {
+    //   _scaffoldKey.currentState.openDrawer();
+    // });
   }
 
   @override

@@ -40,7 +40,7 @@ Future<bool> showLanguageSelector() async {
 
 // *******
 // set the lang
-Future<void> setLang(BuildContext context, String lang) {
+Future<void> setLang(BuildContext context, String lang) async {
   Provider.of<CountryData>(context, listen: false).setCountry(lang);
 }
 
@@ -48,13 +48,20 @@ Future<void> setLang(BuildContext context, String lang) {
 void pushFirstButtonLogic(BuildContext context) {
   // change the object to person
   Provider.of<AppSettings>(context, listen: false).changeObject('Person');
+
   // push home
   pushHome(context);
 }
 
-void pushSecoundButtonLogic(BuildContext context) => pushHome(context);
+void pushSecoundButtonLogic(BuildContext context) {
+  // change the object to Accident
+  Provider.of<AppSettings>(context, listen: false).changeObject('Accident');
+
+  // push home
+  pushHome(context);
+}
 
 void pushHome(BuildContext context) {
   // push home
-  Navigator.pushReplacementNamed(context, '/home');
+  Navigator.pushNamed(context, '/home');
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lost/pages/menu_once/welcome.dart';
+import 'package:lost/widgets/exit_app_confirmation.dart';
 
 import 'design.dart';
 
@@ -11,6 +12,9 @@ import 'package:provider/provider.dart';
 
 // logic code
 import 'package:lost/pages/menu_once/logic.dart';
+
+//language support
+import 'package:lost/app_localizations.dart';
 
 class MainMenuOnce extends StatefulWidget {
   final bool showCountryPage;
@@ -25,6 +29,8 @@ class _MainMenuOnceState extends State<MainMenuOnce> {
   bool showLanguag = false;
 
   bool showCountryPage;
+
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   void dismissWelcome(BuildContext context) {
     setState(() {
@@ -45,8 +51,12 @@ class _MainMenuOnceState extends State<MainMenuOnce> {
   }
 
   // push the main page - the code in logic.dart
-  Function pushFirstButton = pushFirstButtonLogic;
-  Function pushSecoundButton = pushSecoundButtonLogic;
+  // Function pushFirstButton = pushFirstButtonLogic;
+  void pushFirstButton(BuildContext context) {
+    _scaffoldKey.currentState.openDrawer();
+  }
+
+  Function(BuildContext context) pushSecoundButton = pushSecoundButtonLogic;
 
   @override
   void initState() {
@@ -96,99 +106,103 @@ class _MainMenuOnceState extends State<MainMenuOnce> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
 
-    return Scaffold(
-        backgroundColor: scaffoldColor,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              // the image in the back
-              BackgrounDesign(),
+    return WillPopScope(
+      onWillPop: () => exitApp(context),
+      child: Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: scaffoldColor,
+          drawer: FirstMenu(),
+          body: SafeArea(
+            child: Stack(
+              children: [
+                // the image in the back
+                BackgrounDesign(),
 
-              // the Top menu icon
-              // Positioned(
-              //     top: 7,
-              //     right: 4,
-              //     child: Icon(
-              //       Icons.menu,
-              //       size: 35,
-              //     )),
+                // the Top menu icon
+                // Positioned(
+                //     top: 7,
+                //     right: 4,
+                //     child: Icon(
+                //       Icons.menu,
+                //       size: 35,
+                //     )),
 
-              // the BIG Tiltel
-              Positioned(
-                top: 60,
-                child: Container(
-                  width: screenSize.width,
-                  child: Center(
-                    child: Text(
-                      'أنا يوسف',
-                      style: TextStyle(
-                          color: mainTextColor,
-                          fontSize: 42,
-                          fontWeight: FontWeight.bold),
+                // the BIG Tiltel
+                Positioned(
+                  top: 60,
+                  child: Container(
+                    width: screenSize.width,
+                    child: Center(
+                      child: Text(
+                        'أنا يوسف',
+                        style: TextStyle(
+                            color: mainTextColor,
+                            fontSize: 42,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              // the rigth bottom sttings icon
-              // Positioned(
-              //   bottom: 7,
-              //   right: 7,
-              //   child: Icon(
-              //     Icons.settings_outlined,
-              //     color: mainTextColor,
-              //     size: 40,
-              //   ),
-              // ),
+                // the rigth bottom sttings icon
+                // Positioned(
+                //   bottom: 7,
+                //   right: 7,
+                //   child: Icon(
+                //     Icons.settings_outlined,
+                //     color: mainTextColor,
+                //     size: 40,
+                //   ),
+                // ),
 
-              // the Three Big Buttons
-              Container(
-                width: screenSize.width,
-                height: screenSize.height,
-                margin: EdgeInsets.only(top: 180, bottom: 60),
-                padding: EdgeInsets.symmetric(vertical: 40),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  // mainAxisSize: MainAxisSize.min,
-                  children: [
-                    MenueSquareButton(
-                      color: mainLiteColor,
-                      image: 'imeges/personal.png',
-                      text: 'مفقودات',
-                      onClick: pushFirstButton,
-                    ),
-                    MenueSquareButton(
-                      color: mainDarkColor,
-                      image: 'imeges/accident.png',
-                      text: 'حوادث السير',
-                      onClick: pushSecoundButton,
-                    ),
-                    // AddButton(),
-                  ],
+                // the Three Big Buttons
+                Container(
+                  width: screenSize.width,
+                  height: screenSize.height,
+                  margin: EdgeInsets.only(top: 180, bottom: 60),
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    // mainAxisSize: MainAxisSize.min,
+                    children: [
+                      MenueSquareButton(
+                        color: mainLiteColor,
+                        image: 'imeges/personal.png',
+                        text: 'مفقودات',
+                        onClick: pushFirstButton,
+                      ),
+                      MenueSquareButton(
+                        color: mainDarkColor,
+                        image: 'imeges/accident.png',
+                        text: 'حوادث السير',
+                        onClick: pushSecoundButton,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              // the Hover screens
-              showWelcome
-                  ? Welcome(
-                      onDismiss: dismissWelcome,
-                      mode: 'welcome',
-                    )
-                  : false
-                      // showLanguag
-                      ? Welcome(
-                          onDismiss: dismissLange,
-                          mode: 'language',
-                        )
-                      : showCountryPage
-                          ? Welcome(
-                              onDismiss: dismissCountry,
-                              mode: 'country',
-                            )
-                          : SizedBox.shrink(),
-            ],
-          ),
-        ));
+                // the Hover screens
+                showWelcome
+                    ? Welcome(
+                        onDismiss: dismissWelcome,
+                        mode: 'welcome',
+                      )
+                    : false
+                        // showLanguag
+                        ? Welcome(
+                            onDismiss: dismissLange,
+                            mode: 'language',
+                          )
+                        : showCountryPage
+                            ? Welcome(
+                                onDismiss: dismissCountry,
+                                mode: 'country',
+                              )
+                            : SizedBox.shrink(),
+              ],
+            ),
+          )),
+    );
   }
 }
 
@@ -257,17 +271,98 @@ class MenueSquareButton extends StatelessWidget {
   }
 }
 
-class AddButton extends StatelessWidget {
+class FirstMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
-        shape: CircleBorder(),
-        color: mainDarkColor,
-        child: Icon(
-          Icons.add,
-          color: mainTextColor,
-          size: 60,
+    Size screenSize = MediaQuery.of(context).size;
+    return SafeArea(
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: Colors.transparent,
         ),
-        onPressed: () {});
+        child: Container(
+          width: screenSize.width * (2 / 3),
+          height: 300,
+          child: Drawer(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25),
+                  bottomLeft: Radius.circular(25),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // the menu titel
+                  Text(
+                    'المفقودات',
+                    style: TextStyle(
+                      fontSize: 30,
+                      color: mainDarkColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  // the menu
+                  ListView(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    children: <Widget>[
+                      //people
+                      ListTile(
+                        leading: Icon(
+                          Icons.people,
+                        ),
+                        title: Text(AppLocalizations.of(context)
+                            .translate('menu_people')),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          // change the object selected
+                          Provider.of<AppSettings>(context, listen: false)
+                              .changeObject('Person');
+                          // push home
+                          pushHome(context);
+                        },
+                      ),
+
+                      //cars
+                      ListTile(
+                        leading: Icon(Icons.directions_car),
+                        title: Text(AppLocalizations.of(context)
+                            .translate('menu_cars')),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          // change the object selected
+                          Provider.of<AppSettings>(context, listen: false)
+                              .changeObject('Car');
+                          // push home
+                          pushHome(context);
+                        },
+                      ),
+
+                      //PersonalBelongings
+                      ListTile(
+                        leading: Icon(Icons.phone_android),
+                        title: Text(AppLocalizations.of(context)
+                            .translate('menu_PersonalBelongings')),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          // change the object selected
+                          Provider.of<AppSettings>(context, listen: false)
+                              .changeObject('PersonalBelongings');
+                          // push home
+                          pushHome(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

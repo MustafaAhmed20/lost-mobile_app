@@ -97,6 +97,7 @@ class Menu extends StatelessWidget {
                               .changeObject('Accident');
                         },
                       ),
+
                       //people
                       ListTile(
                         leading: Icon(
@@ -111,7 +112,9 @@ class Menu extends StatelessWidget {
                               .changeObject('Person');
                         },
                       ),
+
                       //cars
+
                       ListTile(
                         leading: Icon(Icons.directions_car),
                         title: Text(AppLocalizations.of(context)
@@ -123,6 +126,7 @@ class Menu extends StatelessWidget {
                               .changeObject('Car');
                         },
                       ),
+
                       //PersonalBelongings
                       ListTile(
                         leading: Icon(Icons.phone_android),

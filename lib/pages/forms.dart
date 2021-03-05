@@ -153,6 +153,23 @@ class _OperatioFormState extends State<OperatioForm> {
       }
     }
 
+    // the back button logic
+    void backStep() {
+      if (widget.accident && stage == 2) {
+        // don't back from stage 3(index 2)
+        Navigator.pop(context);
+        return;
+      }
+
+      if (stage > 0) {
+        setState(() {
+          stage -= 1;
+        });
+      } else {
+        Navigator.pop(context);
+      }
+    }
+
     // the steps Decoration
     BoxDecoration stepsBoxDecoration = BoxDecoration(
       // color: Colors.grey[200],
@@ -211,127 +228,122 @@ class _OperatioFormState extends State<OperatioForm> {
 
     Size screenSize = MediaQuery.of(context).size;
 
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(children: [
-          // the image in the back
-          BackgrounDesign(),
+    return WillPopScope(
+      onWillPop: () async {
+        backStep();
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: scaffoldColor,
+        body: SafeArea(
+          child: Stack(children: [
+            // the image in the back
+            BackgrounDesign(),
 
-          // the Top close icon
-          Positioned(
-              top: 5,
-              // right: 2,
-              child: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(
-                    Icons.close,
-                    size: 35,
-                    color: Colors.red,
-                  ))),
+            // the Top close icon
+            Positioned(
+                top: 5,
+                // right: 2,
+                child: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      size: 35,
+                      color: Colors.red,
+                    ))),
 
-          // the BIG Tiltel
-          Positioned(
-            top: 40,
-            child: Container(
-              width: screenSize.width,
-              child: Center(
-                child: Text(
-                  'إضافة',
-                  style: TextStyle(
-                      color: mainTextColor,
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold),
+            // the BIG Tiltel
+            Positioned(
+              top: 40,
+              child: Container(
+                width: screenSize.width,
+                child: Center(
+                  child: Text(
+                    'إضافة',
+                    style: TextStyle(
+                        color: mainTextColor,
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // the data
-          Container(
-            margin: EdgeInsets.only(top: 130, bottom: 10, right: 10, left: 10),
-            padding: EdgeInsets.only(bottom: 10),
-            decoration: BoxDecoration(
-              // color: Colors.white,
-              // color: liteBackground,
-              color: mainDarkColor.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(25),
-            ),
-            clipBehavior: Clip.hardEdge,
-            width: screenSize.width,
-            height: screenSize.height,
-            child: Stepper(
-              type: StepperType.horizontal,
-              currentStep: stage,
-              steps: steps,
-              onStepContinue: () {},
-              onStepCancel: () {
-                if (widget.accident && stage == 2) {
-                  // don't back from stage 3(index 2)
-                  Navigator.pop(context);
-                }
-
-                if (stage > 0) {
-                  setState(() {
-                    stage -= 1;
-                  });
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-              controlsBuilder: (context,
-                  {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    // wait
-                    formWait ? wait(context) : SizedBox.shrink(),
-                    // Submit
-                    Expanded(
-                      child: formWait
-                          ? SizedBox.shrink()
-                          : MaterialButton(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18.0),
-                              ),
-                              color: Theme.of(context).primaryColor,
-                              child: Text(
-                                AppLocalizations.of(context)
-                                    .translate('operatioForm_Submit'),
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              onPressed: () {
-                                continueSteps();
-                              },
-                            ),
-                    ),
-                    // cancel
-                    Expanded(
-                      child: formWait
-                          ? SizedBox.shrink()
-                          : MaterialButton(
-                              shape: RoundedRectangleBorder(
+            // the data
+            Container(
+              margin:
+                  EdgeInsets.only(top: 130, bottom: 10, right: 10, left: 10),
+              padding: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                // color: Colors.white,
+                // color: liteBackground,
+                color: mainDarkColor.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              clipBehavior: Clip.hardEdge,
+              width: screenSize.width,
+              height: screenSize.height,
+              child: Stepper(
+                type: StepperType.horizontal,
+                currentStep: stage,
+                steps: steps,
+                onStepContinue: () {},
+                onStepCancel: backStep,
+                controlsBuilder: (context,
+                    {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      // wait
+                      formWait ? wait(context) : SizedBox.shrink(),
+                      // Submit
+                      Expanded(
+                        child: formWait
+                            ? SizedBox.shrink()
+                            : MaterialButton(
+                                shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(18.0),
-                                  side: BorderSide(color: Colors.red)),
-                              color: Colors.red,
-                              child: Text(
-                                AppLocalizations.of(context)
-                                    .translate('operatioForm_Cancel'),
-                                style: TextStyle(color: Colors.white),
+                                ),
+                                color: Theme.of(context).primaryColor,
+                                child: Text(
+                                  AppLocalizations.of(context)
+                                      .translate('operatioForm_Submit'),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                onPressed: () {
+                                  continueSteps();
+                                },
                               ),
-                              onPressed: () {
-                                //_fbKey.currentState.reset();
-                                onStepCancel();
-                              },
-                            ),
-                    ),
-                  ],
-                );
-              },
+                      ),
+                      // cancel
+                      Expanded(
+                        child: formWait
+                            ? SizedBox.shrink()
+                            : MaterialButton(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18.0),
+                                    side: BorderSide(color: Colors.red)),
+                                color: Colors.red,
+                                child: Text(
+                                  AppLocalizations.of(context)
+                                      .translate('operatioForm_Cancel'),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                onPressed: () {
+                                  //_fbKey.currentState.reset();
+                                  onStepCancel();
+                                },
+                              ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-        ]),
+          ]),
+        ),
       ),
     );
   }
@@ -462,7 +474,10 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
         child: FormBuilderCheckbox(
           attribute: 'shelter',
           initialValue: false,
-          label: Text('shelter', style: TextStyle(fontSize: 14)),
+          label: Text(
+            'داخل ملجأ؟',
+            style: TextStyle(fontSize: 16),
+          ),
           checkColor: Colors.black,
           valueTransformer: (value) {
             // the true value will be 'true' - false value will be empty string
