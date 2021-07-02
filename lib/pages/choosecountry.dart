@@ -152,7 +152,9 @@ class _ChooseCountryState extends State<ChooseCountry> {
                               var value = _fbKey.currentState.value;
 
                               Provider.of<CountryData>(context, listen: false)
-                                  .setCountry(value['country_name']);
+                                  .setCountry(
+                                      context: context,
+                                      countryName: value['country_name']);
 
                               // change the lang
                               Provider.of<AppSettings>(context, listen: false)

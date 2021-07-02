@@ -70,8 +70,9 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> {
-  countryData() async {
-    return await Provider.of<CountryData>(context, listen: false).loadData();
+  countryData(BuildContext context) async {
+    return await Provider.of<CountryData>(context, listen: false)
+        .loadData(context: context);
   }
 
   // check connection
@@ -84,7 +85,7 @@ class _LoadingState extends State<Loading> {
       Provider.of<UserData>(context, listen: false).checkLogin();
 
       // load country data
-      bool country = await countryData();
+      bool country = await countryData(context);
 
       // new home once page
       Navigator.of(context).pushReplacement(MaterialPageRoute(

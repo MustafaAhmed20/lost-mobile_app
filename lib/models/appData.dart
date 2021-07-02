@@ -26,17 +26,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emojis/emojis.dart';
 import 'package:emojis/emoji.dart';
 
+//
+import 'package:provider/provider.dart';
+
 String address = AppData().serverAddress;
 
 class CountryData extends ChangeNotifier {
 // countries available
 
-  List<dynamic> countries;
+  List<Country> countries;
 
   // the slected country now .. this will go as a filter for operation selecting
   Country selectedCountry;
 
-  Future<bool> loadData() async {
+  Future<bool> loadData({@required BuildContext context}) async {
     // return True if there is selected country , return False if no selected contry
 
     Future<void> getData() async {
@@ -53,7 +56,7 @@ class CountryData extends ChangeNotifier {
           if (body['status'] != 'success') {
             // error handling
           } else if (body['status'] == 'success') {
-            countries = body['data']['country'].map((item) {
+            countries = (body['data']['country'] as List).map((item) {
               return Country.fromJson(item);
             }).toList();
           }
@@ -69,14 +72,22 @@ class CountryData extends ChangeNotifier {
 
     //  try load the selected country from storge
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    int countryId = prefs.getInt('countryId');
+    String country = prefs.getString('country');
 
-    if (countryId != null) {
+    if (country != null) {
+      Country countryObject = Country.fromJson(json.decode(country));
+
+      // set the country
+      setCountry(context: context, countryObject: countryObject);
+
       // set the country
       done.then((value) {
-        this.selectedCountry = this.countries.firstWhere(
-            (country) => country.id == countryId,
+        Country country = this.countries.firstWhere(
+            (country) => country.id == countryObject.id,
             orElse: () => this.countries[0]);
+
+        // reset the country so any change will be save
+        setCountry(context: context, countryObject: country);
       });
 
       return Future<bool>.value(true);
@@ -84,14 +95,27 @@ class CountryData extends ChangeNotifier {
     return Future<bool>.value(false);
   }
 
-  void setCountry(String countryName) async {
-    // the user set the slected country
-    this.selectedCountry = this.countries.firstWhere(
-        (country) => country.name == countryName.toLowerCase(),
-        orElse: () => this.countries[0]);
+  void setCountry(
+      {@required BuildContext context,
+      String countryName,
+      Country countryObject}) async {
+    if (countryName == null && countryObject == null) {
+      // must pass one
+      throw 'must use countryName OR countryObject';
+    }
+    if (countryObject != null) {
+      this.selectedCountry = countryObject;
+    } else {
+      // the user set the slected country
+      this.selectedCountry = this.countries.firstWhere(
+          (country) => country.name == countryName.toLowerCase(),
+          orElse: () => this.countries[0]);
+    }
+
     final prefs = await SharedPreferences.getInstance();
+
     // set value
-    prefs.setInt('countryId', selectedCountry.id);
+    prefs.setString('country', json.encode(selectedCountry.toJson()));
 
     notifyListeners();
   }
@@ -204,27 +228,36 @@ class AppData extends ChangeNotifier {
 
 class OperationData extends ChangeNotifier {
   // operations loaded
-  List<dynamic> operations;
+  List<Operations> unFilteredOperations = [];
+  List<Operations> operations = [];
 
   // if this is true mean show temp screen
   bool isLoading;
 
-  Map<String, String> filters = {};
+  List<bool Function(Operations)> filters = [];
 
-  OperationData({Map f}) {
-    if (f != null) {
-      f.updateAll((key, value) => value.toString());
-      this.filters.addAll(Map<String, String>.from(f));
-      isLoading = false;
+  // filter the data by values
+  void filterData(List<bool Function(Operations)> filters) {
+    if (filters?.isEmpty ?? true) {
+      // all the Operations
+      operations = unFilteredOperations;
+    } else {
+      // get the operations where all the filters apply
+      operations = unFilteredOperations.where((e) {
+        return filters.every((element) => element(e));
+      }).toList();
     }
   }
 
-  Future<void> loadData(Map filters) async {
+  // Future<void> loadData(Map filters) async {
+  Future<void> loadData({@required BuildContext context}) async {
     // till the screen to wait
     isLoading = true;
 
     Future<void> getData(filters) async {
-      Map<String, String> temp = this.filters;
+      int countryId =
+          Provider.of<CountryData>(context, listen: false).selectedCountry?.id;
+      Map<String, String> temp = {'country_id': countryId.toString()};
 
       if (filters != null && filters.isNotEmpty) {
         filters.updateAll((key, value) => value.toString());
@@ -247,8 +280,9 @@ class OperationData extends ChangeNotifier {
           if (body['status'] != 'success') {
             // error handling
           } else if (body['status'] == 'success') {
-            this.operations = body['data']['operations'].map((item) {
-              dynamic operation = Operations.fromJson(item);
+            this.unFilteredOperations =
+                (body['data']['operations'] as List).map((item) {
+              Operations operation = Operations.fromJson(item);
               // load the object data manually
               var object = operation.objectType;
               if (object == 'Person') {
@@ -265,11 +299,11 @@ class OperationData extends ChangeNotifier {
             }).toList();
 
             // updata the photos with server address
-            for (int i = 0; i < this.operations.length; i++) {
-              List photos = this.operations[i].photos;
+            for (int i = 0; i < this.unFilteredOperations.length; i++) {
+              List photos = this.unFilteredOperations[i].photos;
               for (int j = 0; j < photos.length; j++) {
-                var current = this.operations[i].photos[j];
-                this.operations[i].photos[j] =
+                var current = this.unFilteredOperations[i].photos[j];
+                this.unFilteredOperations[i].photos[j] =
                     AppData().serverAddressImeges + current;
               }
             }
@@ -277,19 +311,18 @@ class OperationData extends ChangeNotifier {
         }
       } catch (e) {
         print(e);
-        //throw e;
       }
     }
 
-    await getData(filters);
+    await getData(this.filters);
     isLoading = false;
     notifyListeners();
   }
 
-  Future<void> reLoad(Map filters) async {
+  Future<void> reLoad({@required BuildContext context}) async {
     isLoading = true;
     notifyListeners();
-    await loadData(filters);
+    await loadData(context: context);
   }
 
   // load the comments

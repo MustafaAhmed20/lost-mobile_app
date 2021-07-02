@@ -180,7 +180,9 @@ class CountryPage extends StatelessWidget {
                       var value = _fbKey.currentState.value;
 
                       Provider.of<CountryData>(context, listen: false)
-                          .setCountry(value['country_name']);
+                          .setCountry(
+                              context: context,
+                              countryName: value['country_name']);
                       // dismiss the screen
                       dismissFun(context);
                     }

@@ -6,6 +6,9 @@ import 'package:lost/constants.dart';
 import 'wait.dart';
 import 'package:lost/models/operation.dart';
 import 'package:lost/models/person.dart';
+import 'package:lost/models/car.dart';
+import 'package:lost/models/accident.dart';
+import 'package:lost/models/personalBelongings.dart';
 
 import 'package:provider/provider.dart';
 import 'package:lost/models/appData.dart';
@@ -26,44 +29,73 @@ class HomeData extends StatefulWidget {
 
 class _HomeDataState extends State<HomeData> {
   // the filters applied
-  Map filters = {};
+  // Map filters = {};
 
-  List operations;
+  List<Operations> operations = [];
   List ages;
 
   @override
   void initState() {
     super.initState();
-    // get the selected object
-    String selectedObject =
-        Provider.of<AppSettings>(context, listen: false).selectedObject;
 
-    filters['object'] = selectedObject;
-
-    // the country
-    filters['country_id'] =
-        Provider.of<CountryData>(context, listen: false).selectedCountry?.id;
-
-    // the type(lost or flund) if any
-    if (widget.typeId != null) filters['type_id'] = widget.typeId;
-
-    // load the operations with the filters
-    Provider.of<OperationData>(context, listen: false).loadData(filters);
+    // clear the operations
+    Provider.of<OperationData>(context, listen: false).operations?.clear();
   }
 
   @override
-  Widget build(BuildContext context) {
-    operations = Provider.of<OperationData>(context, listen: true).operations;
-
-    if (operations == null) {
-      operations = [];
-    }
-
+  void didChangeDependencies() {
     bool isLoading =
         Provider.of<OperationData>(context, listen: true).isLoading;
 
     // this for 'Person' object
     ages = Provider.of<AgeData>(context, listen: true).ages;
+
+    String selectedObject =
+        Provider.of<AppSettings>(context, listen: false).selectedObject;
+
+    if (!isLoading) {
+      // filter
+
+      // load the operations with the filters
+      Provider.of<OperationData>(context, listen: false).filterData([
+        (Operations operation) {
+          // the type filter
+          if (selectedObject == 'Accident') {
+            // no type filter on Accident
+            return true;
+          }
+          return operation.typeId == widget.typeId;
+        },
+        (Operations operation) {
+          // the object filter
+
+          // Person
+          if (selectedObject == 'Person' && operation.object is Person)
+            return true;
+          // Accident
+          if (selectedObject == 'Accident' && operation.object is Accident)
+            return true;
+          // Car
+          if (selectedObject == 'Car' && operation.object is Car) return true;
+          // PersonalBelongings
+          if (selectedObject == 'PersonalBelongings' &&
+              operation.object is PersonalBelongings) return true;
+
+          return false;
+        }
+      ]);
+
+      operations =
+          Provider.of<OperationData>(context, listen: false).operations ?? [];
+    }
+
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    bool isLoading =
+        Provider.of<OperationData>(context, listen: true).isLoading ?? true;
 
     // selected object now
     String selectedObject =
@@ -72,10 +104,10 @@ class _HomeDataState extends State<HomeData> {
     return Container(
       margin: EdgeInsets.only(top: 20),
       padding: EdgeInsets.only(bottom: 80),
-      // color: Colors.red,
       child: RefreshIndicator(
         onRefresh: () {
-          return Provider.of<OperationData>(context, listen: false).reLoad({});
+          return Provider.of<OperationData>(context, listen: false)
+              .reLoad(context: context);
         },
         child: isLoading
             ? wait(context)
@@ -105,13 +137,6 @@ class _HomeDataState extends State<HomeData> {
                           },
                           child: Container(
                             color: liteBackground,
-                            // decoration: BoxDecoration(
-                            //   border: Border.symmetric(
-                            //       vertical: BorderSide(
-                            //     color: Colors.grey,
-                            //     width: 0.2,
-                            //   )),
-                            // ),
                             margin: EdgeInsets.only(bottom: 8),
                             child: DataCard(
                               operation: operations[index],

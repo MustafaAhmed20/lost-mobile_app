@@ -41,7 +41,8 @@ Future<bool> showLanguageSelector() async {
 // *******
 // set the lang
 Future<void> setLang(BuildContext context, String lang) async {
-  Provider.of<CountryData>(context, listen: false).setCountry(lang);
+  // TODO: change this to set lang func
+  // Provider.of<CountryData>(context, listen: false).setCountry(lang);
 }
 
 // push the main

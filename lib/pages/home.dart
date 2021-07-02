@@ -33,7 +33,8 @@ class _HomeState extends State<Home> {
   bool isLoading;
 
   // current page viewed
-  int _currentPage = 1;
+  static const int _INITIAlPAGE = 0;
+  int _currentPage = _INITIAlPAGE;
 
   PageController _pageController;
 
@@ -43,11 +44,19 @@ class _HomeState extends State<Home> {
   // key for the scaffold - helps in show the snackbar
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  //
+  String selectedObject;
+
   @override
   void initState() {
     super.initState();
 
-    _pageController = PageController(initialPage: 1, keepPage: true);
+    _pageController =
+        PageController(initialPage: _INITIAlPAGE, keepPage: false);
+
+    // load data
+    Provider.of<OperationData>(context, listen: false)
+        .loadData(context: context);
 
     // open the menu
     // Future.delayed(Duration(seconds: 0, milliseconds: 500)).then((val) {
@@ -62,20 +71,32 @@ class _HomeState extends State<Home> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // use default value of 'Accident' object string - this is a fix for a bug that somtimes apper
+    String tempSelectedObject =
+        Provider.of<AppSettings>(context, listen: true).selectedObjectString ??
+            'menu_accident';
+
+    if (selectedObject != tempSelectedObject) {
+      // the object changed
+      selectedObject = tempSelectedObject;
+      _currentPage = _INITIAlPAGE;
+    }
+
     // check if there is a snakebar need to show from provider
     String massege =
         Provider.of<AppSettings>(context, listen: true).homeSnakeBar;
+
     // show the snakebar
     Future.delayed(Duration(seconds: 0)).then((value) {
       showSnake(context, massege, _scaffoldKey);
     });
+  }
 
-    // use default value of 'Accident' object string - this is a fix for a bug that somtimes apper
-    String selectedObject =
-        Provider.of<AppSettings>(context, listen: true).selectedObjectString ??
-            'menu_accident';
-
+  @override
+  Widget build(BuildContext context) {
     // variable numbers of tabs
     List types =
         Provider.of<TypeOperationData>(context, listen: true).typeOperation ??
@@ -117,57 +138,6 @@ class _HomeState extends State<Home> {
               logged: logged,
               selectedObject: selectedObject,
             ),
-      // plusButton(context, selectedObject, logged),
-      // appBar: AppBar(
-      //   backgroundColor: Theme.of(context).primaryColor,
-      //   title: Text(AppLocalizations.of(context).translate(selectedObject)),
-      //   centerTitle: true,
-      //   // no tap bar if the objct selected is accident
-      //   bottom: selectedObject == 'menu_accident'
-      //       ? null
-      //       : PreferredSize(
-      //           preferredSize: Size(double.infinity, 20),
-      //           child: Row(
-      //               mainAxisAlignment: MainAxisAlignment.spaceAround,
-      //               children: types?.map((type) {
-      //                     int index = types.indexOf(type);
-      //                     return InkWell(
-      //                         onTap: () {
-      //                           setState(() {
-      //                             _currentPage = index;
-      //                           });
-      //                           _pageController.animateToPage(
-      //                             index,
-      //                             duration: Duration(milliseconds: 400),
-      //                             curve: Curves.easeInOut,
-      //                           );
-      //                         },
-      //                         child: Container(
-      //                           color:
-      //                               index == _currentPage ? Colors.white : null,
-      //                           padding: EdgeInsets.symmetric(
-      //                               horizontal: 10, vertical: 3),
-      //                           margin: EdgeInsets.symmetric(
-      //                               vertical: 10.0, horizontal: 2.0),
-      //                           child: Text(
-      //                             AppLocalizations.of(context)
-      //                                 .translate(names[types[index].name]),
-      //                             style: TextStyle(
-      //                               //color: Theme.of(context).accentColor,
-      //                               color: index == _currentPage
-      //                                   ? Theme.of(context).primaryColor
-      //                                   : Theme.of(context).accentColor,
-      //                               fontWeight: FontWeight.bold,
-      //                               fontSize: 14,
-      //                               letterSpacing: 1.0,
-      //                             ),
-      //                           ),
-      //                         ));
-      //                   })?.toList() ??
-      //                   // if the types is null
-      //                   []),
-      //         ),
-      // ),
       backgroundColor: scaffoldColor,
       body: Stack(children: [
         // the design
@@ -191,7 +161,7 @@ class _HomeState extends State<Home> {
           ),
         ),
 
-        // the BIG Tiltel
+        // the BIG Title
         Positioned(
           top: 50,
           child: Container(
@@ -230,97 +200,77 @@ class _HomeState extends State<Home> {
                         ?
                         // Accident object
                         HomeData()
-                        // ChangeNotifierProvider(
-                        //     create: (context) => OperationData({
-                        //       'country_id': Provider.of<CountryData>(context,
-                        //               listen: false)
-                        //           .selectedCountry
-                        //           ?.id,
-                        //     }),
-                        //     child: HomeData(),
-                        //   )
                         : // all the objects
                         Column(
                             children: [
                               // page view controll buttons
                               // no tap bar if the objct selected is accident
-                              selectedObject == 'menu_accident'
-                                  ? null
-                                  : Container(
-                                      height: 40,
-                                      clipBehavior: Clip.hardEdge,
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 50),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: mainLiteColor, width: 1.2),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: types?.map((type) {
-                                                int index = types.indexOf(type);
-                                                return Expanded(
-                                                  child: InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          _currentPage = index;
-                                                        });
-                                                        _pageController
-                                                            .animateToPage(
-                                                          index,
-                                                          duration: Duration(
-                                                              milliseconds:
-                                                                  400),
-                                                          curve:
-                                                              Curves.easeInOut,
-                                                        );
-                                                      },
-                                                      child: Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          // border: Border.all(
-                                                          //     color:
-                                                          //         mainLiteColor),
-                                                          color: index ==
-                                                                  _currentPage
-                                                              ? mainLiteColor
-                                                              : null,
-                                                        ),
-                                                        // padding: EdgeInsets
-                                                        //     .symmetric(
-                                                        //         horizontal: 10,
-                                                        //         vertical: 3),
+                              Container(
+                                height: 40,
+                                clipBehavior: Clip.hardEdge,
+                                margin: EdgeInsets.symmetric(horizontal: 50),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: mainLiteColor, width: 1.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: types?.map((type) {
+                                          int index = types.indexOf(type);
+                                          return Expanded(
+                                            child: InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _currentPage = index;
+                                                  });
+                                                  _pageController.animateToPage(
+                                                    index,
+                                                    duration: Duration(
+                                                        milliseconds: 400),
+                                                    curve: Curves.easeInOut,
+                                                  );
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    // border: Border.all(
+                                                    //     color:
+                                                    //         mainLiteColor),
+                                                    color: index == _currentPage
+                                                        ? mainLiteColor
+                                                        : null,
+                                                  ),
+                                                  // padding: EdgeInsets
+                                                  //     .symmetric(
+                                                  //         horizontal: 10,
+                                                  //         vertical: 3),
 
-                                                        child: Center(
-                                                          child: Text(
-                                                            AppLocalizations.of(
-                                                                    context)
-                                                                .translate(names[
-                                                                    types[index]
-                                                                        .name]),
-                                                            style: TextStyle(
-                                                              //color: Theme.of(context).accentColor,
-                                                              color: index ==
-                                                                      _currentPage
-                                                                  ? Colors.white
-                                                                  : mainLiteColor,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 14,
-                                                              letterSpacing:
-                                                                  1.0,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )),
-                                                );
-                                              })?.toList() ??
-                                              // if the types is null
-                                              []),
-                                    ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate(names[
+                                                              types[index]
+                                                                  .name]),
+                                                      style: TextStyle(
+                                                        //color: Theme.of(context).accentColor,
+                                                        color: index ==
+                                                                _currentPage
+                                                            ? Colors.white
+                                                            : mainLiteColor,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14,
+                                                        letterSpacing: 1.0,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )),
+                                          );
+                                        })?.toList() ??
+                                        // if the types is null
+                                        []),
+                              ),
 
                               // the data
                               Expanded(
@@ -328,7 +278,6 @@ class _HomeState extends State<Home> {
                                   // use the 'selectedObject' as key to force the pageView to rebuild if the object changed.
                                   key: ValueKey(selectedObject),
                                   controller: _pageController,
-
                                   onPageChanged: (index) {
                                     setState(() {
                                       _currentPage = index;
@@ -339,17 +288,6 @@ class _HomeState extends State<Home> {
                                     return HomeData(
                                       typeId: types[index]?.id,
                                     );
-                                    // ChangeNotifierProvider(
-                                    //   create: (context) => OperationData({
-                                    //     'country_id': Provider.of<CountryData>(
-                                    //             context,
-                                    //             listen: false)
-                                    //         .selectedCountry
-                                    //         ?.id,
-                                    // 'type_id': types[index]?.id,
-                                    //   }),
-                                    //   child: HomeData(),
-                                    // );
                                   },
                                 ),
                               ),
@@ -451,46 +389,6 @@ class AddButton extends StatelessWidget {
     );
   }
 }
-
-// Widget plusButton(BuildContext context, selectedObject, logged) {
-//   return FloatingActionButton.extended(
-//     onPressed: () {
-//       // login if not already logged-in
-//       logged
-//           ? Navigator.push(
-//               context,
-//               MaterialPageRoute(
-//                   builder: (context) => OperatioForm(
-//                         accident: selectedObject == 'menu_accident',
-//                       )))
-//           : // loggin page
-
-//           Navigator.pushNamed(context, '/login',
-//               arguments: {'showAlert': true});
-//     },
-//     label: Text(
-//       selectedObject == 'menu_accident'
-//           ? AppLocalizations.of(context).translate('home_addAccident')
-//           : '+',
-//       style: TextStyle(
-//         fontSize: 20.0,
-//         fontWeight: FontWeight.bold,
-//       ),
-//     ),
-//     // this only when the selected object is accident
-//     icon: selectedObject == 'menu_accident'
-//         ? Image.asset(
-//             'imeges/accident.png',
-//             width: 30,
-//           )
-//         : null,
-//     shape: selectedObject == 'menu_accident'
-//         ? RoundedRectangleBorder(
-//             borderRadius: BorderRadius.circular(18.0),
-//           )
-//         : null,
-//   );
-// }
 
 showSnake(BuildContext context, String choice, GlobalKey<ScaffoldState> key) {
   if (choice == null) {
