@@ -129,6 +129,7 @@
    "menu_cars" : "Cars",
    "menu_accident": "car Accidents",
    "menu_PersonalBelongings":"Personal Belongings",
+   "menu_my_operations" : "My posts",
 
    "typeOperation_lost": "lost",
    "typeOperation_found": "found",

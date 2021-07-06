@@ -4,8 +4,8 @@ import 'package:lost/constants.dart';
 
 import 'package:lost/pages/loading.dart';
 import 'package:lost/pages/login.dart';
-import 'package:lost/pages/home.dart';
-import 'package:lost/pages/dataDetails.dart';
+import 'package:lost/pages/home/home.dart';
+import 'package:lost/pages/operations/dataDetails.dart';
 import 'package:lost/pages/choosecountry.dart';
 import 'package:lost/pages/resetPassword.dart';
 import 'package:lost/pages/googlemap.dart';

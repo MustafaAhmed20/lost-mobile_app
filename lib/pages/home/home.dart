@@ -3,9 +3,9 @@ import 'package:lost/pages/menu_once/design.dart';
 import 'package:lost/pages/settings_hover.dart';
 
 import 'package:lost/pages/operations/homeData.dart';
-import 'wait.dart';
-import 'forms.dart';
-import 'snackBars.dart';
+import 'package:lost/pages/wait.dart';
+import 'package:lost/pages/forms.dart';
+import 'package:lost/pages/snackBars.dart';
 
 // import the app data
 import 'package:lost/models/appData.dart';
@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:lost/app_localizations.dart';
 
 // the main menu
-import 'package:lost/pages/menu.dart';
+import 'package:lost/pages/home/menu.dart';
 
 // the colors
 import 'package:lost/constants.dart';

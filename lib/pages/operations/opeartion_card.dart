@@ -27,60 +27,75 @@ class DataCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    List photos = operation.photos;
+    List<String> photos = operation.photos;
     return Container(
       width: screenSize.width,
       height: 70,
-      padding: EdgeInsets.only(right: 5, top: 5, bottom: 5),
-      // color: Colors.red,
+      // padding: EdgeInsets.only(right: 5, top: 5, bottom: 5),
+      decoration: BoxDecoration(
+        // color: Colors.white,
+        color: liteBackground.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(15.0),
+        border: Border.all(
+          width: 1.0,
+          color: Colors.grey[200],
+        ),
+      ),
       child: Row(
         children: [
           // the photo
           Container(
-            height: 60,
-            width: 60,
             decoration: BoxDecoration(
               border: Border.all(color: mainDarkColor),
+              borderRadius: BorderRadius.circular(10.0),
             ),
-            child: Image(
-              fit: BoxFit.fill,
-              image: photos == null || photos.isEmpty
-                  ? AssetImage(
-                      objectType == 'Person'
-                          ? 'imeges/profile.png'
-                          : objectType == 'Car'
-                              ? 'imeges/car.png'
-                              : objectType == 'Accident'
-                                  ? 'imeges/accident.png'
-                                  :
-                                  //Personal Belongings
-                                  'imeges/belongings.png',
-                    )
-                  : NetworkImage(
-                      photos[0],
-                    ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Image(
+                height: 70,
+                width: 70,
+                fit: BoxFit.cover,
+                image: photos == null || photos.isEmpty
+                    ? AssetImage(
+                        objectType == 'Person'
+                            ? 'imeges/profile.png'
+                            : objectType == 'Car'
+                                ? 'imeges/car.png'
+                                : objectType == 'Accident'
+                                    ? 'imeges/accident.png'
+                                    :
+                                    //Personal Belongings
+                                    'imeges/belongings.png',
+                      )
+                    : NetworkImage(
+                        photos[0],
+                      ),
+              ),
             ),
           ),
 
           // the rest of the data
           Expanded(
-            child: objectType == 'Person'
-                ? DataCardPerson(
-                    operation: operation,
-                  )
-                : objectType == 'Car'
-                    ? DataCardCar(
-                        operation: operation,
-                      )
-                    : objectType == 'Accident'
-                        ? DataCardAccident(
-                            operation: operation,
-                          )
-                        :
-                        //Personal Belongings
-                        DataCardPersonalBelongings(
-                            operation: operation,
-                          ),
+            child: Container(
+              margin: EdgeInsets.only(bottom: 5, top: 5),
+              child: objectType == 'Person'
+                  ? DataCardPerson(
+                      operation: operation,
+                    )
+                  : objectType == 'Car'
+                      ? DataCardCar(
+                          operation: operation,
+                        )
+                      : objectType == 'Accident'
+                          ? DataCardAccident(
+                              operation: operation,
+                            )
+                          :
+                          //Personal Belongings
+                          DataCardPersonalBelongings(
+                              operation: operation,
+                            ),
+            ),
           ),
         ],
       ),

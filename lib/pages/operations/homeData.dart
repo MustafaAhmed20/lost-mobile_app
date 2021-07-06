@@ -118,10 +118,13 @@ class _HomeDataState extends State<HomeData> {
                   )
                 : Container(
                     // margin: EdgeInsets.only(top: 20),
-                    child: ListView.builder(
+                    child: ListView.separated(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
                       itemCount: operations.length,
+                      separatorBuilder: (context, index) {
+                        return Divider();
+                      },
                       itemBuilder: (context, index) {
                         return InkWell(
                           onTap: () {
@@ -135,12 +138,8 @@ class _HomeDataState extends State<HomeData> {
                                           operations[index].object.ageId)
                                 });
                           },
-                          child: Container(
-                            color: liteBackground,
-                            margin: EdgeInsets.only(bottom: 8),
-                            child: DataCard(
-                              operation: operations[index],
-                            ),
+                          child: DataCard(
+                            operation: operations[index],
                           ),
                         );
                       },

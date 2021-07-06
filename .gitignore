@@ -1,6 +1,6 @@
 android/app/src/main/AndroidManifest.xml
 
-lib/pages/secrets.dart
+lib/api.dart
 # Miscellaneous
 *.class
 *.log

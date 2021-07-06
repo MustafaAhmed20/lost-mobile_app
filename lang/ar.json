@@ -126,7 +126,8 @@
    "menu_people" : "الأشخاص",
    "menu_cars" : "السيارات",
    "menu_accident": "حوادث السير",
-   "menu_PersonalBelongings":"المتعلقات الشخصية",
+   "menu_PersonalBelongings" : "المتعلقات الشخصية",
+   "menu_my_operations" : "منشوراتي",
 
 
    "typeOperation_lost": "مفقود",

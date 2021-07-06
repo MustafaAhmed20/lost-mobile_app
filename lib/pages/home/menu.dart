@@ -15,6 +15,9 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 // the models
 import 'package:lost/models/models.dart';
 
+// my operations page
+import 'package:lost/pages/operations/my_operations_page.dart';
+
 class Menu extends StatelessWidget {
   // the will be true if the user is loged-in else false
   final bool logged;
@@ -64,26 +67,6 @@ class Menu extends StatelessWidget {
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     children: <Widget>[
-                      // DrawerHeader(
-                      //   child: Text(
-                      //     'Side menu',
-                      //     style: TextStyle(color: Colors.white, fontSize: 25),
-                      //   ),
-                      //   decoration: BoxDecoration(
-                      //       color: Colors.green,
-                      //       image: DecorationImage(
-                      //           fit: BoxFit.fill, image: AssetImage('imeges/menu.jpg'))),
-                      // ),
-                      // Divider with text in middel
-
-                      // Row(
-                      //   children: <Widget>[
-                      //     Expanded(child: Divider()),
-                      //     Text("Sections"),
-                      //     Expanded(child: Divider()),
-                      //   ],
-                      // ),
-
                       //accident
                       ListTile(
                         leading: Image.asset(
@@ -208,6 +191,27 @@ class Menu extends StatelessWidget {
 
                   // push the icon down
                   Spacer(),
+
+                  // my operations tile
+                  logged
+                      ? ListTile(
+                          leading: Icon(Icons.person),
+                          // Image.asset(
+                          //   'imeges/accident.png',
+                          //   width: 40,
+                          // ),
+                          title: Text(AppLocalizations.of(context)
+                              .translate('menu_my_operations')),
+                          onTap: () {
+                            Navigator.of(context).pop();
+
+                            // open my operations
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (c) => MyOperationsPage(),
+                            ));
+                          },
+                        )
+                      : SizedBox.shrink(),
 
                   // the selected contry
                   Container(
