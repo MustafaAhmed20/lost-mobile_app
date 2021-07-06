@@ -6,7 +6,7 @@ this the main state model of the app data
 import 'package:flutter/material.dart';
 
 // the server URL
-import 'package:lost/server.dart' as urls;
+import 'package:lost/api.dart' as urls;
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';

@@ -23,7 +23,7 @@ import 'package:lost/models/appData.dart';
 import 'package:share/share.dart';
 
 // api key
-import 'package:lost/server.dart';
+import 'package:lost/api.dart';
 
 //language support
 import 'package:lost/app_localizations.dart';
