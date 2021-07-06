@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 
 // data classes
 import 'package:lost/models/appData.dart';
-import 'package:lost/models/operation.dart';
+import 'package:lost/models/operation/operation.dart';
 
 // form builder
 import 'package:flutter_form_builder/flutter_form_builder.dart';

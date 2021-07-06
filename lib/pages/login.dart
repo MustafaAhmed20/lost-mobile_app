@@ -3,8 +3,11 @@ import 'package:flutter_login/flutter_login.dart';
 
 // import the app data
 import 'package:lost/models/appData.dart';
-import 'package:lost/models/operation.dart';
 import 'package:provider/provider.dart';
+
+// the models
+import 'package:lost/models/operation/operation.dart';
+
 import 'snackBars.dart';
 
 // the validators functions

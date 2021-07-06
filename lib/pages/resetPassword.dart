@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
+// the providers
 import 'package:provider/provider.dart';
 import 'package:lost/models/appData.dart';
-import 'package:lost/models/operation.dart';
+
+// the models
+import 'package:lost/models/models.dart';
+
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import 'package:flutter_verification_code/flutter_verification_code.dart';

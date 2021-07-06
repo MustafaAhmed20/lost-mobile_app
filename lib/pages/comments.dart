@@ -5,7 +5,7 @@ import 'package:lost/pages/wait.dart';
 
 import 'package:provider/provider.dart';
 import 'package:lost/models/appData.dart';
-import 'package:lost/models/operation.dart';
+import 'package:lost/models/operation/operation.dart';
 
 // the colors
 import 'package:lost/constants.dart';

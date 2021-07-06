@@ -1,4 +1,4 @@
-import 'user.dart';
+import '../user/user.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'operation.g.dart';

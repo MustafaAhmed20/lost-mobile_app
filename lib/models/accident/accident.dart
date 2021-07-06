@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:lost/models/car.dart';
-import 'package:lost/models/person.dart';
+import 'package:lost/models/car/car.dart';
+import 'package:lost/models/person/person.dart';
 
 part 'accident.g.dart';
 

@@ -4,8 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:carousel_slider/carousel_options.dart';
 
 // import operation model
-import 'package:lost/models/operation.dart';
-import 'package:lost/models/person.dart';
+import 'package:lost/models/models.dart';
 
 // use formatter
 import 'package:intl/intl.dart';
@@ -16,6 +15,7 @@ import 'package:lost/pages/comments.dart';
 // the buttons
 import 'package:lost/widgets/buttons.dart';
 
+// the providers
 import 'package:provider/provider.dart';
 import 'package:lost/models/appData.dart';
 
@@ -23,7 +23,7 @@ import 'package:lost/models/appData.dart';
 import 'package:share/share.dart';
 
 // api key
-import 'secrets.dart';
+import 'package:lost/server.dart';
 
 //language support
 import 'package:lost/app_localizations.dart';

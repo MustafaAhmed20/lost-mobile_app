@@ -11,7 +11,9 @@ import 'package:lost/constants.dart';
 
 // form
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:lost/models/operation.dart';
+
+// the models
+import 'package:lost/models/models.dart';
 
 class Menu extends StatelessWidget {
   // the will be true if the user is loged-in else false

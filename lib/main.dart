@@ -50,7 +50,8 @@ class _MyAppState extends State<MyApp> {
     selectedLanguage =
         Provider.of<AppSettings>(context, listen: true).selectedLanguage;
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'أنا يوسف',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'theSans',
 

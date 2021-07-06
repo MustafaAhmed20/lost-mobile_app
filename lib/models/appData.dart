@@ -3,19 +3,16 @@ this the main state model of the app data
 
 */
 
-// the server URL
-import 'package:lost/pages/secrets.dart' as urls;
-
 import 'package:flutter/material.dart';
+
+// the server URL
+import 'package:lost/server.dart' as urls;
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'operation.dart';
-import 'person.dart';
-import 'user.dart';
-import 'car.dart';
-import 'accident.dart';
-import 'personalBelongings.dart';
+// the models
+import 'package:lost/models/models.dart';
 
 import 'package:path/path.dart';
 
@@ -26,7 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emojis/emojis.dart';
 import 'package:emojis/emoji.dart';
 
-//
+// the provider package
 import 'package:provider/provider.dart';
 
 String address = AppData().serverAddress;

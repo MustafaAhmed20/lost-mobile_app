@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:lost/models/appData.dart';
-import 'package:lost/models/operation.dart';
+import 'package:lost/models/operation/operation.dart';
 import 'package:lost/pages/wait.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
