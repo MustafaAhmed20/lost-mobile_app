@@ -34,6 +34,9 @@ class Operations {
   @JsonKey(name: 'status_id')
   int statusId;
 
+  // if this operation is active
+  bool isActive() => this.statusId == 1;
+
   @JsonKey(name: 'country_id')
   int countryId;
 

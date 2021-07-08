@@ -19,9 +19,20 @@ class _MyOperationsPageState extends State<MyOperationsPage> {
   List<Operations> operations = [];
 
   @override
+  void initState() {
+    // the token
+    String userToken = Provider.of<UserData>(context, listen: false).token;
+
+    // load the data
+    Provider.of<OperationData>(context, listen: false)
+        .loadMyOperations(context: context, userToken: userToken);
+    super.initState();
+  }
+
+  @override
   void didChangeDependencies() {
     operations =
-        Provider.of<OperationData>(context, listen: true).operations ?? [];
+        Provider.of<OperationData>(context, listen: true).myOperations ?? [];
 
     super.didChangeDependencies();
   }
@@ -58,8 +69,15 @@ class _MyOperationsPageState extends State<MyOperationsPage> {
               (BuildContext context, int index) {
                 return Container(
                   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: DataCard(
-                    operation: operations[index],
+                  child: GestureDetector(
+                    onTap: () =>
+                        Navigator.pushNamed(context, '/details', arguments: {
+                      'operation': operations[index],
+                    }),
+                    child: DataCard(
+                      operation: operations[index],
+                      showBottomIdentifiers: true,
+                    ),
                   ),
                 );
               },

@@ -18,22 +18,29 @@ import 'package:provider/provider.dart';
 
 class DataCard extends StatelessWidget {
   final Operations operation;
-  String objectType;
+
+  bool showBottomIdentifiers;
+
   DataCard({
     @required this.operation,
-  }) {
-    objectType = operation.objectType;
-  }
+    this.showBottomIdentifiers = false,
+  });
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     List<String> photos = operation.photos;
+    String objectType = operation.objectType;
+
+    // the status strings
+    bool isOperationActive = operation.isActive();
+
+    String statusString = isOperationActive ? 'متاح' : 'مغلق';
+
     return Container(
       width: screenSize.width,
-      height: 70,
-      // padding: EdgeInsets.only(right: 5, top: 5, bottom: 5),
+      height: showBottomIdentifiers ? 100 : 80,
       decoration: BoxDecoration(
-        // color: Colors.white,
         color: liteBackground.withOpacity(0.2),
         borderRadius: BorderRadius.circular(15.0),
         border: Border.all(
@@ -42,9 +49,11 @@ class DataCard extends StatelessWidget {
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // the photo
           Container(
+            // alignment: Alignment.topCenter,
             decoration: BoxDecoration(
               border: Border.all(color: mainDarkColor),
               borderRadius: BorderRadius.circular(10.0),
@@ -77,24 +86,77 @@ class DataCard extends StatelessWidget {
           // the rest of the data
           Expanded(
             child: Container(
-              margin: EdgeInsets.only(bottom: 5, top: 5),
-              child: objectType == 'Person'
-                  ? DataCardPerson(
-                      operation: operation,
-                    )
-                  : objectType == 'Car'
-                      ? DataCardCar(
-                          operation: operation,
+              margin: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
+              child: Column(
+                children: [
+                  // the object data
+                  Expanded(
+                    child: objectType == 'Person'
+                        ? DataCardPerson(
+                            operation: operation,
+                          )
+                        : objectType == 'Car'
+                            ? DataCardCar(
+                                operation: operation,
+                              )
+                            : objectType == 'Accident'
+                                ? DataCardAccident(
+                                    operation: operation,
+                                  )
+                                :
+                                //Personal Belongings
+                                DataCardPersonalBelongings(
+                                    operation: operation,
+                                  ),
+                  ),
+
+                  // the Bottom Identifiers
+                  showBottomIdentifiers
+                      ? Container(
+                          height: 20,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                color: hoverColor,
+                                padding: EdgeInsets.symmetric(horizontal: 5),
+                                child: Center(
+                                    child: Text(
+                                  AppLocalizations.of(context).translate(
+                                    objectType == 'Accident'
+                                        ? 'menu_accident'
+                                        : objectType == 'Person'
+                                            ? 'menu_people'
+                                            : objectType == 'Car'
+                                                ? 'menu_cars'
+                                                : 'menu_PersonalBelongings',
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                )),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 5),
+                                color: isOperationActive
+                                    ? Colors.green
+                                    : Colors.red,
+                                child: Center(
+                                    child: Text(
+                                  statusString,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600),
+                                )),
+                              ),
+                            ],
+                          ),
                         )
-                      : objectType == 'Accident'
-                          ? DataCardAccident(
-                              operation: operation,
-                            )
-                          :
-                          //Personal Belongings
-                          DataCardPersonalBelongings(
-                              operation: operation,
-                            ),
+                      : SizedBox.shrink(),
+                ],
+              ),
             ),
           ),
         ],
@@ -114,11 +176,10 @@ class DataCardPerson extends StatelessWidget {
   Widget build(BuildContext context) {
     // this for 'Person' object
     List ages = Provider.of<AgeData>(context, listen: true).ages ?? [];
-    Age age =
-        ages.firstWhere((element) => element.id == operation.object.ageId);
+    Age age = ages.firstWhere((element) => element.id == operation.object.ageId,
+        orElse: () => null);
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -133,23 +194,35 @@ class DataCardPerson extends StatelessWidget {
 
               // age
               Text(AppLocalizations.of(context).translate('homeData_Age') +
-                  '${age.minAge} - ${age.maxAge}'),
+                  '${age?.minAge ?? ''} - ${age?.maxAge ?? ''}'),
             ],
           ),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               // the time is utc - convarte it to local
               Text(formatter.format(operation.addDate.toLocal())),
 
               // is in shelter
               operation.object.shelter == true
-                  ? Text(
-                      AppLocalizations.of(context)
-                          .translate('homeData_inShelter'),
-                      style: TextStyle(
-                          color: Colors.red, fontWeight: FontWeight.bold))
+                  ? Column(
+                      children: [
+                        Icon(
+                          Icons.home,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        Text(
+                            AppLocalizations.of(context)
+                                .translate('homeData_inShelter'),
+                            style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    )
                   : SizedBox.shrink(),
             ],
           ),
@@ -169,7 +242,6 @@ class DataCardCar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
           Row(
@@ -249,7 +321,6 @@ class DataCardPersonalBelongings extends StatelessWidget {
     var selectedType = types[operation.object.type - 1];
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
           Row(

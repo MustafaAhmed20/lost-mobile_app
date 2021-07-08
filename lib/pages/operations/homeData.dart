@@ -131,11 +131,6 @@ class _HomeDataState extends State<HomeData> {
                             Navigator.pushNamed(context, '/details',
                                 arguments: {
                                   'operation': operations[index],
-                                  'age': selectedObject != 'Person'
-                                      ? null
-                                      : ages.firstWhere((element) =>
-                                          element.id ==
-                                          operations[index].object.ageId)
                                 });
                           },
                           child: DataCard(

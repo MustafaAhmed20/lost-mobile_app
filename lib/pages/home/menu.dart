@@ -196,10 +196,6 @@ class Menu extends StatelessWidget {
                   logged
                       ? ListTile(
                           leading: Icon(Icons.person),
-                          // Image.asset(
-                          //   'imeges/accident.png',
-                          //   width: 40,
-                          // ),
                           title: Text(AppLocalizations.of(context)
                               .translate('menu_my_operations')),
                           onTap: () {

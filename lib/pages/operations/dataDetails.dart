@@ -33,7 +33,7 @@ import 'package:lost/constants.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
-List photos;
+List<String> photos;
 
 class DataDetails extends StatefulWidget {
   @override
@@ -61,11 +61,10 @@ class _DataDetailsState extends State<DataDetails> {
   Widget build(BuildContext context) {
     arguments = ModalRoute.of(context).settings.arguments;
 
-    // selected object now
-    String selectedObject =
-        Provider.of<AppSettings>(context, listen: true).selectedObject;
-
     operation = arguments['operation'];
+
+    // selected object now
+    String selectedObject = operation.objectType;
 
     // photos
     photos = operation.photos;
@@ -74,7 +73,7 @@ class _DataDetailsState extends State<DataDetails> {
     //     .typeOperation
     //     .firstWhere((element) => element.id == operation.typeId);
 
-    dynamic country =
+    Country country =
         Provider.of<CountryData>(context, listen: false).selectedCountry;
 
     // login state - true if user logged-in

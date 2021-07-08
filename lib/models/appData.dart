@@ -228,6 +228,9 @@ class OperationData extends ChangeNotifier {
   List<Operations> unFilteredOperations = [];
   List<Operations> operations = [];
 
+  // the operations for the logged-in user
+  List<Operations> myOperations = [];
+
   // if this is true mean show temp screen
   bool isLoading;
 
@@ -268,7 +271,7 @@ class OperationData extends ChangeNotifier {
         http.Response response = await http.get(uri.toString());
         if (response.statusCode != 200) {
           // throw some error
-          this.operations = [];
+          this.unFilteredOperations = [];
         }
 
         if (response.statusCode == 200) {
@@ -278,32 +281,7 @@ class OperationData extends ChangeNotifier {
             // error handling
           } else if (body['status'] == 'success') {
             this.unFilteredOperations =
-                (body['data']['operations'] as List).map((item) {
-              Operations operation = Operations.fromJson(item);
-              // load the object data manually
-              var object = operation.objectType;
-              if (object == 'Person') {
-                operation.object = Person.fromJson(item['object']);
-              } else if (object == 'Car') {
-                operation.object = Car.fromJson(item['object']);
-              } else if (object == 'Accident') {
-                operation.object = Accident.fromJson(item['object']);
-              } else if (object == 'PersonalBelongings') {
-                operation.object = PersonalBelongings.fromJson(item['object']);
-              }
-
-              return operation;
-            }).toList();
-
-            // updata the photos with server address
-            for (int i = 0; i < this.unFilteredOperations.length; i++) {
-              List photos = this.unFilteredOperations[i].photos;
-              for (int j = 0; j < photos.length; j++) {
-                var current = this.unFilteredOperations[i].photos[j];
-                this.unFilteredOperations[i].photos[j] =
-                    AppData().serverAddressImeges + current;
-              }
-            }
+                _loadOperations(body['data']['operations'] as List);
           }
         }
       } catch (e) {
@@ -321,6 +299,80 @@ class OperationData extends ChangeNotifier {
     notifyListeners();
     await loadData(context: context);
   }
+
+  // load the "my operations"
+  Future<void> loadMyOperations(
+      {@required BuildContext context, @required String userToken}) async {
+    // till the screen to wait
+    isLoading = true;
+
+    Future<void> getData() async {
+      // headers
+      Map<String, String> headers = {'token': userToken.toString()};
+
+      try {
+        var uri = Uri.https(
+            AppData().serverName, AppData().apiSec + '/getmyoperations');
+
+        http.Response response =
+            await http.get(uri.toString(), headers: headers);
+        if (response.statusCode != 200) {
+          // throw some error
+          this.myOperations = [];
+        }
+
+        if (response.statusCode == 200) {
+          Map<String, dynamic> body = json.decode(response.body);
+
+          if (body['status'] != 'success') {
+            // error handling
+          } else if (body['status'] == 'success') {
+            this.myOperations =
+                _loadOperations(body['data']['operations'] as List);
+          }
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    await getData();
+    isLoading = false;
+    notifyListeners();
+  }
+
+  List<Operations> _loadOperations(List data) {
+    List operations = data.map((item) {
+      Operations operation = Operations.fromJson(item);
+      // load the object data manually
+      var object = operation.objectType;
+      if (object == 'Person') {
+        operation.object = Person.fromJson(item['object']);
+      } else if (object == 'Car') {
+        operation.object = Car.fromJson(item['object']);
+      } else if (object == 'Accident') {
+        operation.object = Accident.fromJson(item['object']);
+      } else if (object == 'PersonalBelongings') {
+        operation.object = PersonalBelongings.fromJson(item['object']);
+      }
+
+      return operation;
+    }).toList();
+
+    // updata the photos with server address
+    for (int i = 0; i < this.operations.length; i++) {
+      List photos = this.operations[i].photos;
+      for (int j = 0; j < photos.length; j++) {
+        var current = this.operations[i].photos[j];
+        this.operations[i].photos[j] = AppData().serverAddressImeges + current;
+      }
+    }
+    return operations;
+  }
+
+  // *********************
+  // ***** comments *****
+  // *********************
 
   // load the comments
   Future loadComments(
