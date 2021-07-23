@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -5,11 +7,13 @@ import 'package:intl/intl.dart';
 
 import 'package:lost/models/appData.dart';
 import 'package:lost/pages/menu_once/design.dart';
+import 'package:lost/widgets/photos_uploader_box.dart';
 
 import 'package:provider/provider.dart';
 
 // check Gps func
 import 'package:lost/pages/googlemap.dart';
+
 //language support
 import 'package:lost/app_localizations.dart';
 
@@ -35,13 +39,14 @@ class OperatioForm extends StatefulWidget {
 
 class _OperatioFormState extends State<OperatioForm> {
   // forms key
-  GlobalKey<FormBuilderState> _form0;
-  GlobalKey<FormBuilderState> _form1;
-  GlobalKey<FormBuilderState> _form2;
-  GlobalKey<FormBuilderState> _form3;
+  // GlobalKey<FormBuilderState> _form0;
+  // GlobalKey<FormBuilderState> _form1;
+  // GlobalKey<FormBuilderState> _form2;
+  // GlobalKey<FormBuilderState> _form3;
 
   // make list of the forms keys to access it with 'stage' integer
-  List<GlobalKey<FormBuilderState>> formsKeys;
+  final List<GlobalKey<FormBuilderState>> formsKeys =
+      List.generate(4, (index) => GlobalKey<FormBuilderState>());
 
   // stage - this integer will help the form be like stages
   int stage = 0;
@@ -59,12 +64,12 @@ class _OperatioFormState extends State<OperatioForm> {
   void initState() {
     super.initState();
 
-    _form0 = GlobalKey<FormBuilderState>();
-    _form1 = GlobalKey<FormBuilderState>();
-    _form2 = GlobalKey<FormBuilderState>();
-    _form3 = GlobalKey<FormBuilderState>();
+    // _form0 = GlobalKey<FormBuilderState>();
+    // _form1 = GlobalKey<FormBuilderState>();
+    // _form2 = GlobalKey<FormBuilderState>();
+    // _form3 = GlobalKey<FormBuilderState>();
 
-    formsKeys = [_form0, _form1, _form2, _form3];
+    // formsKeys = [_form0, _form1, _form2, _form3];
 
     data = {};
 
@@ -436,9 +441,11 @@ Widget formPerson(context, formKey, data, {void Function() onChange}) {
                 .translate('operatioForm_requiredError')),
 
         items: ages
-            .map((age) => DropdownMenuItem(
-                value: age.id, child: Text("${age.minAge} - ${age.maxAge}")))
-            .toList(),
+                ?.map((age) => DropdownMenuItem(
+                    value: age.id,
+                    child: Text("${age.minAge} - ${age.maxAge}")))
+                ?.toList() ??
+            [],
       ),
       // skin color
       FormBuilderDropdown(
@@ -949,6 +956,27 @@ Widget form2(context, formKey, data) {
         ),
         */
         // photos
+        FormBuilderField<List<File>>(
+          name: "photos",
+          initialValue: data['photos'] ?? null,
+          builder: (field) => InputDecorator(
+            decoration: InputDecoration(
+              labelText:
+                  AppLocalizations.of(context).translate('operatioForm_photos'),
+              border: InputBorder.none,
+            ),
+            child: Container(
+              margin: EdgeInsets.only(top: 10),
+              child: PhotosUploaderBox(
+                oldFilePhotos: data['photos'] ?? [],
+                onChange: (c, photos) {
+                  field.didChange(photos.map((e) => e.image).toList());
+                },
+              ),
+            ),
+          ),
+        ),
+
         // FormBuilderImagePicker(
         //   initialValue: data['photos'] ?? null,
         //   decoration: InputDecoration(border: InputBorder.none),

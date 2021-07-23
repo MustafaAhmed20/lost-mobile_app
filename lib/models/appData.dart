@@ -3,6 +3,8 @@ this the main state model of the app data
 
 */
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 // the server URL
@@ -28,6 +30,8 @@ import 'package:provider/provider.dart';
 
 String address = AppData().serverAddress;
 
+String serverName = AppData().serverName;
+
 class CountryData extends ChangeNotifier {
 // countries available
 
@@ -41,7 +45,8 @@ class CountryData extends ChangeNotifier {
 
     Future<void> getData() async {
       try {
-        http.Response response = await http.get(address + '/getcountry');
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/getcountry');
+        http.Response response = await http.get(uri);
 
         if (response.statusCode != 200) {
           // throw some error
@@ -129,7 +134,9 @@ class TypeOperationData extends ChangeNotifier {
   void loadData() async {
     Future<void> getData() async {
       try {
-        http.Response response = await http.get(address + '/gettypeoperation');
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/gettypeoperation');
+
+        http.Response response = await http.get(uri);
 
         if (response.statusCode != 200) {
           // throw some error
@@ -165,8 +172,10 @@ class StatusOperationData extends ChangeNotifier {
   void loadData() async {
     Future<void> getData() async {
       try {
-        http.Response response =
-            await http.get(address + '/getstatusoperation');
+        Uri uri =
+            Uri.https(serverName, AppData().apiSec + '/getstatusoperation');
+
+        http.Response response = await http.get(uri);
 
         if (response.statusCode != 200) {
           // throw some error
@@ -204,7 +213,9 @@ class AppData extends ChangeNotifier {
   Future<bool> checkConnection() async {
     Future<bool> getData() async {
       try {
-        http.Response data = await http.get(address + '/checkconnection');
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/checkconnection');
+
+        http.Response data = await http.get(uri);
 
         if (data.statusCode != 200) {
           return Future<bool>.value(false);
@@ -268,7 +279,8 @@ class OperationData extends ChangeNotifier {
         var uri = Uri.https(
             AppData().serverName, AppData().apiSec + '/getoperation', temp);
 
-        http.Response response = await http.get(uri.toString());
+        http.Response response = await http.get(uri);
+
         if (response.statusCode != 200) {
           // throw some error
           this.unFilteredOperations = [];
@@ -314,8 +326,7 @@ class OperationData extends ChangeNotifier {
         var uri = Uri.https(
             AppData().serverName, AppData().apiSec + '/getmyoperations');
 
-        http.Response response =
-            await http.get(uri.toString(), headers: headers);
+        http.Response response = await http.get(uri, headers: headers);
         if (response.statusCode != 200) {
           // throw some error
           this.myOperations = [];
@@ -384,7 +395,7 @@ class OperationData extends ChangeNotifier {
         var uri = Uri.https(
             AppData().serverName, AppData().apiSec + '/getcomment', temp);
 
-        http.Response response = await http.get(uri.toString());
+        http.Response response = await http.get(uri);
         if (response.statusCode != 200) {
           // throw some error
           print(response.body);
@@ -424,8 +435,10 @@ class OperationData extends ChangeNotifier {
         "Content-Type": "application/json"
       };
       String body = json.encode({'text': text, "operationid": operation.id});
-      http.Response response = await http.post(address + '/sendcomment',
-          body: body, headers: headers);
+      Uri uri = Uri.https(serverName, AppData().apiSec + '/sendcomment');
+
+      http.Response response =
+          await http.post(uri, body: body, headers: headers);
 
       if (response.statusCode != 201) {
         // throw some error
@@ -451,7 +464,9 @@ class AgeData extends ChangeNotifier {
   void loadData() async {
     Future<void> getData() async {
       try {
-        http.Response response = await http.get(address + '/getage');
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/getage');
+
+        http.Response response = await http.get(uri);
 
         if (response.statusCode != 200) {
           // throw some error
@@ -491,7 +506,9 @@ class UserData extends ChangeNotifier {
   Future<bool> checkLoginToken(String token) async {
     // this will check if the token is valid or not
 
-    http.Response response = await http.post(address + '/checklogin',
+    Uri uri = Uri.https(serverName, AppData().apiSec + '/checklogin');
+
+    http.Response response = await http.post(uri,
         headers: {"Content-Type": "application/json", 'token': token});
     if (response.statusCode != 200) {
       // remove the token
@@ -500,7 +517,7 @@ class UserData extends ChangeNotifier {
 
       // remove the token from the Preferences
       final prefs = await SharedPreferences.getInstance();
-      prefs.setString('token', null);
+      prefs.remove('token');
       return false;
     } else {
       // new token
@@ -537,7 +554,9 @@ class UserData extends ChangeNotifier {
           'password': password,
           'country_id': selectedCountryId
         });
-        http.Response response = await http.post(address + '/login',
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/login');
+
+        http.Response response = await http.post(uri,
             body: body, headers: {"Content-Type": "application/json"});
 
         if (response.statusCode != 200) {
@@ -585,7 +604,9 @@ class UserData extends ChangeNotifier {
           'password': password,
           'country_id': selectedCountryId
         });
-        http.Response response = await http.post(address + '/registeruser',
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/registeruser');
+
+        http.Response response = await http.post(uri,
             body: body, headers: {"Content-Type": "application/json"});
 
         Map<String, dynamic> resultBody = json.decode(response.body);
@@ -624,7 +645,10 @@ class UserData extends ChangeNotifier {
       try {
         String body =
             json.encode({'phone': phone, 'country_id': selectedCountryId});
-        http.Response response = await http.post(address + '/forgotpassword',
+
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/forgotpassword');
+
+        http.Response response = await http.post(uri,
             body: body, headers: {"Content-Type": "application/json"});
 
         if (response.statusCode != 200) {
@@ -664,7 +688,10 @@ class UserData extends ChangeNotifier {
           'code': code,
           'password': password
         });
-        http.Response response = await http.post(address + '/resetpassword',
+
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/resetpassword');
+
+        http.Response response = await http.post(uri,
             body: body, headers: {"Content-Type": "application/json"});
 
         if (response.statusCode != 200) {
@@ -700,7 +727,7 @@ class UserData extends ChangeNotifier {
     this.user = null;
     Future clear() async {
       final prefs = await SharedPreferences.getInstance();
-      prefs.setString('token', null);
+      prefs.remove('token');
     }
 
     clear();
@@ -712,8 +739,10 @@ class UserData extends ChangeNotifier {
       String body = json.encode({
         'phone': this.phone,
       });
-      http.Response response = await http.post(address + '/getuser',
-          body: body, headers: {"Content-Type": "application/json"});
+      Uri uri = Uri.https(serverName, AppData().apiSec + '/getuser');
+
+      http.Response response = await http
+          .post(uri, body: body, headers: {"Content-Type": "application/json"});
 
       if (response.statusCode != 200) {
         // throw some error
@@ -742,7 +771,9 @@ class UserStatusData extends ChangeNotifier {
   void loadData() async {
     Future<void> getData() async {
       try {
-        http.Response response = await http.get(address + '/getstatus');
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/getstatus');
+
+        http.Response response = await http.get(uri);
 
         if (response.statusCode != 200) {
           // throw some error
@@ -776,7 +807,9 @@ class UserPermissionData extends ChangeNotifier {
   void loadData() async {
     Future<void> getData() async {
       try {
-        http.Response response = await http.get(address + '/getpermission');
+        Uri uri = Uri.https(serverName, AppData().apiSec + '/getpermission');
+
+        http.Response response = await http.get(uri);
 
         if (response.statusCode != 200) {
           // throw some error
@@ -815,7 +848,7 @@ class PostData extends ChangeNotifier {
     // create local copy from the data
     Map<dynamic, dynamic> data = Map<dynamic, dynamic>()..addAll(passedData);
 
-    List photos = data['photos'];
+    List<File> photos = data['photos'];
     data.remove('photos');
 
     if (data['location'] != null) {
@@ -880,8 +913,11 @@ class PostData extends ChangeNotifier {
         "Content-Type": "application/json"
       };
       String body = json.encode({'feedback': text});
-      http.Response response = await http.post(address + '/addfeedback',
-          body: body, headers: headers);
+
+      Uri uri = Uri.https(serverName, AppData().apiSec + '/addfeedback');
+
+      http.Response response =
+          await http.post(uri, body: body, headers: headers);
 
       if (response.statusCode != 201) {
         // throw some error
