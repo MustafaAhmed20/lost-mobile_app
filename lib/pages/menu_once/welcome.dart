@@ -16,6 +16,8 @@ import 'package:lost/models/operation/operation.dart';
 // form builder
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import 'package:country_pickers/country_pickers.dart' as CountryPickers;
+
 class Welcome extends StatefulWidget {
   final String mode;
   final Function onDismiss;
@@ -155,15 +157,43 @@ class CountryPage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: FormBuilder(
                     key: _fbKey,
-                    child: FormBuilderCountryPicker(
-                      attribute: 'country_name',
-                      decoration: InputDecoration(border: InputBorder.none),
+
+                    child: FormBuilderField<Country>(
+                      name: 'country_name',
+                      enabled: true,
                       initialValue: null,
-                      countryFilterByIsoCode: countries != null
-                          ? countries.map((e) => e.isoName.toString()).toList()
-                          : [],
-                      validators: [FormBuilderValidators.required()],
+                      validator: FormBuilderValidators.required(context),
+                      builder: (field) => InputDecorator(
+                        decoration: InputDecoration(border: InputBorder.none),
+                        child: CountryPickers.CountryPickerDropdown(
+                          initialValue:
+                              selectedCountry?.isoName ?? countries[0].isoName,
+                          isFirstDefaultIfInitialValueNotProvided: true,
+                          onValuePicked: (value) {
+                            field.didChange(countries.firstWhere(
+                                (element) => element.isoName == value.isoCode));
+                          },
+                          itemFilter: (country) {
+                            Country filterdCountry = countries.firstWhere(
+                                (element) => element.isoName == country.isoCode,
+                                orElse: () => null);
+
+                            if (filterdCountry != null) return true;
+                            return false;
+                          },
+                        ),
+                      ),
                     ),
+
+                    // FormBuilderCountryPicker(
+                    //   attribute: 'country_name',
+                    //   decoration: InputDecoration(border: InputBorder.none),
+                    //   initialValue: null,
+                    //   countryFilterByIsoCode: countries != null
+                    //       ? countries.map((e) => e.isoName.toString()).toList()
+                    //       : [],
+                    //   validators: [FormBuilderValidators.required()],
+                    // ),
                   ),
                 ),
 

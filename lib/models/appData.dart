@@ -20,8 +20,8 @@ import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // emojis
-import 'package:emojis/emojis.dart';
-import 'package:emojis/emoji.dart';
+// import 'package:emojis/emojis.dart';
+// import 'package:emojis/emoji.dart';
 
 // the provider package
 import 'package:provider/provider.dart';
@@ -954,11 +954,11 @@ class AppSettings extends ChangeNotifier {
       ['5.png', 'skin_dark']
     ];
 
-    cars = [
-      [Emoji.byChar(Emojis.automobile), 'light'],
-      [Emoji.byChar(Emojis.tramCar), 'mediumLight'],
-      [Emoji.byChar(Emojis.minibus), 'medium'],
-    ];
+    // cars = [
+    //   [Emoji.byChar(Emojis.automobile), 'light'],
+    //   [Emoji.byChar(Emojis.tramCar), 'mediumLight'],
+    //   [Emoji.byChar(Emojis.minibus), 'medium'],
+    // ];
 
     availablePersonalBelongingsTypes = [
       [

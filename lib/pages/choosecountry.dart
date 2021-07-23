@@ -10,6 +10,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 //language support
 import 'package:lost/app_localizations.dart';
 
+import 'package:country_pickers/country_pickers.dart' as CountryPickers;
+
 class ChooseCountry extends StatefulWidget {
   @override
   _ChooseCountryState createState() => _ChooseCountryState();
@@ -31,7 +33,8 @@ class _ChooseCountryState extends State<ChooseCountry> {
     }
 
     // the countries
-    List countries = Provider.of<CountryData>(context, listen: true).countries;
+    List<Country> countries =
+        Provider.of<CountryData>(context, listen: true).countries;
 
     Country selectedCountry =
         Provider.of<CountryData>(context, listen: true).selectedCountry;
@@ -61,7 +64,7 @@ class _ChooseCountryState extends State<ChooseCountry> {
                         bottomRight: Radius.circular(25.0))),
                 margin: EdgeInsets.symmetric(horizontal: 25),
                 width: double.infinity,
-                height: 270,
+                height: 300,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -72,18 +75,41 @@ class _ChooseCountryState extends State<ChooseCountry> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            FormBuilderCountryPicker(
-                              decoration: InputDecoration(
+                            FormBuilderField<Country>(
+                              name: 'country_name',
+                              enabled: true,
+                              initialValue: selectedCountry ?? countries[0],
+                              validator:
+                                  FormBuilderValidators.required(context),
+                              builder: (field) => InputDecorator(
+                                decoration: InputDecoration(
                                   labelText: AppLocalizations.of(context)
-                                      .translate('Settings_Country')),
-                              attribute: 'country_name',
-                              initialValue: selectedCountry?.isoName ??
-                                  countries[0].isoName,
-                              dialogTitle: Text(AppLocalizations.of(context)
-                                  .translate('Settings_Country')),
-                              countryFilterByIsoCode: countries
-                                  .map((e) => e.isoName.toString())
-                                  .toList(),
+                                      .translate('Settings_Country'),
+                                  border: InputBorder.none,
+                                  errorText: field.errorText,
+                                ),
+                                child: CountryPickers.CountryPickerDropdown(
+                                  initialValue: selectedCountry?.isoName ??
+                                      countries[0].isoName,
+                                  isFirstDefaultIfInitialValueNotProvided: true,
+                                  onValuePicked: (value) {
+                                    field.didChange(countries.firstWhere(
+                                        (element) =>
+                                            element.isoName == value.isoCode));
+                                  },
+                                  itemFilter: (country) {
+                                    Country filterdCountry =
+                                        countries.firstWhere(
+                                            (element) =>
+                                                element.isoName ==
+                                                country.isoCode,
+                                            orElse: () => null);
+
+                                    if (filterdCountry != null) return true;
+                                    return false;
+                                  },
+                                ),
+                              ),
                             ),
 
                             // the lang
@@ -95,17 +121,15 @@ class _ChooseCountryState extends State<ChooseCountry> {
                                     .translate('Settings_language'),
                               ),
                               spacing: 10,
-                              attribute: 'lan',
+                              name: 'lan',
                               initialValue: 'ar',
-                              readOnly: true,
-                              validators: [
-                                (value) {
-                                  if (value == null) {
-                                    return 'You must choose a language!';
-                                  }
-                                  return null;
-                                },
-                              ],
+                              enabled: true,
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'You must choose a language!';
+                                }
+                                return null;
+                              },
                               options: [
                                 // FormBuilderFieldOption(
                                 //   value: 'en',
@@ -154,7 +178,7 @@ class _ChooseCountryState extends State<ChooseCountry> {
                               Provider.of<CountryData>(context, listen: false)
                                   .setCountry(
                                       context: context,
-                                      countryName: value['country_name']);
+                                      countryObject: value['country_name']);
 
                               // change the lang
                               Provider.of<AppSettings>(context, listen: false)

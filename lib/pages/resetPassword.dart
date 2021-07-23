@@ -105,12 +105,10 @@ class _ResetPasswordState extends State<ResetPassword> {
                   child: Column(
                     children: <Widget>[
                       FormBuilderTextField(
-                          attribute: "password",
-                          decoration:
-                              InputDecoration(labelText: "new password"),
-                          validators: [
-                            FormBuilderValidators.required(),
-                          ])
+                        name: "password",
+                        decoration: InputDecoration(labelText: "new password"),
+                        validator: FormBuilderValidators.required(context),
+                      )
                     ],
                   ),
                 ),

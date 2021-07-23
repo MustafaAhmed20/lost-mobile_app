@@ -338,17 +338,15 @@ class _NewMessageBoxState extends State<NewMessageBox> {
                 child: FormBuilder(
                   key: formKey,
                   child: FormBuilderTextField(
-                    attribute: 'text',
+                    name: 'text',
                     maxLines: 5,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'تعليقك هنا',
                         hintStyle: TextStyle(color: Colors.grey, fontSize: 12)),
-                    validators: [
-                      FormBuilderValidators.required(
-                          errorText: 'رجاء ادخل تعليقك'),
-                    ],
+                    validator: FormBuilderValidators.required(context,
+                        errorText: 'رجاء ادخل تعليقك'),
                   ),
                 ),
               ),

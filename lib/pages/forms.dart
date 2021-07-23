@@ -366,7 +366,7 @@ Widget chooseObjectForm(context, formKey, data, accident) {
   return formPerson(context, formKey, data);
 }
 
-Widget formPerson(context, formKey, data, {Function onChange}) {
+Widget formPerson(context, formKey, data, {void Function() onChange}) {
   // the ages ranges - for 'person' object
   List ages = Provider.of<AgeData>(context, listen: false).ages;
 
@@ -385,7 +385,7 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
       types.firstWhere((e) => e.name == 'found').id == data['type_id'];
 
   return FormBuilder(
-    onChanged: onChange != null ? (val) => onChange() : null,
+    onChanged: onChange != null ? () => onChange() : null,
     key: formKey,
     autovalidateMode: AutovalidateMode.always,
     child: Column(children: [
@@ -396,7 +396,7 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
       ),
       // name
       FormBuilderTextField(
-        attribute: "person_name",
+        name: "person_name",
         decoration: InputDecoration(
             labelText:
                 AppLocalizations.of(context).translate('operatioForm_name')),
@@ -404,17 +404,15 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
       // gender
       FormBuilderRadioGroup(
         activeColor: Colors.black,
-        orientation: GroupedRadioOrientation.vertical,
-        attribute: "gender",
+        orientation: OptionsOrientation.vertical,
+        name: "gender",
         decoration: InputDecoration(
           labelText:
               AppLocalizations.of(context).translate('personForm_gender'),
         ),
-        validators: [
-          FormBuilderValidators.required(
-              errorText: AppLocalizations.of(context)
-                  .translate('operatioForm_requiredError')),
-        ],
+        validator: FormBuilderValidators.required(context,
+            errorText: AppLocalizations.of(context)
+                .translate('operatioForm_requiredError')),
         options: genders.keys
             .map((sex) => FormBuilderFieldOption(
                   value: sex,
@@ -425,7 +423,7 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
       ),
       // age
       FormBuilderDropdown(
-        attribute: "age_id",
+        name: "age_id",
         decoration: InputDecoration(
             labelText:
                 AppLocalizations.of(context).translate('operatioForm_age')),
@@ -433,11 +431,10 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
         //   AppLocalizations.of(context).translate('operatioForm_AgeRange'),
         //   style: TextStyle(fontSize: 10),
         // ),
-        validators: [
-          FormBuilderValidators.required(
-              errorText: AppLocalizations.of(context)
-                  .translate('operatioForm_requiredError')),
-        ],
+        validator: FormBuilderValidators.required(context,
+            errorText: AppLocalizations.of(context)
+                .translate('operatioForm_requiredError')),
+
         items: ages
             .map((age) => DropdownMenuItem(
                 value: age.id, child: Text("${age.minAge} - ${age.maxAge}")))
@@ -445,7 +442,7 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
       ),
       // skin color
       FormBuilderDropdown(
-        attribute: "skin",
+        name: "skin",
         decoration: InputDecoration(
           labelText: AppLocalizations.of(context).translate('personForm_skin'),
         ),
@@ -472,9 +469,9 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
       Visibility(
         visible: showShelter,
         child: FormBuilderCheckbox(
-          attribute: 'shelter',
+          name: 'shelter',
           initialValue: false,
-          label: Text(
+          title: Text(
             'داخل ملجأ؟',
             style: TextStyle(fontSize: 16),
           ),
@@ -499,7 +496,7 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
           width: double.infinity,
           child: FormBuilderTextField(
             maxLines: 8,
-            attribute: 'details',
+            name: 'details',
             //initialValue: data['details'] ?? null,
             decoration: InputDecoration(
               border: OutlineInputBorder(
@@ -517,11 +514,11 @@ Widget formPerson(context, formKey, data, {Function onChange}) {
   );
 }
 
-Widget formCar(context, formKey, data, {Function onChange}) {
+Widget formCar(context, formKey, data, {void Function() onChange}) {
   // the emoji used - get it from provider
   //List cars = Provider.of<AppSettings>(context, listen: false).cars;
   return FormBuilder(
-    onChanged: onChange != null ? (val) => onChange() : null,
+    onChanged: onChange != null ? () => onChange() : null,
     key: formKey,
     autovalidateMode: AutovalidateMode.always,
     child: Column(children: [
@@ -532,41 +529,35 @@ Widget formCar(context, formKey, data, {Function onChange}) {
       ),
       // Brand
       FormBuilderTextField(
-        attribute: "brand",
+        name: "brand",
         decoration: InputDecoration(
             labelText: AppLocalizations.of(context).translate('carForm_brand')),
-        validators: [
-          FormBuilderValidators.required(
-              errorText: AppLocalizations.of(context)
-                  .translate('operatioForm_requiredError')),
-        ],
+        validator: FormBuilderValidators.required(context,
+            errorText: AppLocalizations.of(context)
+                .translate('operatioForm_requiredError')),
       ),
       // Modle
       FormBuilderTextField(
-        attribute: "model",
+        name: "model",
         decoration: InputDecoration(
             labelText: AppLocalizations.of(context).translate('carForm_model')),
-        validators: [
-          FormBuilderValidators.required(
-              errorText: AppLocalizations.of(context)
-                  .translate('operatioForm_requiredError')),
-        ],
+        validator: FormBuilderValidators.required(context,
+            errorText: AppLocalizations.of(context)
+                .translate('operatioForm_requiredError')),
       ),
       // type - this field not used now
       Offstage(
         offstage: true,
         child: FormBuilderDropdown(
-            attribute: "car_type",
+            name: "car_type",
             initialValue: 1,
             decoration: InputDecoration(
               labelText: AppLocalizations.of(context).translate('carForm_type'),
             ),
             hint: Text(AppLocalizations.of(context).translate('carForm_type')),
-            validators: [
-              FormBuilderValidators.required(
-                  errorText: AppLocalizations.of(context)
-                      .translate('operatioForm_requiredError')),
-            ],
+            validator: FormBuilderValidators.required(context,
+                errorText: AppLocalizations.of(context)
+                    .translate('operatioForm_requiredError')),
             items: []
             //cars
             //     .map((type) => DropdownMenuItem(
@@ -592,34 +583,35 @@ Widget formCar(context, formKey, data, {Function onChange}) {
           // plate number - letters
           Expanded(
             child: FormBuilderTextField(
-              attribute: "plate_number_letters",
-              decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)
-                    .translate('carForm_plateLetters'),
-                labelStyle: TextStyle(
-                  letterSpacing: 1.0,
+                name: "plate_number_letters",
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)
+                      .translate('carForm_plateLetters'),
+                  labelStyle: TextStyle(
+                    letterSpacing: 1.0,
+                  ),
                 ),
-              ),
-              style: TextStyle(
-                letterSpacing: 4.0,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              validators: [
-                FormBuilderValidators.required(
-                    errorText: AppLocalizations.of(context)
-                        .translate('operatioForm_requiredError')),
-                // validate the value
-                (val) {
+                style: TextStyle(
+                  letterSpacing: 4.0,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                validator: (val) {
+                  String firstValidate = FormBuilderValidators.required(context,
+                      errorText: AppLocalizations.of(context)
+                          .translate('operatioForm_requiredError'))(val);
+
+                  if (firstValidate != null) return firstValidate;
+
+                  // validate the value
+
                   return validatPlateNumberLetters(context, val);
-                },
-              ],
-            ),
+                }),
           ),
           // plate number - numbers
           Expanded(
             child: FormBuilderTextField(
-              attribute: "plate_number_numbers",
+              name: "plate_number_numbers",
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)
                     .translate('carForm_plateNumbers'),
@@ -632,15 +624,16 @@ Widget formCar(context, formKey, data, {Function onChange}) {
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
-              validators: [
-                FormBuilderValidators.required(
+              validator: (value) {
+                String firstValidate = FormBuilderValidators.required(context,
                     errorText: AppLocalizations.of(context)
-                        .translate('operatioForm_requiredError')),
+                        .translate('operatioForm_requiredError'))(value);
+
+                if (firstValidate != null) return firstValidate;
+
                 // validate the value
-                (val) {
-                  return validatPlateNumberNumbers(context, val);
-                },
-              ],
+                return validatPlateNumberNumbers(context, value);
+              },
             ),
           )
         ],
@@ -655,7 +648,7 @@ Widget formCar(context, formKey, data, {Function onChange}) {
           width: double.infinity,
           child: FormBuilderTextField(
             maxLines: 8,
-            attribute: 'details',
+            name: 'details',
             //initialValue: data['details'] ?? null,
             decoration: InputDecoration(
               border: OutlineInputBorder(
@@ -676,7 +669,7 @@ Widget formCar(context, formKey, data, {Function onChange}) {
 class FormPersonalBelongings extends StatefulWidget {
   final GlobalKey<FormBuilderState> formKey;
 
-  final Function onChange;
+  final void Function() onChange;
 
   FormPersonalBelongings({this.formKey, this.onChange});
   @override
@@ -694,7 +687,7 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
     List<List> types = Provider.of<AppSettings>(context, listen: false)
         .availablePersonalBelongingsTypes;
     return FormBuilder(
-      onChanged: widget.onChange != null ? (val) => widget.onChange() : null,
+      onChanged: widget.onChange != null ? () => widget.onChange() : null,
       key: widget.formKey,
       autovalidateMode: AutovalidateMode.always,
       child: Column(children: [
@@ -705,15 +698,13 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
         ),
         // type
         FormBuilderDropdown(
-          attribute: "personal_belongings_type",
+          name: "personal_belongings_type",
           decoration: InputDecoration(
               labelText: AppLocalizations.of(context)
                   .translate('belongingsForm_type')),
-          validators: [
-            FormBuilderValidators.required(
-                errorText: AppLocalizations.of(context)
-                    .translate('operatioForm_requiredError')),
-          ],
+          validator: FormBuilderValidators.required(context,
+              errorText: AppLocalizations.of(context)
+                  .translate('operatioForm_requiredError')),
           onChanged: (val) {
             // set the subtype if any
             List item = types[val - 1];
@@ -747,15 +738,13 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
         Visibility(
           visible: hideSubtype,
           child: FormBuilderDropdown(
-            attribute: "personal_belongings_subtype",
+            name: "personal_belongings_subtype",
             decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)
                     .translate('belongingsForm_subtype')),
-            validators: [
-              FormBuilderValidators.required(
-                  errorText: AppLocalizations.of(context)
-                      .translate('operatioForm_requiredError')),
-            ],
+            validator: FormBuilderValidators.required(context,
+                errorText: AppLocalizations.of(context)
+                    .translate('operatioForm_requiredError')),
             items: subtypeList,
           ),
         ),
@@ -765,7 +754,7 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
           width: double.infinity,
           child: FormBuilderTextField(
             maxLines: 8,
-            attribute: 'details',
+            name: 'details',
             //initialValue: data['details'] ?? null,
             decoration: InputDecoration(
               border: OutlineInputBorder(
@@ -783,7 +772,7 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
   }
 }
 
-Widget form0(context, formKey, data, {Function autoSubmit}) {
+Widget form0(context, formKey, data, {void Function() autoSubmit}) {
   // the types of operations
   List typeOperation =
       Provider.of<TypeOperationData>(context, listen: false).typeOperation;
@@ -792,7 +781,7 @@ Widget form0(context, formKey, data, {Function autoSubmit}) {
   return FormBuilder(
     key: formKey,
     // auto submit with the click
-    onChanged: autoSubmit != null ? (val) => autoSubmit() : null,
+    onChanged: autoSubmit != null ? () => autoSubmit() : null,
     autovalidateMode: AutovalidateMode.always,
     child: Column(
       children: [
@@ -805,16 +794,15 @@ Widget form0(context, formKey, data, {Function autoSubmit}) {
           padding: EdgeInsets.all(8.0),
           child: FormBuilderChoiceChip(
             decoration: InputDecoration(border: InputBorder.none),
-            attribute: "type_id",
+            name: "type_id",
             initialValue: data['type_id'] ?? null,
             direction: Axis.vertical,
             shape: RoundedRectangleBorder(),
-            validators: [
-              FormBuilderValidators.required(
-                errorText: AppLocalizations.of(context)
-                    .translate('operatioForm_requiredError'),
-              )
-            ],
+            validator: FormBuilderValidators.required(
+              context,
+              errorText: AppLocalizations.of(context)
+                  .translate('operatioForm_requiredError'),
+            ),
             options: typeOperation
                 .map((type) => FormBuilderFieldOption(
                     value: type.id,
@@ -830,7 +818,7 @@ Widget form0(context, formKey, data, {Function autoSubmit}) {
   );
 }
 
-Widget form1(context, formKey, data, {Function autoSubmit}) {
+Widget form1(context, formKey, data, {void Function() autoSubmit}) {
   // the list of available objects
   Map objects =
       Provider.of<AppSettings>(context, listen: false).availableObjects;
@@ -839,7 +827,7 @@ Widget form1(context, formKey, data, {Function autoSubmit}) {
 
   return FormBuilder(
     key: formKey,
-    onChanged: autoSubmit != null ? (val) => autoSubmit() : null,
+    onChanged: autoSubmit != null ? () => autoSubmit() : null,
     autovalidateMode: AutovalidateMode.always,
     child: Column(
       children: [
@@ -850,16 +838,15 @@ Widget form1(context, formKey, data, {Function autoSubmit}) {
         // stage 1 - the object type
         FormBuilderChoiceChip(
           decoration: InputDecoration(border: InputBorder.none),
-          attribute: "object_type",
+          name: "object_type",
           initialValue: data['object_type'] ?? null,
           direction: Axis.vertical,
           shape: RoundedRectangleBorder(),
-          validators: [
-            FormBuilderValidators.required(
-              errorText: AppLocalizations.of(context)
-                  .translate('operatioForm_requiredError'),
-            )
-          ],
+          validator: FormBuilderValidators.required(
+            context,
+            errorText: AppLocalizations.of(context)
+                .translate('operatioForm_requiredError'),
+          ),
           options: objects.keys
               .map((object) => FormBuilderFieldOption(
                   value: object,
@@ -892,7 +879,7 @@ Widget form2(context, formKey, data) {
         ),
         // date
         FormBuilderDateTimePicker(
-          attribute: "date",
+          name: "date",
           initialValue:
               data['date'] != null ? DateTime.parse(data['date']) : now,
           inputType: InputType.date,
@@ -901,9 +888,7 @@ Widget form2(context, formKey, data) {
           decoration: InputDecoration(
               labelText:
                   AppLocalizations.of(context).translate('operatioForm_date')),
-          validators: [
-            FormBuilderValidators.required(),
-          ],
+          validator: FormBuilderValidators.required(context),
           valueTransformer: (value) {
             if (value != null) {
               return formatter.format(value);
@@ -918,37 +903,35 @@ Widget form2(context, formKey, data) {
 
             Expanded(
               child: FormBuilderTextField(
-                  attribute: 'state',
-                  initialValue: data['state'] ?? null,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    labelText: AppLocalizations.of(context)
-                        .translate('operatioForm_state'),
-                    alignLabelWithHint: true,
-                  ),
-                  validators: [
-                    FormBuilderValidators.required(
-                        errorText: AppLocalizations.of(context)
-                            .translate('operatioForm_requiredError')),
-                  ]),
+                name: 'state',
+                initialValue: data['state'] ?? null,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  labelText: AppLocalizations.of(context)
+                      .translate('operatioForm_state'),
+                  alignLabelWithHint: true,
+                ),
+                validator: FormBuilderValidators.required(context,
+                    errorText: AppLocalizations.of(context)
+                        .translate('operatioForm_requiredError')),
+              ),
             ),
 
             // city
             Expanded(
               child: FormBuilderTextField(
-                  attribute: 'city',
-                  initialValue: data['city'] ?? null,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    labelText: AppLocalizations.of(context)
-                        .translate('operatioForm_city'),
-                    alignLabelWithHint: true,
-                  ),
-                  validators: [
-                    FormBuilderValidators.required(
-                        errorText: AppLocalizations.of(context)
-                            .translate('operatioForm_requiredError')),
-                  ]),
+                name: 'city',
+                initialValue: data['city'] ?? null,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  labelText: AppLocalizations.of(context)
+                      .translate('operatioForm_city'),
+                  alignLabelWithHint: true,
+                ),
+                validator: FormBuilderValidators.required(context,
+                    errorText: AppLocalizations.of(context)
+                        .translate('operatioForm_requiredError')),
+              ),
             ),
           ],
         ),
@@ -956,7 +939,7 @@ Widget form2(context, formKey, data) {
         // details
         /*
         FormBuilderTextField(
-          attribute: 'details',
+          name: 'details',
           initialValue: data['details'] ?? null,
           decoration: InputDecoration(
             labelText:
@@ -966,103 +949,108 @@ Widget form2(context, formKey, data) {
         ),
         */
         // photos
-        FormBuilderImagePicker(
-          initialValue: data['photos'] ?? null,
-          decoration: InputDecoration(border: InputBorder.none),
-          labelText:
-              AppLocalizations.of(context).translate('operatioForm_photos'),
-          imageQuality: 70,
-          maxImages: 5,
-          attribute: "photos",
-        ),
-        // Gps location
-        FormBuilderCustomField(
-            initialValue: data['location'] ?? null,
-            attribute: 'location',
-            formField: FormField(
-              enabled: true,
-              builder: (FormFieldState<dynamic> field) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // the labelText
-                  Text(
-                    'اختر الموقع:',
-                  ),
+        // FormBuilderImagePicker(
+        //   initialValue: data['photos'] ?? null,
+        //   decoration: InputDecoration(border: InputBorder.none),
+        //   labelText:
+        //       AppLocalizations.of(context).translate('operatioForm_photos'),
+        //   imageQuality: 70,
+        //   maxImages: 5,
+        //   name: "photos",
+        // ),
 
-                  // the button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      RaisedButton(
-                        child: Text(AppLocalizations.of(context)
-                            .translate('operatioForm_Chooselocation')),
-                        onPressed: () async {
-                          // first check the Gps
-                          bool gps = false;
-                          await checkGps().then((value) => gps = value);
-                          if (!gps) {
-                            // no gps - show alert massege
-                            showDialog(
-                              //barrierDismissible: false,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Dialog(
-                                  child: AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(32.0))),
-                                    actionsPadding:
-                                        EdgeInsets.symmetric(horizontal: 50),
-                                    title: Text(AppLocalizations.of(context)
-                                        .translate('operatioForm_ActivateGps')),
-                                    content: Container(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: <Widget>[
-                                          Text(AppLocalizations.of(context)
-                                              .translate(
-                                                  'operatioForm_PleaseActivate')),
-                                          RaisedButton(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(18.0),
-                                            ),
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            textColor: Colors.white,
-                                            child: Text("OK"),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          } else {
-                            await Navigator.pushNamed(context, '/map')
-                                .then((value) {
-                              field.didChange(value);
-                            });
-                          }
-                        },
+        // Gps location
+
+        FormBuilderField(
+            initialValue: data['location'] ?? null,
+            name: 'location',
+            builder: (field) => FormField(
+                  enabled: true,
+                  builder: (FormFieldState<dynamic> field) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // the labelText
+                      Text(
+                        'اختر الموقع:',
                       ),
-                      Icon(
-                        field.value == null ? null : Icons.check_circle,
-                        color: field.value == null ? null : Colors.green,
+
+                      // the button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          // RaisedButton(
+                          ElevatedButton(
+                            child: Text(AppLocalizations.of(context)
+                                .translate('operatioForm_Chooselocation')),
+                            onPressed: () async {
+                              // first check the Gps
+                              bool gps = false;
+                              await checkGps().then((value) => gps = value);
+                              if (!gps) {
+                                // no gps - show alert massege
+                                showDialog(
+                                  //barrierDismissible: false,
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Dialog(
+                                      child: AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(32.0))),
+                                        actionsPadding: EdgeInsets.symmetric(
+                                            horizontal: 50),
+                                        title: Text(AppLocalizations.of(context)
+                                            .translate(
+                                                'operatioForm_ActivateGps')),
+                                        content: Container(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: <Widget>[
+                                              Text(AppLocalizations.of(context)
+                                                  .translate(
+                                                      'operatioForm_PleaseActivate')),
+                                              RaisedButton(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          18.0),
+                                                ),
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                textColor: Colors.white,
+                                                child: Text("OK"),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              } else {
+                                await Navigator.pushNamed(context, '/map')
+                                    .then((value) {
+                                  field.didChange(value);
+                                });
+                              }
+                            },
+                          ),
+                          Icon(
+                            field.value == null ? null : Icons.check_circle,
+                            color: field.value == null ? null : Colors.green,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            )),
+                )),
       ],
     ),
   );
@@ -1090,8 +1078,8 @@ class _FormAccidentState extends State<FormAccident> {
     // collect the data from the forms and put it in the main form as json
 
     // delete the main form data
-    widget.formKey.currentState.fields['cars'].currentState.reset();
-    widget.formKey.currentState.fields['persons'].currentState.reset();
+    widget.formKey.currentState.fields['cars'].reset();
+    widget.formKey.currentState.fields['persons'].reset();
 
     if (carsFormsKeys.isEmpty && personsFormsKeys.isEmpty) {
       // no cars and no persons added
@@ -1130,9 +1118,8 @@ class _FormAccidentState extends State<FormAccident> {
 
     // save it as json
 
-    widget.formKey.currentState.fields['cars'].currentState
-        .setValue(jsonEncode(carsData));
-    widget.formKey.currentState.fields['persons'].currentState
+    widget.formKey.currentState.fields['cars'].setValue(jsonEncode(carsData));
+    widget.formKey.currentState.fields['persons']
         .setValue(jsonEncode(personsData));
   }
 
@@ -1166,16 +1153,22 @@ class _FormAccidentState extends State<FormAccident> {
                   AppLocalizations.of(context).translate('accidentForm_car') +
                       ' ${index + 1}',
                   style: TextStyle(color: Colors.black)),
-              trailing: RaisedButton(
-                  shape: CircleBorder(),
-                  color: Colors.red,
-                  child: Icon(Icons.delete, color: Colors.white),
-                  onPressed: () {
-                    setState(() {
-                      carsFormsKeys.removeAt(index);
-                      cars.removeAt(index);
-                    });
-                  }),
+              trailing:
+                  // RaisedButton(
+                  ElevatedButton(
+
+                      // style: ButtonStyle(
+                      // shape: CircleBorder(),
+                      // foregroundColor: Colors.red,
+
+                      // ),
+                      child: Icon(Icons.delete, color: Colors.white),
+                      onPressed: () {
+                        setState(() {
+                          carsFormsKeys.removeAt(index);
+                          cars.removeAt(index);
+                        });
+                      }),
               children: [e],
             );
           }).toList() +
@@ -1264,43 +1257,37 @@ class _FormAccidentState extends State<FormAccident> {
                   Offstage(
                     offstage: true,
                     child: FormBuilderTextField(
-                      attribute: 'cars',
-                      validators: [
-                        (val) {
+                        name: 'cars',
+                        validator: (val) {
                           if (val == null || val == '') {
                             // the other field must not be null
-                            var other = widget.formKey.currentState
-                                .fields['persons'].currentState.value;
+                            var other = widget
+                                .formKey.currentState.fields['persons'].value;
                             if (other == null || other == '') {
                               return 'error';
                             }
                           }
 
                           return null;
-                        }
-                      ],
-                    ),
+                        }),
                   ),
                   // persons json
                   Offstage(
                     offstage: true,
                     child: FormBuilderTextField(
-                      attribute: 'persons',
-                      validators: [
-                        (val) {
+                        name: 'persons',
+                        validator: (val) {
                           if (val == null || val == '') {
                             // the other field must not be null
-                            var other = widget.formKey.currentState
-                                .fields['cars'].currentState.value;
+                            var other = widget
+                                .formKey.currentState.fields['cars'].value;
                             if (other == null || other == '') {
                               return 'error';
                             }
                           }
 
                           return null;
-                        }
-                      ],
-                    ),
+                        }),
                   ),
                   //details
                   Container(
@@ -1308,7 +1295,7 @@ class _FormAccidentState extends State<FormAccident> {
                     width: double.infinity,
                     child: FormBuilderTextField(
                       maxLines: 8,
-                      attribute: 'details',
+                      name: 'details',
                       //initialValue: data['details'] ?? null,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(

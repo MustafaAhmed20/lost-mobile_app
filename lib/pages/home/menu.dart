@@ -18,6 +18,8 @@ import 'package:lost/models/models.dart';
 // my operations page
 import 'package:lost/pages/operations/my_operations_page.dart';
 
+import 'package:country_pickers/country_pickers.dart' as CountryPickers;
+
 class Menu extends StatelessWidget {
   // the will be true if the user is loged-in else false
   final bool logged;
@@ -226,21 +228,26 @@ class Menu extends StatelessWidget {
 
                         // the selected contry
                         Container(
-                          width: 100,
-                          child: FormBuilderCountryPicker(
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              // labelText: "الدولة الحالية",
-                            ),
-                            attribute: 'country_name',
-                            readOnly: true,
-                            initialValue: selectedCountry?.isoName ??
-                                countries[0].isoName,
-                            dialogTitle: Text(AppLocalizations.of(context)
-                                .translate('Settings_Country')),
-                            // countryFilterByIsoCode: countries
-                            //     .map((e) => e.isoName.toString())
-                            //     .toList(),
+                          // width: 100,
+                          child: Builder(
+                            builder: (context) {
+                              var country = CountryPickers.CountryPickerUtils
+                                  .getCountryByIsoCode(
+                                      selectedCountry?.isoName ??
+                                          countries[0].isoName);
+                              return Row(
+                                children: [
+                                  // the flag
+                                  CountryPickers.CountryPickerUtils
+                                      .getDefaultFlagImage(country),
+
+                                  SizedBox(
+                                    width: 8.0,
+                                  ),
+                                  Text("${country.name}"),
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ],
