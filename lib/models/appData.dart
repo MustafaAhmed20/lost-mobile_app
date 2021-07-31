@@ -126,7 +126,7 @@ class CountryData extends ChangeNotifier {
 class TypeOperationData extends ChangeNotifier {
 // Type Operations available
 
-  List<dynamic> typeOperation;
+  List<TypeOperation> typeOperation;
 
   // the translate of the type operation
   Map names = {'found': 'typeOperation_found', 'lost': 'typeOperation_lost'};
@@ -148,7 +148,8 @@ class TypeOperationData extends ChangeNotifier {
           if (body['status'] != 'success') {
             // error handling
           } else if (body['status'] == 'success') {
-            this.typeOperation = body['data']['type_operation'].map((item) {
+            this.typeOperation =
+                (body['data']['type_operation'] as List).map((item) {
               return TypeOperation.fromJson(item);
             }).toList();
           }
@@ -941,7 +942,7 @@ class AppSettings extends ChangeNotifier {
   Locale selectedLanguage;
 
   // this determine the selected object (like person, cars , etc)
-  Map availableObjects = {
+  Map<String, String> availableObjects = {
     'Accident': 'menu_accident',
     'Person': 'menu_people',
     'Car': 'menu_cars',

@@ -4,7 +4,7 @@ import 'package:lost/pages/settings_hover.dart';
 
 import 'package:lost/pages/operations/homeData.dart';
 import 'package:lost/pages/wait.dart';
-import 'package:lost/pages/forms.dart';
+import 'package:lost/pages/forms/forms.dart';
 import 'package:lost/pages/snackBars.dart';
 
 // import the app data

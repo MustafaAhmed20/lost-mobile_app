@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
 
-// Color liteBackground = Color(0x502A6D);
+// const Color liteBackground =  Color(0x502A6D);
 Color liteBackground = mainDarkColor.withOpacity(0.3);
 
 // lite
-Color mainLiteColor = Color(0xff823476);
+const Color mainLiteColor = Color(0xff823476);
+
 // dark
-Color mainDarkColor = Color(0xff502A6D);
+const Color mainDarkColor = Color(0xff502A6D);
 
-// the hover color
-Color hoverColor = Color(0xff3F276A);
+// the hover const Color
+const Color hoverColor = Color(0xff3F276A);
 
-Color scaffoldColor = hoverColor;
+const Color scaffoldColor = hoverColor;
 
-// text colors
-Color mainTextColor = Colors.white;
-// Color otherTextColor = mainLiteColor;
-Color otherTextColor = hoverColor;
+// text const Colors
+const Color mainTextColor = Colors.white;
+// const Color otherTextconst Color = mainLiteconst Color;
+
+const Color otherTextColor = hoverColor;
 
 const Color textColorHint = Color(0xffb3bdcb);
+
+const Color textColorDarkBlack = Color(0xff2e384d);
+
+const Color textColorRedError = Color(0xffe84242);
 
 // the info text
 String infoText = """
