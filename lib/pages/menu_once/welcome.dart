@@ -106,7 +106,8 @@ class CountryPage extends StatelessWidget {
     Size screenSize = MediaQuery.of(context).size;
 
     // the countries
-    List countries = Provider.of<CountryData>(context, listen: true).countries;
+    List<Country> countries =
+        Provider.of<CountryData>(context, listen: true).countries;
 
     Country selectedCountry =
         Provider.of<CountryData>(context, listen: true).selectedCountry;
@@ -212,7 +213,7 @@ class CountryPage extends StatelessWidget {
                       Provider.of<CountryData>(context, listen: false)
                           .setCountry(
                               context: context,
-                              countryName: value['country_name']);
+                              countryObject: value['country_name']);
                       // dismiss the screen
                       dismissFun(context);
                     }

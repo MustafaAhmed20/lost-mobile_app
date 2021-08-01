@@ -35,7 +35,7 @@ String serverName = AppData().serverName;
 class CountryData extends ChangeNotifier {
 // countries available
 
-  List<Country> countries;
+  List<Country> countries = [];
 
   // the slected country now .. this will go as a filter for operation selecting
   Country selectedCountry;
@@ -75,6 +75,9 @@ class CountryData extends ChangeNotifier {
     //  try load the selected country from storge
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String country = prefs.getString('country');
+
+    // wait for the list of countries
+    await done;
 
     if (country != null) {
       Country countryObject = Country.fromJson(json.decode(country));
