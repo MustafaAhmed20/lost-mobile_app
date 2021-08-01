@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:lost/models/appData.dart';
 import 'package:lost/pages/forms/form2.dart';
@@ -48,7 +49,7 @@ class _OperatioFormState extends State<OperatioForm> {
   bool formWait = false;
 
   //the summation of the forms data
-  Map data;
+  Map<String, dynamic> data;
 
   // data needed to post from provider
   Map<String, String> envData;
@@ -112,6 +113,12 @@ class _OperatioFormState extends State<OperatioForm> {
 
   // the back button logic
   void backStep() {
+    var formKey = formsKeys[stage];
+
+    // add the form data to the global data var
+    formKey.currentState.save();
+    data.addAll(formKey.currentState.value);
+
     if (widget.accident && stage == 2) {
       // don't back from stage 3(index 2)
       Navigator.pop(context);
@@ -303,52 +310,72 @@ class _OperatioFormState extends State<OperatioForm> {
                 onStepCancel: backStep,
                 controlsBuilder: (context,
                     {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
+                  return
                       // wait
-                      formWait ? wait(context) : SizedBox.shrink(),
-                      // Submit
-                      Expanded(
-                        child: formWait
-                            ? SizedBox.shrink()
-                            : MaterialButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                ),
-                                color: Theme.of(context).primaryColor,
-                                child: Text(
-                                  AppLocalizations.of(context)
-                                      .translate('operatioForm_Submit'),
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                onPressed: () {
-                                  continueSteps();
-                                },
+                      formWait
+                          ? Container(
+                              margin: EdgeInsets.symmetric(vertical: 5),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'الرجاء الانتظار',
+                                    textDirection: TextDirection.rtl,
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SpinKitThreeBounce(
+                                    color: Colors.white,
+                                    size: 25.0,
+                                  ),
+                                ],
                               ),
-                      ),
-                      // cancel
-                      Expanded(
-                        child: formWait
-                            ? SizedBox.shrink()
-                            : MaterialButton(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    side: BorderSide(color: Colors.red)),
-                                color: Colors.red,
-                                child: Text(
-                                  AppLocalizations.of(context)
-                                      .translate('operatioForm_Cancel'),
-                                  style: TextStyle(color: Colors.white),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                // Submit
+                                Expanded(
+                                  child: MaterialButton(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                    ),
+                                    color: Theme.of(context).primaryColor,
+                                    child: Text(
+                                      AppLocalizations.of(context)
+                                          .translate('operatioForm_Submit'),
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    onPressed: () {
+                                      continueSteps();
+                                    },
+                                  ),
                                 ),
-                                onPressed: () {
-                                  //_fbKey.currentState.reset();
-                                  onStepCancel();
-                                },
-                              ),
-                      ),
-                    ],
-                  );
+
+                                // cancel
+                                Expanded(
+                                  child: MaterialButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(18.0),
+                                        side: BorderSide(color: Colors.red)),
+                                    color: Colors.red,
+                                    child: Text(
+                                      AppLocalizations.of(context)
+                                          .translate('operatioForm_Cancel'),
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    onPressed: () {
+                                      //_fbKey.currentState.reset();
+                                      onStepCancel();
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
                 },
               ),
             ),
@@ -383,226 +410,13 @@ class ChooseObjectForm extends StatelessWidget {
     } else if (object == 'Car') {
       return formCar(context, formKey, data);
     } else if (object == 'PersonalBelongings') {
-      return FormPersonalBelongings(formKey: formKey);
+      return FormPersonalBelongings(
+        formKey: formKey,
+        data: data,
+      );
     }
 
     // default form if the user not select a form yet
     return formPerson(context, formKey, data);
   }
 }
-
-// Widget form2(context, formKey, data) {
-//   // current time
-//   DateTime now = new DateTime.now();
-
-//   // this help make the date with the correct format
-//   var formatter = new DateFormat('yyyy-MM-dd');
-//   return FormBuilder(
-//     key: formKey,
-//     autovalidateMode: AutovalidateMode.always,
-//     child: Column(
-//       children: [
-//         Text(
-//           AppLocalizations.of(context)
-//               .translate('operatioForm_operatioDetails'),
-//           style: TextStyle(fontSize: 20),
-//         ),
-//         // date
-//         FormBuilderDateTimePicker(
-//           name: "date",
-//           initialValue:
-//               data['date'] != null ? DateTime.parse(data['date']) : now,
-//           inputType: InputType.date,
-//           format: formatter,
-//           lastDate: now,
-//           decoration: InputDecoration(
-//               labelText:
-//                   AppLocalizations.of(context).translate('operatioForm_date')),
-//           validator: FormBuilderValidators.required(context),
-//           valueTransformer: (value) {
-//             if (value != null) {
-//               return formatter.format(value);
-//             }
-//             return value;
-//           },
-//         ),
-
-//         Row(
-//           children: [
-//             // state
-
-//             Expanded(
-//               child: FormBuilderTextField(
-//                 name: 'state',
-//                 initialValue: data['state'] ?? null,
-//                 decoration: InputDecoration(
-//                   border: InputBorder.none,
-//                   labelText: AppLocalizations.of(context)
-//                       .translate('operatioForm_state'),
-//                   alignLabelWithHint: true,
-//                 ),
-//                 validator: FormBuilderValidators.required(context,
-//                     errorText: AppLocalizations.of(context)
-//                         .translate('operatioForm_requiredError')),
-//               ),
-//             ),
-
-//             // city
-//             Expanded(
-//               child: FormBuilderTextField(
-//                 name: 'city',
-//                 initialValue: data['city'] ?? null,
-//                 decoration: InputDecoration(
-//                   border: InputBorder.none,
-//                   labelText: AppLocalizations.of(context)
-//                       .translate('operatioForm_city'),
-//                   alignLabelWithHint: true,
-//                 ),
-//                 validator: FormBuilderValidators.required(context,
-//                     errorText: AppLocalizations.of(context)
-//                         .translate('operatioForm_requiredError')),
-//               ),
-//             ),
-//           ],
-//         ),
-
-//         // details
-//         /*
-//         FormBuilderTextField(
-//           name: 'details',
-//           initialValue: data['details'] ?? null,
-//           decoration: InputDecoration(
-//             labelText:
-//                 AppLocalizations.of(context).translate('operatioForm_details'),
-//             alignLabelWithHint: true,
-//           ),
-//         ),
-//         */
-//         // photos
-//         FormBuilderField<List<File>>(
-//           name: "photos",
-//           initialValue: data['photos'] ?? null,
-//           builder: (field) => InputDecorator(
-//             decoration: InputDecoration(
-//               labelText:
-//                   AppLocalizations.of(context).translate('operatioForm_photos'),
-//               border: InputBorder.none,
-//             ),
-//             child: Container(
-//               margin: EdgeInsets.only(top: 10),
-//               child: PhotosUploaderBox(
-//                 oldFilePhotos: data['photos'] ?? [],
-//                 onChange: (c, photos) {
-//                   field.didChange(photos.map((e) => e.image).toList());
-//                 },
-//               ),
-//             ),
-//           ),
-//         ),
-
-//         // FormBuilderImagePicker(
-//         //   initialValue: data['photos'] ?? null,
-//         //   decoration: InputDecoration(border: InputBorder.none),
-//         //   labelText:
-//         //       AppLocalizations.of(context).translate('operatioForm_photos'),
-//         //   imageQuality: 70,
-//         //   maxImages: 5,
-//         //   name: "photos",
-//         // ),
-
-//         // Gps location
-
-//         FormBuilderField(
-//             initialValue: data['location'] ?? null,
-//             name: 'location',
-//             builder: (field) => FormField(
-//                   enabled: true,
-//                   builder: (FormFieldState<dynamic> field) => Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       // the labelText
-//                       Text(
-//                         'اختر الموقع:',
-//                       ),
-
-//                       // the button
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                         children: <Widget>[
-//                           // RaisedButton(
-//                           ElevatedButton(
-//                             child: Text(AppLocalizations.of(context)
-//                                 .translate('operatioForm_Chooselocation')),
-//                             onPressed: () async {
-//                               // first check the Gps
-//                               bool gps = false;
-//                               await checkGps().then((value) => gps = value);
-//                               if (!gps) {
-//                                 // no gps - show alert massege
-//                                 showDialog(
-//                                   //barrierDismissible: false,
-//                                   context: context,
-//                                   builder: (BuildContext context) {
-//                                     return Dialog(
-//                                       child: AlertDialog(
-//                                         shape: RoundedRectangleBorder(
-//                                             borderRadius: BorderRadius.all(
-//                                                 Radius.circular(32.0))),
-//                                         actionsPadding: EdgeInsets.symmetric(
-//                                             horizontal: 50),
-//                                         title: Text(AppLocalizations.of(context)
-//                                             .translate(
-//                                                 'operatioForm_ActivateGps')),
-//                                         content: Container(
-//                                           child: Column(
-//                                             mainAxisAlignment:
-//                                                 MainAxisAlignment.spaceEvenly,
-//                                             mainAxisSize: MainAxisSize.min,
-//                                             crossAxisAlignment:
-//                                                 CrossAxisAlignment.stretch,
-//                                             children: <Widget>[
-//                                               Text(AppLocalizations.of(context)
-//                                                   .translate(
-//                                                       'operatioForm_PleaseActivate')),
-//                                               RaisedButton(
-//                                                 shape: RoundedRectangleBorder(
-//                                                   borderRadius:
-//                                                       BorderRadius.circular(
-//                                                           18.0),
-//                                                 ),
-//                                                 color: Theme.of(context)
-//                                                     .primaryColor,
-//                                                 textColor: Colors.white,
-//                                                 child: Text("OK"),
-//                                                 onPressed: () {
-//                                                   Navigator.of(context).pop();
-//                                                 },
-//                                               ),
-//                                             ],
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     );
-//                                   },
-//                                 );
-//                               } else {
-//                                 await Navigator.pushNamed(context, '/map')
-//                                     .then((value) {
-//                                   field.didChange(value);
-//                                 });
-//                               }
-//                             },
-//                           ),
-//                           Icon(
-//                             field.value == null ? null : Icons.check_circle,
-//                             color: field.value == null ? null : Colors.green,
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 )),
-//       ],
-//     ),
-//   );
-// }

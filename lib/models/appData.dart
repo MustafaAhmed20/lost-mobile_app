@@ -354,7 +354,7 @@ class OperationData extends ChangeNotifier {
   }
 
   List<Operations> _loadOperations(List data) {
-    List operations = data.map((item) {
+    List<Operations> operations = data.map((item) {
       Operations operation = Operations.fromJson(item);
       // load the object data manually
       var object = operation.objectType;
@@ -372,11 +372,11 @@ class OperationData extends ChangeNotifier {
     }).toList();
 
     // updata the photos with server address
-    for (int i = 0; i < this.operations.length; i++) {
-      List photos = this.operations[i].photos;
+    for (int i = 0; i < operations.length; i++) {
+      List photos = operations[i].photos;
       for (int j = 0; j < photos.length; j++) {
-        var current = this.operations[i].photos[j];
-        this.operations[i].photos[j] = AppData().serverAddressImeges + current;
+        var current = operations[i].photos[j];
+        operations[i].photos[j] = AppData().serverAddressImeges + current;
       }
     }
     return operations;
@@ -864,6 +864,9 @@ class PostData extends ChangeNotifier {
     // convarte all values to string
     data.updateAll((key, value) => value.toString());
     data = Map<String, String>.from(data);
+
+    // await Future.delayed(Duration(seconds: 3));
+    // return 'Error';
 
     try {
       // headers

@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 //language support
 import 'package:lost/app_localizations.dart';
+import 'package:lost/pages/forms/details_field.dart';
 
 // validation
 import 'package:lost/pages/validators.dart';
@@ -16,7 +17,9 @@ class FormPersonalBelongings extends StatefulWidget {
 
   final void Function() onChange;
 
-  FormPersonalBelongings({this.formKey, this.onChange});
+  final Map<String, dynamic> data;
+
+  FormPersonalBelongings({this.formKey, this.onChange, @required this.data});
   @override
   _FormPersonalBelongingsState createState() => _FormPersonalBelongingsState();
 }
@@ -41,6 +44,7 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
           AppLocalizations.of(context).translate('menu_PersonalBelongings'),
           style: TextStyle(fontSize: 20),
         ),
+
         // type
         FormBuilderDropdown(
           name: "personal_belongings_type",
@@ -79,6 +83,7 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
             );
           }).toList(),
         ),
+
         // subtype
         Visibility(
           visible: hideSubtype,
@@ -93,23 +98,11 @@ class _FormPersonalBelongingsState extends State<FormPersonalBelongings> {
             items: subtypeList,
           ),
         ),
+
         //details
         Container(
-          height: 200,
-          width: double.infinity,
-          child: FormBuilderTextField(
-            maxLines: 8,
-            name: 'details',
-            //initialValue: data['details'] ?? null,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.greenAccent, width: 0.8),
-                //borderRadius: BorderRadius.circular(18.0),
-              ),
-              labelText: AppLocalizations.of(context)
-                  .translate('operatioForm_details'),
-              alignLabelWithHint: true,
-            ),
+          child: DetailsField(
+            data: widget.data,
           ),
         ),
       ]),

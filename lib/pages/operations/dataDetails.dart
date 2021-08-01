@@ -7,10 +7,11 @@ import 'package:carousel_slider/carousel_options.dart';
 import 'package:lost/models/models.dart';
 
 // use formatter
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' show DateFormat;
 
 // the comments
 import 'package:lost/pages/comments.dart';
+import 'package:lost/widgets/MapsLauncher.dart';
 
 // the buttons
 import 'package:lost/widgets/buttons.dart';
@@ -230,14 +231,29 @@ class _DataDetailsState extends State<DataDetails> {
             // location image and share
             operation.lat == null
                 ? noLocation(context)
-                : Center(
-                    child: InkWell(
-                      onTap: () {
-                        Share.share(
-                            'https://www.google.com/maps/search/?api=1&query=${operation.lat},${operation.lng}');
-                      },
-                      child: Image.network(
-                          'https://maps.googleapis.com/maps/api/staticmap?size=600x300&markers=color:red%7C${operation.lat},${operation.lng}&key=$mapsKey'),
+                : Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Center(
+                      child: InkWell(
+                        onTap: () {
+                          // Share.share(
+                          //     'https://www.google.com/maps/search/?api=1&query=${operation.lat},${operation.lng}');
+                          openMapsSheet(context, operation.lat, operation.lng);
+                        },
+                        child: Image.network(
+                          'https://maps.googleapis.com/maps/api/staticmap?size=600x300&markers=color:red%7C${operation.lat},${operation.lng}&key=$mapsKey',
+                          errorBuilder: (context, obj, _) {
+                            return Center(
+                                child: Text('فشل في تحميل الموقع',
+                                    textDirection: TextDirection.rtl,
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 25,
+                                    )));
+                          },
+                        ),
+                      ),
                     ),
                   ),
           ],

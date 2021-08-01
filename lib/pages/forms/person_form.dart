@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 //language support
 import 'package:lost/app_localizations.dart';
+import 'package:lost/pages/forms/details_field.dart';
 
 // validation
 import 'package:lost/pages/validators.dart';
@@ -39,6 +40,7 @@ Widget formPerson(context, formKey, data, {void Function() onChange}) {
         AppLocalizations.of(context).translate('personForm_operatioDetails'),
         style: TextStyle(fontSize: 20),
       ),
+
       // name
       FormBuilderTextField(
         name: "person_name",
@@ -46,6 +48,7 @@ Widget formPerson(context, formKey, data, {void Function() onChange}) {
             labelText:
                 AppLocalizations.of(context).translate('operatioForm_name')),
       ),
+
       // gender
       FormBuilderRadioGroup(
         activeColor: Colors.black,
@@ -66,6 +69,7 @@ Widget formPerson(context, formKey, data, {void Function() onChange}) {
                 ))
             .toList(),
       ),
+
       // age
       FormBuilderDropdown(
         name: "age_id",
@@ -87,6 +91,7 @@ Widget formPerson(context, formKey, data, {void Function() onChange}) {
                 ?.toList() ??
             [],
       ),
+
       // skin color
       FormBuilderDropdown(
         name: "skin",
@@ -112,6 +117,7 @@ Widget formPerson(context, formKey, data, {void Function() onChange}) {
                 )))
             .toList(),
       ),
+
       // shelter
       Visibility(
         visible: showShelter,
@@ -134,26 +140,15 @@ Widget formPerson(context, formKey, data, {void Function() onChange}) {
           },
         ),
       ),
+
       //details
-      Visibility(
-        // not show if use Accident object
-        visible: data['object_type'] != 'Accident',
-        child: Container(
-          height: 200,
-          width: double.infinity,
-          child: FormBuilderTextField(
-            maxLines: 8,
-            name: 'details',
-            //initialValue: data['details'] ?? null,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.greenAccent, width: 0.8),
-                //borderRadius: BorderRadius.circular(18.0),
-              ),
-              labelText: AppLocalizations.of(context)
-                  .translate('operatioForm_details'),
-              alignLabelWithHint: true,
-            ),
+      Container(
+        margin: EdgeInsets.only(top: 10),
+        child: Visibility(
+          // not show if use Accident object
+          visible: data['object_type'] != 'Accident',
+          child: DetailsField(
+            data: data,
           ),
         ),
       ),

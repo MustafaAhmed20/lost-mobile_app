@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 //language support
 import 'package:lost/app_localizations.dart';
+import 'package:lost/pages/forms/details_field.dart';
 
 // validation
 import 'package:lost/pages/validators.dart';
@@ -138,21 +139,9 @@ Widget formCar(context, formKey, data, {void Function() onChange}) {
         // not show if use Accident object
         visible: data['object_type'] != 'Accident',
         child: Container(
-          height: 200,
           width: double.infinity,
-          child: FormBuilderTextField(
-            maxLines: 8,
-            name: 'details',
-            //initialValue: data['details'] ?? null,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.greenAccent, width: 0.8),
-                //borderRadius: BorderRadius.circular(18.0),
-              ),
-              labelText: AppLocalizations.of(context)
-                  .translate('operatioForm_details'),
-              alignLabelWithHint: true,
-            ),
+          child: DetailsField(
+            data: data,
           ),
         ),
       ),

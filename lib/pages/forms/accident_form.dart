@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+// the colors
+import 'package:lost/constants.dart';
+
 // use json
 import 'dart:convert';
 
@@ -10,14 +13,16 @@ import 'package:lost/app_localizations.dart';
 
 // the forms
 import 'package:lost/pages/forms/car_form.dart';
+import 'package:lost/pages/forms/details_field.dart';
 import 'package:lost/pages/forms/person_form.dart';
+import 'package:lost/widgets/buttons.dart';
 
 class FormAccident extends StatefulWidget {
   final GlobalKey<FormBuilderState> formKey;
 
   final Map data;
 
-  FormAccident({this.formKey, this.data});
+  FormAccident({@required this.formKey, @required this.data});
 
   @override
   _FormAccidentState createState() => _FormAccidentState();
@@ -83,192 +88,220 @@ class _FormAccidentState extends State<FormAccident> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-            // title
-            Text(
-              AppLocalizations.of(context).translate('accidentForm_details'),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            // cars title
-            Text(
-              AppLocalizations.of(context).translate('accidentForm_cars'),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-          ] +
-          cars.map((e) {
-            int index = cars.indexOf(e);
-            return ExpansionTile(
-              maintainState: true,
-              initiallyExpanded: true,
-              title: Text(
-                  AppLocalizations.of(context).translate('accidentForm_car') +
-                      ' ${index + 1}',
-                  style: TextStyle(color: Colors.black)),
-              trailing:
-                  // RaisedButton(
-                  ElevatedButton(
+        // title
+        Text(
+          AppLocalizations.of(context).translate('accidentForm_details'),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+        ),
 
-                      // style: ButtonStyle(
-                      // shape: CircleBorder(),
-                      // foregroundColor: Colors.red,
+        SizedBox(height: 15),
 
-                      // ),
-                      child: Icon(Icons.delete, color: Colors.white),
-                      onPressed: () {
-                        setState(() {
-                          carsFormsKeys.removeAt(index);
-                          cars.removeAt(index);
-                        });
-                      }),
-              children: [e],
-            );
-          }).toList() +
-          [
-            SizedBox(
-              height: 15,
-            ),
-            // add car
-            RaisedButton(
-                color: Colors.green,
+        // cars title + plus button
+        Container(
+          height: 30,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
                 child: Text(
-                    AppLocalizations.of(context).translate('accidentForm_add'),
-                    style: TextStyle(
-                      color: Colors.white,
-                    )),
-                onPressed: () {
-                  setState(() {
-                    GlobalKey<FormBuilderState> key =
-                        GlobalKey<FormBuilderState>();
-                    carsFormsKeys.add(key);
-                    cars.add(formCar(context, key, widget.data,
-                        onChange: collectData));
-                  });
-                }),
-            Divider(),
-            Text(
-              AppLocalizations.of(context).translate('accidentForm_persons'),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-          ] +
-          persons.map((e) {
-            int index = persons.indexOf(e);
-            return ExpansionTile(
-              initiallyExpanded: true,
-              maintainState: true,
-              title: Text(
-                  AppLocalizations.of(context)
-                          .translate('accidentForm_person') +
-                      ' ${index + 1}',
-                  style: TextStyle(color: Colors.black)),
-              trailing: RaisedButton(
-                  shape: CircleBorder(),
-                  color: Colors.red,
-                  child: Icon(Icons.delete, color: Colors.white),
-                  onPressed: () {
+                  AppLocalizations.of(context).translate('accidentForm_cars'),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+              ),
+
+              // add car
+              Expanded(
+                child: Button50HBig(
+                  borderRadius: 10,
+                  function: (c) {
                     setState(() {
-                      personsFormsKeys.removeAt(index);
-                      persons.removeAt(index);
+                      GlobalKey<FormBuilderState> key =
+                          GlobalKey<FormBuilderState>();
+                      carsFormsKeys.add(key);
+                      cars.add(formCar(context, key, widget.data,
+                          onChange: collectData));
                     });
-                  }),
-              children: [e],
-            );
-          }).toList() +
-          [
-            SizedBox(
-              height: 15,
+                  },
+                  color: mainLiteColor,
+                  text: AppLocalizations.of(context)
+                      .translate('accidentForm_add'),
+                  textColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        SizedBox(height: 15),
+
+        // the cars
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: cars.length,
+          itemBuilder: (context, index) => ExpansionTile(
+            maintainState: true,
+            initiallyExpanded: true,
+            title: Text(
+                AppLocalizations.of(context).translate('accidentForm_car') +
+                    ' ${index + 1}',
+                style: TextStyle(color: Colors.black)),
+            trailing: GestureDetector(
+              onTap: () {
+                setState(() {
+                  carsFormsKeys.removeAt(index);
+                  cars.removeAt(index);
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ),
-            // add persons
-            RaisedButton(
-                color: Colors.green,
+            children: [cars[index]],
+          ),
+        ),
+
+        SizedBox(height: 15),
+
+        Divider(),
+
+        // persons title + plus button
+        Container(
+          height: 30,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
                 child: Text(
-                    AppLocalizations.of(context).translate('accidentForm_add'),
-                    style: TextStyle(
-                      color: Colors.white,
-                    )),
-                onPressed: () {
-                  setState(() {
-                    GlobalKey<FormBuilderState> key =
-                        GlobalKey<FormBuilderState>();
-                    personsFormsKeys.add(key);
-                    persons.add(formPerson(context, key, widget.data,
-                        onChange: collectData));
-                  });
-                }),
+                  AppLocalizations.of(context)
+                      .translate('accidentForm_persons'),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+              ),
 
-            // not visble form with the main form key
-            // this will control the submit to the main form
-            FormBuilder(
-              key: widget.formKey,
-              child: Column(
-                children: [
-                  // cars json
-                  Offstage(
-                    offstage: true,
-                    child: FormBuilderTextField(
-                        name: 'cars',
-                        validator: (val) {
-                          if (val == null || val == '') {
-                            // the other field must not be null
-                            var other = widget
-                                .formKey.currentState.fields['persons'].value;
-                            if (other == null || other == '') {
-                              return 'error';
-                            }
-                          }
+              // add persons
+              Expanded(
+                child: Button50HBig(
+                  borderRadius: 10,
+                  function: (c) {
+                    setState(() {
+                      GlobalKey<FormBuilderState> key =
+                          GlobalKey<FormBuilderState>();
+                      personsFormsKeys.add(key);
+                      persons.add(formPerson(context, key, widget.data,
+                          onChange: collectData));
+                    });
+                  },
+                  color: mainLiteColor,
+                  text: AppLocalizations.of(context)
+                      .translate('accidentForm_add'),
+                  textColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
 
-                          return null;
-                        }),
-                  ),
-                  // persons json
-                  Offstage(
-                    offstage: true,
-                    child: FormBuilderTextField(
-                        name: 'persons',
-                        validator: (val) {
-                          if (val == null || val == '') {
-                            // the other field must not be null
-                            var other = widget
-                                .formKey.currentState.fields['cars'].value;
-                            if (other == null || other == '') {
-                              return 'error';
-                            }
-                          }
+        SizedBox(height: 15),
 
-                          return null;
-                        }),
-                  ),
-                  //details
-                  Container(
-                    height: 200,
-                    width: double.infinity,
-                    child: FormBuilderTextField(
-                      maxLines: 8,
-                      name: 'details',
-                      //initialValue: data['details'] ?? null,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.greenAccent, width: 0.8),
-                          //borderRadius: BorderRadius.circular(18.0),
-                        ),
-                        labelText: AppLocalizations.of(context)
-                            .translate('operatioForm_details'),
-                        alignLabelWithHint: true,
+        ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: persons.length,
+            itemBuilder: (context, index) => ExpansionTile(
+                  initiallyExpanded: true,
+                  maintainState: true,
+                  title: Text(
+                      AppLocalizations.of(context)
+                              .translate('accidentForm_person') +
+                          ' ${index + 1}',
+                      style: TextStyle(color: Colors.black)),
+                  trailing: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        personsFormsKeys.removeAt(index);
+                        persons.removeAt(index);
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                        size: 20,
                       ),
                     ),
                   ),
-                ],
+                  children: [persons[index]],
+                )),
+
+        SizedBox(height: 15),
+
+        // not visible form with the main form key
+        // this will control the submit to the main form
+        FormBuilder(
+          key: widget.formKey,
+          child: Column(
+            children: [
+              // cars json
+              Offstage(
+                offstage: true,
+                child: FormBuilderTextField(
+                    name: 'cars',
+                    validator: (val) {
+                      if (val == null || val == '') {
+                        // the other field must not be null
+                        var other =
+                            widget.formKey.currentState.fields['persons'].value;
+                        if (other == null || other == '') {
+                          return 'error';
+                        }
+                      }
+
+                      return null;
+                    }),
               ),
-            ),
-          ],
+
+              // persons json
+              Offstage(
+                offstage: true,
+                child: FormBuilderTextField(
+                    name: 'persons',
+                    validator: (val) {
+                      if (val == null || val == '') {
+                        // the other field must not be null
+                        var other =
+                            widget.formKey.currentState.fields['cars'].value;
+                        if (other == null || other == '') {
+                          return 'error';
+                        }
+                      }
+
+                      return null;
+                    }),
+              ),
+
+              //details
+              DetailsField(
+                data: widget.data,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

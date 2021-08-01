@@ -99,6 +99,8 @@ class Form2 extends StatelessWidget {
                           child: TextInput(
                             height: 6,
                             onChange: (c, text) => field.didChange(text),
+                            controller:
+                                TextEditingController(text: field.value ?? ''),
                           ),
                         )),
                   ),
@@ -132,43 +134,16 @@ class Form2 extends StatelessWidget {
                           child: TextInput(
                             height: 6,
                             onChange: (c, text) => field.didChange(text),
+                            controller:
+                                TextEditingController(text: field.value ?? ''),
                           ),
                         )),
                   ),
                 ),
               ),
-
-              // city
-              // Expanded(
-              //   child: FormBuilderTextField(
-              //     name: 'city',
-              //     initialValue: data['city'] ?? null,
-              //     decoration: InputDecoration(
-              //       border: InputBorder.none,
-              //       labelText: AppLocalizations.of(context)
-              //           .translate('operatioForm_city'),
-              //       alignLabelWithHint: true,
-              //     ),
-              //     validator: FormBuilderValidators.required(context,
-              //         errorText: AppLocalizations.of(context)
-              //             .translate('operatioForm_requiredError')),
-              //   ),
-              // ),
             ],
           ),
 
-          // details
-          /*
-        FormBuilderTextField(
-          name: 'details',
-          initialValue: data['details'] ?? null,
-          decoration: InputDecoration(
-            labelText:
-                AppLocalizations.of(context).translate('operatioForm_details'),
-            alignLabelWithHint: true,
-          ),
-        ),
-        */
           // photos
           FormBuilderField<List<File>>(
             name: "photos",
@@ -191,109 +166,92 @@ class Form2 extends StatelessWidget {
             ),
           ),
 
-          // FormBuilderImagePicker(
-          //   initialValue: data['photos'] ?? null,
-          //   decoration: InputDecoration(border: InputBorder.none),
-          //   labelText:
-          //       AppLocalizations.of(context).translate('operatioForm_photos'),
-          //   imageQuality: 70,
-          //   maxImages: 5,
-          //   name: "photos",
-          // ),
-
           // Gps location
           FormBuilderField(
-              initialValue: data['location'] ?? null,
-              name: 'location',
-              builder: (field) => FormField(
-                    enabled: true,
-                    builder: (FormFieldState<dynamic> field) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // the labelText
-                        Text(
-                          'اختر الموقع:',
-                        ),
+            initialValue: data['location'] ?? null,
+            name: 'location',
+            builder: (field) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // the labelText
+                Text(
+                  'اختر الموقع:',
+                ),
 
-                        // the button
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            // RaisedButton(
-                            ElevatedButton(
-                              child: Text(AppLocalizations.of(context)
-                                  .translate('operatioForm_Chooselocation')),
-                              onPressed: () async {
-                                // first check the Gps
-                                bool gps = false;
-                                await checkGps().then((value) => gps = value);
-                                if (!gps) {
-                                  // no gps - show alert massege
-                                  showDialog(
-                                    //barrierDismissible: false,
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return Dialog(
-                                        child: AlertDialog(
+                // the button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    // RaisedButton(
+                    ElevatedButton(
+                      child: Text(AppLocalizations.of(context)
+                          .translate('operatioForm_Chooselocation')),
+                      onPressed: () async {
+                        // first check the Gps
+                        bool gps = false;
+                        await checkGps().then((value) => gps = value);
+                        if (!gps) {
+                          // no gps - show alert massege
+                          showDialog(
+                            //barrierDismissible: false,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                child: AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(32.0))),
+                                  actionsPadding:
+                                      EdgeInsets.symmetric(horizontal: 50),
+                                  title: Text(AppLocalizations.of(context)
+                                      .translate('operatioForm_ActivateGps')),
+                                  content: Container(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: <Widget>[
+                                        Text(AppLocalizations.of(context)
+                                            .translate(
+                                                'operatioForm_PleaseActivate')),
+                                        RaisedButton(
                                           shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(32.0))),
-                                          actionsPadding: EdgeInsets.symmetric(
-                                              horizontal: 50),
-                                          title: Text(AppLocalizations.of(
-                                                  context)
-                                              .translate(
-                                                  'operatioForm_ActivateGps')),
-                                          content: Container(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: <Widget>[
-                                                Text(AppLocalizations.of(
-                                                        context)
-                                                    .translate(
-                                                        'operatioForm_PleaseActivate')),
-                                                RaisedButton(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            18.0),
-                                                  ),
-                                                  color: Theme.of(context)
-                                                      .primaryColor,
-                                                  textColor: Colors.white,
-                                                  child: Text("OK"),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                              ],
-                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(18.0),
                                           ),
+                                          color: Theme.of(context).primaryColor,
+                                          textColor: Colors.white,
+                                          child: Text("OK"),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
                                         ),
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  await Navigator.pushNamed(context, '/map')
-                                      .then((value) {
-                                    field.didChange(value);
-                                  });
-                                }
-                              },
-                            ),
-                            Icon(
-                              field.value == null ? null : Icons.check_circle,
-                              color: field.value == null ? null : Colors.green,
-                            ),
-                          ],
-                        ),
-                      ],
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        } else {
+                          await Navigator.pushNamed(context, '/map')
+                              .then((value) {
+                            field.didChange(value);
+                          });
+                        }
+                      },
                     ),
-                  )),
+                    Icon(
+                      field.value == null ? null : Icons.check_circle,
+                      color: field.value == null ? null : Colors.green,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
