@@ -38,9 +38,6 @@ class _HomeState extends State<Home> {
 
   PageController _pageController;
 
-  // this will be true if logged in user is admin
-  bool admin = false;
-
   // key for the scaffold - helps in show the snackbar
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -106,23 +103,6 @@ class _HomeState extends State<Home> {
     bool logged = Provider.of<UserData>(context, listen: true).token == null
         ? false
         : true;
-    if (logged) {
-      // check if user is admin
-      dynamic user = Provider.of<UserData>(context, listen: false).user;
-      List<dynamic> permission =
-          Provider.of<UserPermissionData>(context, listen: true).userPermission;
-
-      if (permission != null && user != null) {
-        if (user.permission ==
-            permission.firstWhere((element) => element.name == 'admin').id) {
-          admin = true;
-        } else {
-          admin = false;
-        }
-      }
-    } else {
-      admin = false;
-    }
 
     // the operation types names
     Map names = Provider.of<TypeOperationData>(context, listen: true).names;

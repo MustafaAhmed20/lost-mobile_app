@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'dart:io';
 
+import 'package:lost/constants.dart';
+
 Future<bool> exitApp(BuildContext context) {
   return showDialog(
         context: context,
@@ -40,5 +42,54 @@ Future<bool> exitApp(BuildContext context) {
           ),
         ),
       ) ??
+      false;
+}
+
+/// conform Dialog
+Future<bool> conformDialog(
+    BuildContext context, String title, String question) {
+  return (showDialog(
+        context: context,
+        builder: (context) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: Text(
+              title,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Text(
+              question,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                fontSize: 12,
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('تراجع',
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(fontSize: 12)),
+              ),
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  'تأكيد',
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: mainDarkColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      )) ??
       false;
 }

@@ -15,6 +15,8 @@ import 'package:lost/widgets/MapsLauncher.dart';
 
 // the buttons
 import 'package:lost/widgets/buttons.dart';
+import 'package:lost/widgets/exit_app_confirmation.dart';
+import 'package:lost/widgets/process_and_wait.dart';
 
 // the providers
 import 'package:provider/provider.dart';
@@ -47,15 +49,86 @@ class _DataDetailsState extends State<DataDetails> {
 
   Operations operation;
 
+  /// is logged-in user is admin
+  bool isUserAdmin(BuildContext context) {
+    // not logged-in
+    if (!isUserLoggedIn(context)) return false;
+
+    Users user = Provider.of<UserData>(context, listen: false).user;
+
+    List<Permission> permissions =
+        Provider.of<UserPermissionData>(context, listen: false).userPermission;
+
+    if (permissions != null && user != null) {
+      if (user.permission ==
+          permissions.firstWhere((element) => element.name == 'admin').id)
+        return true;
+    }
+
+    return false;
+  }
+
+  /// is the user logged-in is the owner of this operation
+  bool isUserIsOwner(BuildContext context) {
+    // not logged-in
+    if (!isUserLoggedIn(context)) return false;
+
+    Users user = Provider.of<UserData>(context, listen: false).user;
+
+    return operation.user.publicId == user.publicId;
+  }
+
+  bool isUserLoggedIn(BuildContext context) {
+    // login state - true if user logged-in
+    bool logged = Provider.of<UserData>(context, listen: false).token == null
+        ? false
+        : true;
+    return logged;
+  }
+
+  void openLogginPage(BuildContext context) {
+    // go to login page
+    Navigator.pushNamed(context, '/login', arguments: {'showAlert': true});
+  }
+
   // open the comments page
   void openComments(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => Comments(
-          operation: operation,
-        ),
-      ),
-    );
+    isUserLoggedIn(context)
+        ? Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => Comments(
+                operation: operation,
+              ),
+            ),
+          )
+        : openLogginPage(context);
+  }
+
+  void openPhone(BuildContext context) {
+    // open phone call if the user logged-in
+    isUserLoggedIn(context)
+        ? launch("tel://0${operation.user.phone}")
+        : openLogginPage(context);
+  }
+
+  /// close the operation
+  void closeOpeartion(BuildContext context) async {
+    if (!await conformDialog(
+        context, 'تأكيد اغلاق الاعلان', 'هل انت متأكد من اغلاق الطلب؟')) return;
+
+    // the current logged in user if any
+    String userToken = Provider.of<UserData>(context, listen: false).token;
+
+    var result = await Navigator.of(context).push(PageRouteBuilder(
+        opaque: false,
+        pageBuilder: (context, _, __) => ProcessAndWait(
+              process: Provider.of<OperationData>(context, listen: false)
+                  .closeOperation(
+                      userToken: userToken, operationId: operation.id),
+            )));
+
+    // success
+    if (result == true) Navigator.of(context).pop();
   }
 
   @override
@@ -76,11 +149,6 @@ class _DataDetailsState extends State<DataDetails> {
 
     Country country =
         Provider.of<CountryData>(context, listen: false).selectedCountry;
-
-    // login state - true if user logged-in
-    bool logged = Provider.of<UserData>(context, listen: true).token == null
-        ? false
-        : true;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -113,121 +181,146 @@ class _DataDetailsState extends State<DataDetails> {
             Container(
               width: double.infinity,
               margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              padding: EdgeInsets.only(right: 10),
+              padding: EdgeInsets.only(right: 10, top: 15, left: 20, bottom: 8),
               decoration: BoxDecoration(
-                  // color: Colors.grey[200],
                   color: liteBackground,
                   shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(25.0),
-                  )),
-              child: Padding(
-                  padding: EdgeInsets.only(top: 15, left: 20, bottom: 8),
-                  child: Column(
-                    children: [
-                      // contact box
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // messages button
-                            Container(
-                              width: 100,
-                              child: Button50HBig(
-                                function: openComments,
-                                color: mainLiteColor,
-                                text: 'التعليقات',
-                                textColor: Colors.white,
-                                textSize: 14,
-                                image: 'imeges/chat.png',
-                                iconSize: 25,
+                  borderRadius: BorderRadius.all(Radius.circular(25.0))),
+              child: Column(
+                children: [
+                  // contact box
+                  Container(
+                    // padding: EdgeInsets.symmetric(horizontal: 30),
+                    // color: Colors.red,
+                    height: 40,
+                    child:
+                        // if the operation is active
+                        operation.isActive()
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // messages button
+                                  Expanded(
+                                    child: Container(
+                                      child: Button50HBig(
+                                        function: openComments,
+                                        color: mainLiteColor,
+                                        text: 'التعليقات',
+                                        textColor: Colors.white,
+                                        textSize: 14,
+                                        image: 'imeges/chat.png',
+                                        iconSize: 25,
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(width: 2),
+
+                                  // phone button
+                                  Expanded(
+                                    child: Container(
+                                      child: Button50HBig(
+                                        function: openPhone,
+                                        color: mainLiteColor,
+                                        text: 'اتصال',
+                                        textColor: Colors.white,
+                                        textSize: 14,
+                                        image: 'imeges/call.png',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            :
+                            // closed
+                            Text(
+                                'هذا الطلب مغلق',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
+                  ),
 
-                            // phone button
-                            Container(
-                              width: 100,
-                              child: Button50HBig(
-                                function: (c) {
-                                  // open phone call if the user logged-in
-                                  logged
-                                      ? launch("tel://0${operation.user.phone}")
-                                      :
-                                      // go to login page
-                                      Navigator.pushNamed(context, '/login',
-                                          arguments: {'showAlert': true});
-                                },
-                                color: mainLiteColor,
-                                text: 'اتصال',
-                                textColor: Colors.white,
-                                textSize: 14,
-                                image: 'imeges/call.png',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                  // close this operation
+                  operation.isActive() &&
+                          (isUserAdmin(context) || isUserIsOwner(context))
+                      ? Container(
+                          margin: EdgeInsets.only(top: 20),
+                          height: 35,
+                          child: Button50HBig(
+                            function: closeOpeartion,
+                            color: Colors.green,
+                            text: 'اغلاق الطلب',
+                            textColor: Colors.white,
+                            textSize: 14,
+                          ),
+                        )
+                      : SizedBox.shrink(),
 
-                      // some space
-                      SizedBox(height: 10),
+                  // some space
+                  SizedBox(height: 10),
 
-                      // object Title
-                      Text(
-                        selectedObject == 'Person'
+                  // object Title
+                  Text(
+                    selectedObject == 'Person'
+                        ? AppLocalizations.of(context)
+                            .translate('personForm_operatioDetails')
+                        : selectedObject == 'Car'
                             ? AppLocalizations.of(context)
-                                .translate('personForm_operatioDetails')
-                            : selectedObject == 'Car'
+                                .translate('carForm_operatioDetails')
+                            : selectedObject == 'Accident'
                                 ? AppLocalizations.of(context)
-                                    .translate('carForm_operatioDetails')
-                                : selectedObject == 'Accident'
-                                    ? AppLocalizations.of(context)
-                                        .translate('accidentForm_details')
-                                    : AppLocalizations.of(context)
-                                        .translate('dataDetails_details'),
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          // color: otherTextColor,
-                        ),
-                      ),
+                                    .translate('accidentForm_details')
+                                : AppLocalizations.of(context)
+                                    .translate('dataDetails_details'),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      // color: otherTextColor,
+                    ),
+                  ),
 
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Divider(),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Divider(),
+                  ),
 
-                      // the object data
-                      selectedObject == 'Person'
-                          ? personTable(context, operation.object)
-                          : selectedObject == 'Car'
-                              ? carTable(context, operation.object)
-                              : selectedObject == 'Accident'
-                                  ? accidentTable(context, operation)
-                                  : personalBelongingsTable(
-                                      context, operation.object),
+                  // the object data
+                  selectedObject == 'Person'
+                      ? personTable(context, operation.object)
+                      : selectedObject == 'Car'
+                          ? carTable(context, operation.object)
+                          : selectedObject == 'Accident'
+                              ? accidentTable(context, operation)
+                              : personalBelongingsTable(
+                                  context, operation.object),
 
-                      // operation Title
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Text(
-                          AppLocalizations.of(context)
-                              .translate('operatioForm_operatioDetails'),
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Divider(),
-                      ),
+                  // operation Title
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: Text(
+                      AppLocalizations.of(context)
+                          .translate('operatioForm_operatioDetails'),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
 
-                      // the operation data
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Divider(),
+                  ),
 
-                      operationTable(context, country, operation),
-                    ],
-                  )),
+                  // the operation data
+
+                  operationTable(context, country, operation),
+                ],
+              ),
             ),
+
             // location image and share
             operation.lat == null
                 ? noLocation(context)
@@ -236,8 +329,6 @@ class _DataDetailsState extends State<DataDetails> {
                     child: Center(
                       child: InkWell(
                         onTap: () {
-                          // Share.share(
-                          //     'https://www.google.com/maps/search/?api=1&query=${operation.lat},${operation.lng}');
                           openMapsSheet(context, operation.lat, operation.lng);
                         },
                         child: Image.network(

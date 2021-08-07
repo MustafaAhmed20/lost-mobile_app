@@ -385,6 +385,40 @@ class OperationData extends ChangeNotifier {
     return operations;
   }
 
+  /// close the operaion
+  Future<String> closeOperation(
+      {@required String userToken, @required int operationId}) async {
+    // send feedback - return null if success else string error message
+    try {
+      // headers
+      Map<String, String> headers = {'token': userToken.toString()};
+
+      Map<String, String> body = {
+        'status': 'closed',
+        'operationid': operationId.toString()
+      };
+
+      Uri uri =
+          Uri.https(serverName, AppData().apiSec + '/updateoperationstatus');
+
+      http.Response response =
+          await http.put(uri, body: body, headers: headers);
+
+      if (response.statusCode != 200) {
+        // throw some error
+        Map<String, dynamic> body = json.decode(response.body);
+
+        return body['message'];
+      }
+
+      // success
+      return null;
+    } catch (e) {
+      print(e);
+      return Future.value(e.toString());
+    }
+  }
+
   // *********************
   // ***** comments *****
   // *********************
@@ -507,6 +541,7 @@ class UserData extends ChangeNotifier {
 
   Users user;
 
+  /// check if the token is valid from the server - if not valid remove it
   Future<bool> checkLoginToken(String token) async {
     // this will check if the token is valid or not
 
@@ -517,11 +552,9 @@ class UserData extends ChangeNotifier {
     if (response.statusCode != 200) {
       // remove the token
       this.token = null;
+      save();
       notifyListeners();
 
-      // remove the token from the Preferences
-      final prefs = await SharedPreferences.getInstance();
-      prefs.remove('token');
       return false;
     } else {
       // new token
@@ -530,18 +563,15 @@ class UserData extends ChangeNotifier {
       this.token = token;
 
       // save it in the Preferences
-      final prefs = await SharedPreferences.getInstance();
-      prefs.setString('token', token);
+      save();
     }
     return true;
   }
 
   Future checkLogin() async {
     // check login if saved
-    final prefs = await SharedPreferences.getInstance();
-    token = prefs.getString('token');
-    if (token != null) {
-      this.token = token;
+    load();
+    if (this.token != null) {
       notifyListeners();
 
       // check the token if valid or not - if not valid the token will be deleted
@@ -584,6 +614,7 @@ class UserData extends ChangeNotifier {
             // save the token
             final prefs = await SharedPreferences.getInstance();
             prefs.setString('token', this.token);
+            save();
 
             return null;
           }
@@ -729,20 +760,13 @@ class UserData extends ChangeNotifier {
     // logut the user
     this.token = null;
     this.user = null;
-    Future clear() async {
-      final prefs = await SharedPreferences.getInstance();
-      prefs.remove('token');
-    }
-
-    clear();
+    save();
     notifyListeners();
   }
 
   Future<void> loadUserdata() async {
     try {
-      String body = json.encode({
-        'phone': this.phone,
-      });
+      String body = json.encode({'phone': this.phone});
       Uri uri = Uri.https(serverName, AppData().apiSec + '/getuser');
 
       http.Response response = await http
@@ -761,11 +785,38 @@ class UserData extends ChangeNotifier {
           this.user = (body['data']['user'] as List)
               .map((u) => Users.fromJson((u as Map<String, dynamic>)))
               .toList()[0];
+
+          // save
+          save();
         }
       }
     } catch (e) {
       print(e);
     }
+  }
+
+  /// load the data from disk
+  void load() async {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token');
+    String user = prefs.getString('user');
+    if (token != null) this.token = token;
+    if (user != null) this.user = Users.fromJson(jsonDecode(user));
+  }
+
+  /// save data to disk
+  void save() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (this.token != null)
+      prefs.setString('token', this.token);
+    else
+      prefs.remove('token');
+
+    if (this.user != null)
+      prefs.setString('user', jsonEncode(this.user.toJson()));
+    else
+      prefs.remove('user');
   }
 }
 
@@ -806,7 +857,7 @@ class UserStatusData extends ChangeNotifier {
 }
 
 class UserPermissionData extends ChangeNotifier {
-  List<dynamic> userPermission;
+  List<Permission> userPermission;
 
   void loadData() async {
     Future<void> getData() async {
@@ -825,7 +876,8 @@ class UserPermissionData extends ChangeNotifier {
           if (body['status'] != 'success') {
             // error handling
           } else if (body['status'] == 'success') {
-            this.userPermission = body['data']['permission'].map((item) {
+            this.userPermission =
+                (body['data']['permission'] as List).map((item) {
               return Permission.fromJson(item);
             }).toList();
           }

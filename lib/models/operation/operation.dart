@@ -36,6 +36,7 @@ class Operations {
 
   // if this operation is active
   bool isActive() => this.statusId == 1;
+  // bool isActive() => false;
 
   @JsonKey(name: 'country_id')
   int countryId;
@@ -49,17 +50,19 @@ class Operations {
   @JsonKey(ignore: true)
   List<Comment> comments;
 
-  Operations(
-      {this.id,
-      this.date,
-      this.lat,
-      this.lng,
-      this.objectType,
-      this.typeId,
-      this.object,
-      this.countryId,
-      this.statusId,
-      this.photos});
+  Operations({
+    this.id,
+    this.date,
+    this.lat,
+    this.lng,
+    this.objectType,
+    this.typeId,
+    this.object,
+    this.countryId,
+    this.statusId,
+    this.photos,
+    this.user,
+  });
 
   factory Operations.fromJson(Map<String, dynamic> json) =>
       _$OperationsFromJson(json);
