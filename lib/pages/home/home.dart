@@ -339,6 +339,22 @@ class AddButton extends StatelessWidget {
   final String selectedObject;
   final bool logged;
 
+  void onClick(BuildContext context) async {
+    // login if not already logged-in
+    if (logged) {
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => OperatioForm(
+                    accident: selectedObject == 'menu_accident',
+                  )));
+    } else {
+      // loggin page
+
+      Navigator.pushNamed(context, '/login', arguments: {'showAlert': true});
+    }
+  }
+
   AddButton({
     @required this.selectedObject,
     @required this.logged,
@@ -352,20 +368,7 @@ class AddButton extends StatelessWidget {
         color: mainTextColor,
         size: 50,
       ),
-      onPressed: () {
-        // login if not already logged-in
-        logged
-            ? Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => OperatioForm(
-                          accident: selectedObject == 'menu_accident',
-                        )))
-            : // loggin page
-
-            Navigator.pushNamed(context, '/login',
-                arguments: {'showAlert': true});
-      },
+      onPressed: () => onClick(context),
     );
   }
 }

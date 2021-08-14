@@ -98,6 +98,11 @@ class _OperatioFormState extends State<OperatioForm> {
           if (value != null) {
             print(value);
           } else {
+            // refresh the data
+            Provider.of<OperationData>(context, listen: false)
+                .reLoad(context: context);
+
+            // pop the screen
             Navigator.of(context).pop();
           }
         });

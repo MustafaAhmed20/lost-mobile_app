@@ -128,7 +128,19 @@ class _DataDetailsState extends State<DataDetails> {
             )));
 
     // success
-    if (result == true) Navigator.of(context).pop();
+    if (result == true) {
+      // reload the data
+      Provider.of<OperationData>(context, listen: false)
+          .reLoad(context: context);
+
+      // reload 'my operation'
+      Provider.of<OperationData>(context, listen: false).loadMyOperations(
+        context: context,
+        userToken: userToken,
+      );
+
+      Navigator.of(context).pop();
+    }
   }
 
   @override
