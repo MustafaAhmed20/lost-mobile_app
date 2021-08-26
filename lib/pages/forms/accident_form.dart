@@ -118,7 +118,9 @@ class _FormAccidentState extends State<FormAccident> {
                       GlobalKey<FormBuilderState> key =
                           GlobalKey<FormBuilderState>();
                       carsFormsKeys.add(key);
-                      cars.add(formCar(context, key, widget.data,
+                      cars.add(FormCar(
+                          formKey: key,
+                          data: widget.data,
                           onChange: collectData));
                     });
                   },

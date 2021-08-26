@@ -413,7 +413,7 @@ class ChooseObjectForm extends StatelessWidget {
     } else if (object == 'Person') {
       return formPerson(context, formKey, data);
     } else if (object == 'Car') {
-      return formCar(context, formKey, data);
+      return FormCar(formKey: formKey, data: data);
     } else if (object == 'PersonalBelongings') {
       return FormPersonalBelongings(
         formKey: formKey,
