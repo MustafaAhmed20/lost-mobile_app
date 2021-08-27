@@ -258,7 +258,7 @@ class _SettingsCornerIconState extends State<SettingsCornerIcon> {
         child: Icon(
           Icons.settings_outlined,
           color: mainTextColor,
-          size: 40,
+          size: 35,
         ),
       ),
     );

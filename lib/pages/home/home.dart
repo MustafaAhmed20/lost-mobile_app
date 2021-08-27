@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:lost/pages/menu_once/design.dart';
 import 'package:lost/pages/settings_hover.dart';
 
@@ -19,6 +20,12 @@ import 'package:lost/pages/home/menu.dart';
 
 // the colors
 import 'package:lost/constants.dart';
+
+//
+import 'package:lost/pages/home/bottom_app_bar.dart';
+
+// sizer
+import 'package:sizer/sizer.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -112,13 +119,38 @@ class _HomeState extends State<Home> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: Menu(logged: logged),
-      floatingActionButton: types?.isEmpty ?? true
-          ? null
-          : AddButton(
-              logged: logged,
-              selectedObject: selectedObject,
+      appBar: PreferredSize(
+        child: Container(color: scaffoldColor),
+        preferredSize: Size(0, 0),
+      ),
+      floatingActionButton: Container(
+        margin: EdgeInsets.symmetric(horizontal: 4.5.w),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            FloatingActionButton(
+              backgroundColor: mainLiteColor,
+              child: Icon(Icons.settings),
+              onPressed: () {},
             ),
-      backgroundColor: scaffoldColor,
+            FloatingActionButton(
+              backgroundColor: mainLiteColor,
+              child: Icon(Icons.search),
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+      // types?.isEmpty ?? true
+      //     ? null
+      //     : AddButton(
+      //         logged: logged,
+      //         selectedObject: selectedObject,
+      //       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // backgroundColor: scaffoldColor,
+      // backgroundColor: mainTextColor,
+      bottomNavigationBar: BottomAppBarWidget(),
       body: Stack(children: [
         // the design
         SafeArea(
@@ -143,9 +175,10 @@ class _HomeState extends State<Home> {
 
         // the BIG Title
         Positioned(
-          top: 50,
+          top: 10,
           child: Container(
             width: screenSize.width,
+            // color: Colors.red,
             child: Center(
               child: Text(
                 AppLocalizations.of(context).translate(selectedObject),
@@ -277,98 +310,60 @@ class _HomeState extends State<Home> {
         ),
 
         // the settings corner
-        Positioned(
-          right: 0,
-          bottom: 0,
-          child: Container(
-            height: 80,
-            child: Stack(
-              children: [
-                Image(
-                  image: AssetImage(
-                    'imeges/background_corner.jpg',
-                  ),
-                  fit: BoxFit.fill,
-                ),
-                // the icon
-                Positioned(
-                  top: 20,
-                  // right: 25,
-                  child: SettingsCornerIcon(),
-                ),
-              ],
-            ),
-          ),
-        ),
+        // Positioned(
+        //   right: 0,
+        //   bottom: 0,
+        //   child: Container(
+        //     height: 80,
+        //     child: Stack(
+        //       children: [
+        //         Image(
+        //           image: AssetImage(
+        //             'imeges/background_corner.jpg',
+        //           ),
+        //           fit: BoxFit.fill,
+        //         ),
+        //         // the icon
+        //         Positioned(
+        //           top: 20,
+        //           // right: 25,
+        //           child: SettingsCornerIcon(),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
 
         // pull to refrech row
-        Positioned(
-          bottom: 0,
-          child: Container(
-            height: 70,
-            width: screenSize.width,
-            // padding: EdgeInsets.only(right: 10),
-            // color: Colors.red,
-            child: Column(
-              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              // mainAxisSize: MainAxisSize.max,
-              children: [
-                // the text
-                Text(
-                  'لتحديث الصفحة اسحب الشاشة للأسفل',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: textColorHint,
-                  ),
-                ),
-                // the icon
-                Icon(
-                  Icons.arrow_downward,
-                  color: textColorHint,
-                ),
-              ],
-            ),
-          ),
-        ),
+        // Positioned(
+        //   bottom: 0,
+        //   child: Container(
+        //     height: 70,
+        //     width: screenSize.width,
+        //     // padding: EdgeInsets.only(right: 10),
+        //     // color: Colors.red,
+        //     child: Column(
+        //       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //       // mainAxisSize: MainAxisSize.max,
+        //       children: [
+        //         // the text
+        //         Text(
+        //           'لتحديث الصفحة اسحب الشاشة للأسفل',
+        //           style: TextStyle(
+        //             fontSize: 12,
+        //             color: textColorHint,
+        //           ),
+        //         ),
+        //         // the icon
+        //         Icon(
+        //           Icons.arrow_downward,
+        //           color: textColorHint,
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
       ]),
-    );
-  }
-}
-
-class AddButton extends StatelessWidget {
-  final String selectedObject;
-  final bool logged;
-
-  void onClick(BuildContext context) async {
-    // login if not already logged-in
-    if (logged) {
-      await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => OperatioForm(
-                    accident: selectedObject == 'menu_accident',
-                  )));
-    } else {
-      // loggin page
-
-      Navigator.pushNamed(context, '/login', arguments: {'showAlert': true});
-    }
-  }
-
-  AddButton({
-    @required this.selectedObject,
-    @required this.logged,
-  });
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-      backgroundColor: mainDarkColor,
-      child: Icon(
-        Icons.add,
-        color: mainTextColor,
-        size: 50,
-      ),
-      onPressed: () => onClick(context),
     );
   }
 }
