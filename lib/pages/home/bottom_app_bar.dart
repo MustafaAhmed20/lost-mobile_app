@@ -18,13 +18,11 @@ class BottomAppBarWidget extends StatelessWidget {
     return BottomAppBar(
       color: mainLiteColor,
       shape: DoubleCircularNotchedButton(),
-      // shape: CircularNotchedRectangle(),
-      // shape: AutomaticNotchedShape(Border()),
       child: Container(
         height: 7.h,
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(vertical: 0.2.h),
-        child: GestureDetector(
+        child: InkWell(
           onTap: () => onAddLogic(context),
           child: Container(
             child: Column(

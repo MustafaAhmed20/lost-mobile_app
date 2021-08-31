@@ -23,7 +23,11 @@ import 'package:country_pickers/country_pickers.dart' as CountryPickers;
 class Menu extends StatelessWidget {
   // the will be true if the user is loged-in else false
   final bool logged;
-  Menu({this.logged});
+
+  // use menu for search
+  final bool searchMode;
+
+  Menu({this.logged, this.searchMode = false});
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +46,7 @@ class Menu extends StatelessWidget {
         ),
         child: Container(
           width: screenSize.width * (2 / 3),
+          height: searchMode ? 20 : double.infinity,
           child: Drawer(
             child: Container(
               padding: EdgeInsets.only(top: 20, bottom: 10),

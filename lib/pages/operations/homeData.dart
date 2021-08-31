@@ -86,7 +86,7 @@ class _HomeDataState extends State<HomeData> {
       ]);
 
       operations =
-          Provider.of<OperationData>(context, listen: false).operations ?? [];
+          Provider.of<OperationData>(context, listen: true).operations ?? [];
     }
 
     super.didChangeDependencies();

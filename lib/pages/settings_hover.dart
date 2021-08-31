@@ -11,6 +11,9 @@ import 'dart:math' as math;
 import 'package:provider/provider.dart';
 import 'package:lost/models/appData.dart';
 
+// sizer
+import 'package:sizer/sizer.dart';
+
 class SettingsCornerIcon extends StatefulWidget {
   @override
   _SettingsCornerIconState createState() => _SettingsCornerIconState();
@@ -253,12 +256,13 @@ class _SettingsCornerIconState extends State<SettingsCornerIcon> {
         });
       },
       child: Container(
-        width: 80,
+        width: double.infinity,
+        height: double.infinity,
         // color: Colors.red,
         child: Icon(
           Icons.settings_outlined,
           color: mainTextColor,
-          size: 35,
+          size: 25.sp,
         ),
       ),
     );

@@ -249,9 +249,7 @@ class OperationData extends ChangeNotifier {
   // if this is true mean show temp screen
   bool isLoading;
 
-  List<bool Function(Operations)> filters = [];
-
-  // filter the data by values
+  /// filter the data by values
   void filterData(List<bool Function(Operations)> filters) {
     if (filters?.isEmpty ?? true) {
       // all the Operations
@@ -262,6 +260,8 @@ class OperationData extends ChangeNotifier {
         return filters.every((element) => element(e));
       }).toList();
     }
+
+    notifyListeners();
   }
 
   // Future<void> loadData(Map filters) async {
@@ -269,15 +269,13 @@ class OperationData extends ChangeNotifier {
     // till the screen to wait
     isLoading = true;
 
-    Future<void> getData(filters) async {
+    // Future<void> getData(filters) async {
+    Future<void> getData() async {
       int countryId =
           Provider.of<CountryData>(context, listen: false).selectedCountry?.id;
-      Map<String, String> temp = {'country_id': countryId.toString()};
 
-      if (filters != null && filters.isNotEmpty) {
-        filters.updateAll((key, value) => value.toString());
-        temp.addAll(Map<String, String>.from(filters));
-      }
+      // filter with country
+      Map<String, String> temp = {'country_id': countryId.toString()};
 
       try {
         var uri = Uri.https(
@@ -305,7 +303,7 @@ class OperationData extends ChangeNotifier {
       }
     }
 
-    await getData(this.filters);
+    await getData();
     isLoading = false;
     notifyListeners();
   }

@@ -51,6 +51,10 @@ class _HomeState extends State<Home> {
   //
   String selectedObject;
 
+  /// the mode for menu
+  /// true mean use it for search
+  bool useMenuForSearch = false;
+
   @override
   void initState() {
     super.initState();
@@ -61,11 +65,6 @@ class _HomeState extends State<Home> {
     // load data
     Provider.of<OperationData>(context, listen: false)
         .loadData(context: context);
-
-    // open the menu
-    // Future.delayed(Duration(seconds: 0, milliseconds: 500)).then((val) {
-    //   _scaffoldKey.currentState.openDrawer();
-    // });
   }
 
   @override
@@ -118,7 +117,18 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: Menu(logged: logged),
+      drawer: Menu(logged: logged, searchMode: useMenuForSearch),
+      onDrawerChanged: (isOpened) {
+        // when Drawer closed
+        // set the flage to false
+        if (!isOpened) {
+          Future.delayed(Duration(milliseconds: 300)).then((value) {
+            setState(() {
+              useMenuForSearch = false;
+            });
+          });
+        }
+      },
       appBar: PreferredSize(
         child: Container(color: scaffoldColor),
         preferredSize: Size(0, 0),
@@ -130,26 +140,25 @@ class _HomeState extends State<Home> {
           children: <Widget>[
             FloatingActionButton(
               backgroundColor: mainLiteColor,
-              child: Icon(Icons.settings),
-              onPressed: () {},
+              child: SettingsCornerIcon(),
+              onPressed: null,
             ),
             FloatingActionButton(
               backgroundColor: mainLiteColor,
-              child: Icon(Icons.search),
-              onPressed: () {},
+              child: Icon(Icons.search, size: 25.sp),
+              onPressed: () {
+                // open with searh mode
+                setState(() {
+                  useMenuForSearch = true;
+                });
+
+                _scaffoldKey.currentState.openDrawer();
+              },
             ),
           ],
         ),
       ),
-      // types?.isEmpty ?? true
-      //     ? null
-      //     : AddButton(
-      //         logged: logged,
-      //         selectedObject: selectedObject,
-      //       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // backgroundColor: scaffoldColor,
-      // backgroundColor: mainTextColor,
       bottomNavigationBar: BottomAppBarWidget(),
       body: Stack(children: [
         // the design
@@ -161,13 +170,13 @@ class _HomeState extends State<Home> {
 
         // the menu icon
         Positioned(
-          top: 40,
+          top: 0.3.h,
           right: 0,
           child: InkWell(
             onTap: () => _scaffoldKey.currentState.openDrawer(),
             child: Container(
-              height: 50,
-              width: 50,
+              height: 6.h,
+              width: 6.h,
               // color: Colors.red,
             ),
           ),
@@ -175,7 +184,7 @@ class _HomeState extends State<Home> {
 
         // the BIG Title
         Positioned(
-          top: 10,
+          top: 1.h,
           child: Container(
             width: screenSize.width,
             // color: Colors.red,
@@ -308,31 +317,6 @@ class _HomeState extends State<Home> {
                           ),
           ),
         ),
-
-        // the settings corner
-        // Positioned(
-        //   right: 0,
-        //   bottom: 0,
-        //   child: Container(
-        //     height: 80,
-        //     child: Stack(
-        //       children: [
-        //         Image(
-        //           image: AssetImage(
-        //             'imeges/background_corner.jpg',
-        //           ),
-        //           fit: BoxFit.fill,
-        //         ),
-        //         // the icon
-        //         Positioned(
-        //           top: 20,
-        //           // right: 25,
-        //           child: SettingsCornerIcon(),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
 
         // pull to refrech row
         // Positioned(
