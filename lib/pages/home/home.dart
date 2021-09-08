@@ -115,6 +115,12 @@ class _HomeState extends State<Home> {
 
     Size screenSize = MediaQuery.of(context).size;
 
+    /// show red dot in search button
+    bool showRedDotInSearhButton =
+        Provider.of<OperationData>(context, listen: true)
+            .customFiltersFunctions
+            .isNotEmpty;
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: Menu(logged: logged, searchMode: useMenuForSearch),
@@ -139,22 +145,44 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             FloatingActionButton(
+              heroTag: 'settings',
               backgroundColor: mainLiteColor,
               child: SettingsCornerIcon(),
               onPressed: null,
             ),
-            FloatingActionButton(
-              backgroundColor: mainLiteColor,
-              child: Icon(Icons.search, size: 25.sp),
-              onPressed: () {
-                // open with searh mode
-                setState(() {
-                  useMenuForSearch = true;
-                });
 
-                _scaffoldKey.currentState.openDrawer();
-              },
-            ),
+            // search
+            Stack(children: [
+              FloatingActionButton(
+                heroTag: 'search',
+                backgroundColor: mainLiteColor,
+                child: Icon(Icons.search, size: 25.sp),
+                onPressed: () {
+                  // open with searh mode
+                  setState(() {
+                    useMenuForSearch = true;
+                  });
+
+                  _scaffoldKey.currentState.openDrawer();
+                },
+              ),
+
+              // red dot
+              showRedDotInSearhButton
+                  ? Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Container(
+                        width: 2.5.h,
+                        height: 2.5.h,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    )
+                  : SizedBox.shrink(),
+            ]),
           ],
         ),
       ),

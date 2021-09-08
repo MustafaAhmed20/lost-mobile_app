@@ -249,19 +249,93 @@ class OperationData extends ChangeNotifier {
   // if this is true mean show temp screen
   bool isLoading;
 
+  // filters
+  Map<String, dynamic> customFilters = {};
+  Map<String, bool Function(Operations)> customFiltersFunctions = {};
+
+  /// filter the data with custom Filters
+  void filterDataCustomFilters(
+      {String textFilter, DateTime firstDateRange, DateTime endDateRange}) {
+    // filter with text
+    if (textFilter?.isNotEmpty ?? false) {
+      customFilters['text'] = textFilter;
+
+      // add the filter func
+      customFiltersFunctions['text'] = (Operations operation) {
+        // operation.details
+        bool con1 = operation.details?.contains(textFilter) ?? false;
+        bool con2 = operation.city?.contains(textFilter) ?? false;
+        bool con3 = operation.state?.contains(textFilter) ?? false;
+
+        return con1 || con2 || con3;
+      };
+    } else {
+      // remove the function if exists
+      customFilters.remove('text');
+      customFiltersFunctions.remove('text');
+    }
+
+    // from date
+    if (firstDateRange != null) {
+      customFilters['from_date'] = firstDateRange;
+
+      // add the filter func
+      customFiltersFunctions['from_date'] = (Operations operation) {
+        // operation.details
+        bool con1 = operation.date.isAfter(firstDateRange);
+
+        return con1;
+      };
+    } else {
+      // remove the function if exists
+      customFilters.remove('from_date');
+      customFiltersFunctions.remove('from_date');
+    }
+
+    // end date
+    if (endDateRange != null) {
+      customFilters['end_date'] = endDateRange;
+
+      // add the filter func
+      customFiltersFunctions['end_date'] = (Operations operation) {
+        // operation.details
+        bool con1 = operation.date.isBefore(endDateRange);
+
+        return con1;
+      };
+    } else {
+      // remove the function if exists
+      customFilters.remove('end_date');
+      customFiltersFunctions.remove('end_date');
+    }
+
+    notifyListeners();
+  }
+
+  /// clear the custom Filters
+  void clearCustomFilters() {
+    customFilters.clear();
+    customFiltersFunctions.clear();
+    notifyListeners();
+  }
+
   /// filter the data by values
   void filterData(List<bool Function(Operations)> filters) {
-    if (filters?.isEmpty ?? true) {
+    List<bool Function(Operations)> appliedFilters = List.from(filters ?? []);
+
+    appliedFilters.addAll(customFiltersFunctions.values);
+
+    if (appliedFilters?.isEmpty ?? true) {
       // all the Operations
       operations = unFilteredOperations;
     } else {
       // get the operations where all the filters apply
       operations = unFilteredOperations.where((e) {
-        return filters.every((element) => element(e));
+        return appliedFilters.every((element) => element(e));
       }).toList();
     }
 
-    notifyListeners();
+    // notifyListeners();
   }
 
   // Future<void> loadData(Map filters) async {
