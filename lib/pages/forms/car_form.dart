@@ -8,8 +8,17 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:lost/app_localizations.dart';
 import 'package:lost/pages/forms/details_field.dart';
 
+// colors
+import 'package:lost/constants.dart';
+
 // validation
 import 'package:lost/pages/validators.dart';
+
+// sizer
+import 'package:sizer/sizer.dart';
+
+//
+import 'package:lost/widgets/verification_code.dart';
 
 class FormCar extends StatefulWidget {
   final GlobalKey<FormBuilderState> formKey;
@@ -23,13 +32,8 @@ class FormCar extends StatefulWidget {
 }
 
 class _FormCarState extends State<FormCar> {
-  final TextEditingController controller = TextEditingController();
-
-  bool isTextFieldUpdatedByUser = false;
-
   @override
   void dispose() {
-    controller.dispose();
     super.dispose();
   }
 
@@ -95,104 +99,200 @@ class _FormCarState extends State<FormCar> {
               ),
         ),
 
-        // plate number
+        // plate number title
         Padding(
           padding: const EdgeInsets.only(top: 20, bottom: 10),
-          child: Text(
-            AppLocalizations.of(context).translate('carForm_plate'),
-            style: TextStyle(fontSize: 16),
+          child: Column(
+            children: [
+              Text(
+                AppLocalizations.of(context).translate('carForm_plate'),
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                '(من اليسار لليمين)',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
         ),
 
         // plate number & letters
-        Row(
+        Column(
           children: [
-            // plate number - letters
-            Expanded(
-              child: FormBuilderTextField(
-                  name: "plate_number_letters",
-                  controller: controller,
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)
-                        .translate('carForm_plateLetters'),
-                    labelStyle: TextStyle(
-                      letterSpacing: 1.0,
+            // plate letters
+            FormBuilderField<String>(
+              name: "plate_number_letters",
+              builder: (field) => InputDecorator(
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)
+                      .translate('carForm_plateLetters'),
+                  border: InputBorder.none,
+                  errorText: field.errorText,
+                ),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 1.h),
+                  width: 100.w,
+                  child: Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: VerificationCode(
+                      textStyle: TextStyle(
+                          fontSize: 16.0.sp, color: textColorDarkBlack),
+                      itemSize: 50.sp,
+                      keyboardType: TextInputType.text,
+                      length: 4,
+                      onCompleted: (String value) {},
+                      onChanged: (value) {
+                        field.didChange(value);
+                      },
+                      onEditing: (bool value) {},
                     ),
                   ),
-                  valueTransformer: (value) {
-                    // return '88';
-                    return value;
-                  },
-                  onChanged: (value) {
-                    // print(value);
-                    // formKey.currentState.fields['plate_number_letters']
-                    //     .didChange('8');
+                ),
+              ),
+              validator: (val) {
+                String firstValidate = FormBuilderValidators.required(context,
+                    errorText: AppLocalizations.of(context)
+                        .translate('operatioForm_requiredError'))(val);
 
-                    // widget.formKey.currentState.fields['plate_number_letters']
-                    //     .setValue('8');
-                    // setState(() {
-                    // print('this happend');
-                    // if (!isTextFieldUpdatedByUser) {
-                    //   isTextFieldUpdatedByUser = true;
+                if (firstValidate != null) return firstValidate;
 
-                    //   print('change happend!');
-                    //   setState(() {
-                    //     controller.text = '8';
-                    //   });
-                    //   return;
-                    // }
-                    // isTextFieldUpdatedByUser = false;
-                    // });
-                  },
-                  style: TextStyle(
-                    letterSpacing: 7.0,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  validator: (val) {
-                    String firstValidate = FormBuilderValidators.required(
-                        context,
-                        errorText: AppLocalizations.of(context)
-                            .translate('operatioForm_requiredError'))(val);
-
-                    if (firstValidate != null) return firstValidate;
-
-                    // validate the value
-
-                    return validatPlateNumberLetters(context, val);
-                  }),
+                // validate the value
+                return validatPlateNumberLetters(context, val);
+              },
             ),
 
-            // plate number - numbers
-            Expanded(
-              child: FormBuilderTextField(
-                name: "plate_number_numbers",
+            // plate numbers
+            FormBuilderField<String>(
+              name: "plate_number_numbers",
+              builder: (field) => InputDecorator(
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)
                       .translate('carForm_plateNumbers'),
-                  labelStyle: TextStyle(
-                    letterSpacing: 1.0,
+                  border: InputBorder.none,
+                  errorText: field.errorText,
+                ),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 1.h),
+                  width: 100.w,
+                  child: Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: VerificationCode(
+                      textStyle: TextStyle(
+                          fontSize: 16.0.sp, color: textColorDarkBlack),
+                      itemSize: 50.sp,
+                      keyboardType: TextInputType.number,
+                      length: 4,
+                      onCompleted: (String value) {},
+                      onChanged: (value) {
+                        field.didChange(value);
+                      },
+                      onEditing: (bool value) {},
+                    ),
                   ),
                 ),
-                style: TextStyle(
-                  letterSpacing: 7.0,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                validator: (value) {
-                  String firstValidate = FormBuilderValidators.required(context,
-                      errorText: AppLocalizations.of(context)
-                          .translate('operatioForm_requiredError'))(value);
-
-                  if (firstValidate != null) return firstValidate;
-
-                  // validate the value
-                  return validatPlateNumberNumbers(context, value);
-                },
               ),
-            )
+              validator: (value) {
+                String firstValidate = FormBuilderValidators.required(context,
+                    errorText: AppLocalizations.of(context)
+                        .translate('operatioForm_requiredError'))(value);
+
+                if (firstValidate != null) return firstValidate;
+
+                // validate the value
+                return validatPlateNumberNumbers(context, value);
+              },
+            ),
           ],
         ),
+
+        // // Row(
+        //   children: [
+        //     // plate number - letters
+        //     Expanded(
+        //       child: FormBuilderTextField(
+        //           name: "plate_number_letters",
+        //           controller: controller,
+        //           decoration: InputDecoration(
+        //             labelText: AppLocalizations.of(context)
+        //                 .translate('carForm_plateLetters'),
+        //             labelStyle: TextStyle(
+        //               letterSpacing: 1.0,
+        //             ),
+        //           ),
+        //           valueTransformer: (value) {
+        //             // return '88';
+        //             return value;
+        //           },
+        //           onChanged: (value) {
+        //             // print(value);
+        //             // formKey.currentState.fields['plate_number_letters']
+        //             //     .didChange('8');
+
+        //             // widget.formKey.currentState.fields['plate_number_letters']
+        //             //     .setValue('8');
+        //             // setState(() {
+        //             // print('this happend');
+        //             // if (!isTextFieldUpdatedByUser) {
+        //             //   isTextFieldUpdatedByUser = true;
+
+        //             //   print('change happend!');
+        //             //   setState(() {
+        //             //     controller.text = '8';
+        //             //   });
+        //             //   return;
+        //             // }
+        //             // isTextFieldUpdatedByUser = false;
+        //             // });
+        //           },
+        //           style: TextStyle(
+        //             letterSpacing: 7.0,
+        //             fontSize: 20,
+        //             fontWeight: FontWeight.bold,
+        //           ),
+        //           validator: (val) {
+        //             String firstValidate = FormBuilderValidators.required(
+        //                 context,
+        //                 errorText: AppLocalizations.of(context)
+        //                     .translate('operatioForm_requiredError'))(val);
+
+        //             if (firstValidate != null) return firstValidate;
+
+        //             // validate the value
+
+        //             return validatPlateNumberLetters(context, val);
+        //           }),
+        //     ),
+
+        //     // plate number - numbers
+        //     Expanded(
+        //       child: FormBuilderTextField(
+        //         name: "plate_number_numbers",
+        //         decoration: InputDecoration(
+        //           labelText: AppLocalizations.of(context)
+        //               .translate('carForm_plateNumbers'),
+        //           labelStyle: TextStyle(
+        //             letterSpacing: 1.0,
+        //           ),
+        //         ),
+        //         style: TextStyle(
+        //           letterSpacing: 7.0,
+        //           fontSize: 20,
+        //           fontWeight: FontWeight.bold,
+        //         ),
+        //         validator: (value) {
+        //           String firstValidate = FormBuilderValidators.required(context,
+        //               errorText: AppLocalizations.of(context)
+        //                   .translate('operatioForm_requiredError'))(value);
+
+        //           if (firstValidate != null) return firstValidate;
+
+        //           // validate the value
+        //           return validatPlateNumberNumbers(context, value);
+        //         },
+        //       ),
+        //     )
+        //   ],
+        // ),
 
         //details
         Visibility(

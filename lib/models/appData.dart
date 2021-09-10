@@ -976,7 +976,7 @@ class PostData extends ChangeNotifier {
     // create local copy from the data
     Map<dynamic, dynamic> data = Map<dynamic, dynamic>()..addAll(passedData);
 
-    List<File> photos = data['photos'];
+    List<File> photos = data['photos'] ?? [];
     data.remove('photos');
 
     if (data['location'] != null) {

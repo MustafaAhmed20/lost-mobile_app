@@ -26,7 +26,7 @@ import 'package:lost/models/appData.dart';
 
 import 'package:intl/intl.dart' show DateFormat;
 
-class Form2 extends StatelessWidget {
+class Form2 extends StatefulWidget {
   final Map<dynamic, dynamic> data;
 
   final GlobalKey<FormBuilderState> formKey;
@@ -37,14 +37,37 @@ class Form2 extends StatelessWidget {
   });
 
   @override
+  _Form2State createState() => _Form2State();
+}
+
+class _Form2State extends State<Form2> {
+  TextEditingController stateController;
+  TextEditingController cityController;
+
+  @override
+  void initState() {
+    stateController = TextEditingController(text: widget.data['state'] ?? '');
+    cityController = TextEditingController(text: widget.data['city'] ?? '');
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    stateController.dispose();
+    cityController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // current time
     DateTime now = new DateTime.now();
 
     // this help make the date with the correct format
-    var formatter = new DateFormat('yyyy-MM-dd');
+    DateFormat formatter = new DateFormat('yyyy-MM-dd');
+
     return FormBuilder(
-      key: formKey,
+      key: widget.formKey,
       autovalidateMode: AutovalidateMode.always,
       child: Column(
         children: [
@@ -53,11 +76,13 @@ class Form2 extends StatelessWidget {
                 .translate('operatioForm_operatioDetails'),
             style: TextStyle(fontSize: 20),
           ),
+
           // date
           FormBuilderDateTimePicker(
             name: "date",
-            initialValue:
-                data['date'] != null ? DateTime.parse(data['date']) : now,
+            initialValue: widget.data['date'] != null
+                ? DateTime.parse(widget.data['date'])
+                : now,
             inputType: InputType.date,
             format: formatter,
             lastDate: now,
@@ -73,6 +98,7 @@ class Form2 extends StatelessWidget {
             },
           ),
 
+          // state & city
           Row(
             children: [
               // state
@@ -80,7 +106,7 @@ class Form2 extends StatelessWidget {
                 child: Container(
                   child: FormBuilderField<String>(
                     name: 'state',
-                    initialValue: data['state'] ?? null,
+                    initialValue: widget.data['state'] ?? null,
                     validator: FormBuilderValidators.required(context,
                         errorText: AppLocalizations.of(context)
                             .translate('operatioForm_requiredError')),
@@ -98,9 +124,9 @@ class Form2 extends StatelessWidget {
                           padding: EdgeInsets.only(top: 10),
                           child: TextInput(
                             height: 6,
+                            textSize: 12,
                             onChange: (c, text) => field.didChange(text),
-                            controller:
-                                TextEditingController(text: field.value ?? ''),
+                            controller: stateController,
                           ),
                         )),
                   ),
@@ -115,7 +141,7 @@ class Form2 extends StatelessWidget {
                 child: Container(
                   child: FormBuilderField<String>(
                     name: 'city',
-                    initialValue: data['city'] ?? null,
+                    initialValue: widget.data['city'] ?? null,
                     validator: FormBuilderValidators.required(context,
                         errorText: AppLocalizations.of(context)
                             .translate('operatioForm_requiredError')),
@@ -133,9 +159,9 @@ class Form2 extends StatelessWidget {
                           padding: EdgeInsets.only(top: 10),
                           child: TextInput(
                             height: 6,
+                            textSize: 12,
                             onChange: (c, text) => field.didChange(text),
-                            controller:
-                                TextEditingController(text: field.value ?? ''),
+                            controller: cityController,
                           ),
                         )),
                   ),
@@ -147,7 +173,7 @@ class Form2 extends StatelessWidget {
           // photos
           FormBuilderField<List<File>>(
             name: "photos",
-            initialValue: data['photos'] ?? null,
+            initialValue: widget.data['photos'] ?? null,
             builder: (field) => InputDecorator(
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)
@@ -157,7 +183,7 @@ class Form2 extends StatelessWidget {
               child: Container(
                 margin: EdgeInsets.only(top: 10),
                 child: PhotosUploaderBox(
-                  oldFilePhotos: data['photos'] ?? [],
+                  oldFilePhotos: widget.data['photos'] ?? [],
                   onChange: (c, photos) {
                     field.didChange(photos.map((e) => e.image).toList());
                   },
@@ -168,7 +194,7 @@ class Form2 extends StatelessWidget {
 
           // Gps location
           FormBuilderField(
-            initialValue: data['location'] ?? null,
+            initialValue: widget.data['location'] ?? null,
             name: 'location',
             builder: (field) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
