@@ -75,7 +75,7 @@ class _DataDetailsState extends State<DataDetails> {
 
     Users user = Provider.of<UserData>(context, listen: false).user;
 
-    return operation.user.publicId == user.publicId;
+    return (operation.user?.publicId == user?.publicId) ?? false;
   }
 
   bool isUserLoggedIn(BuildContext context) {

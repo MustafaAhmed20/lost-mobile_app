@@ -621,6 +621,7 @@ class UserData extends ChangeNotifier {
 
     http.Response response = await http.post(uri,
         headers: {"Content-Type": "application/json", 'token': token});
+
     if (response.statusCode != 200) {
       // remove the token
       this.token = null;
@@ -634,6 +635,9 @@ class UserData extends ChangeNotifier {
       String token = body['data']['token'];
       this.token = token;
 
+      // reload the user data
+      loadUserdata();
+
       // save it in the Preferences
       save();
     }
@@ -642,7 +646,8 @@ class UserData extends ChangeNotifier {
 
   Future checkLogin() async {
     // check login if saved
-    load();
+    await load();
+
     if (this.token != null) {
       notifyListeners();
 
@@ -680,12 +685,11 @@ class UserData extends ChangeNotifier {
           } else if (body['status'] == 'success') {
             this.token = body['data']['token'];
             this.phone = phone;
+
             // load the user data
             loadUserdata();
 
-            // save the token
-            final prefs = await SharedPreferences.getInstance();
-            prefs.setString('token', this.token);
+            // save the data locally
             save();
 
             return null;
@@ -871,7 +875,9 @@ class UserData extends ChangeNotifier {
   void load() async {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token');
+    String phone = prefs.getString('phone');
     String user = prefs.getString('user');
+    if (phone != null) this.phone = phone;
     if (token != null) this.token = token;
     if (user != null) this.user = Users.fromJson(jsonDecode(user));
   }
@@ -884,6 +890,11 @@ class UserData extends ChangeNotifier {
       prefs.setString('token', this.token);
     else
       prefs.remove('token');
+
+    if (this.phone != null)
+      prefs.setString('phone', this.phone);
+    else
+      prefs.remove('phone');
 
     if (this.user != null)
       prefs.setString('user', jsonEncode(this.user.toJson()));
