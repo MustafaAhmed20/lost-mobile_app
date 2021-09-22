@@ -16,12 +16,17 @@ import 'validators.dart';
 //language support
 import 'package:lost/app_localizations.dart';
 
+/// the minimum length for the password
+const int MINIMUM_PASSWORD_LENGTH = 4;
+
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   Map arguments;
 
   Future<String> _authUser(LoginData data, BuildContext context) async {
@@ -57,20 +62,23 @@ class _LoginState extends State<Login> {
     return result;
   }
 
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  Future<void> showMessage() async {
+    await Future.delayed(Duration(seconds: 2));
+    _scaffoldKey.currentState.showSnackBar(needLoginSnackBar(context));
+  }
 
   @override
-  Widget build(BuildContext context) {
-    Future<void> delay() async {
-      await Future.delayed(Duration(seconds: 2));
-      _scaffoldKey.currentState.showSnackBar(needLoginSnackBar(context));
-    }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
     arguments = ModalRoute.of(context).settings.arguments;
     if (arguments != null && arguments['showAlert'] != null) {
-      delay();
+      showMessage();
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     Country selectedCountry =
         Provider.of<CountryData>(context, listen: false).selectedCountry;
 
@@ -107,9 +115,13 @@ class _LoginState extends State<Login> {
             if (value.isEmpty) {
               return AppLocalizations.of(context).translate('login_mustPass');
             }
-            if (value.length < 5) {
+            if (value.length < MINIMUM_PASSWORD_LENGTH) {
               return AppLocalizations.of(context)
                   .translate('login_mustPassLength');
+            }
+            // for the trial period
+            if (value.length > MINIMUM_PASSWORD_LENGTH) {
+              return 'لا يمكن ادخال رقم سري اكبر من $MINIMUM_PASSWORD_LENGTH ارقام';
             }
             return validatPassword(context, value);
           },
@@ -126,11 +138,12 @@ class _LoginState extends State<Login> {
                 .translate('login_recoverPasswordSuccess'),
             confirmPasswordError: AppLocalizations.of(context)
                 .translate('login_PassworConfirmError'),
-            loginButton: AppLocalizations.of(context).translate('login_Login'),
+            loginButton:
+                AppLocalizations.of(context).translate('login_LoginButtonText'),
             forgotPasswordButton:
                 AppLocalizations.of(context).translate('login_PassworReset'),
-            signupButton:
-                AppLocalizations.of(context).translate('login_Signup'),
+            signupButton: AppLocalizations.of(context)
+                .translate('login_SignupButtonText'),
             goBackButton: AppLocalizations.of(context).translate('login_Back'),
             recoverPasswordButton:
                 AppLocalizations.of(context).translate('login_Recover'),

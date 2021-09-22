@@ -37,10 +37,10 @@ String validatPassword(BuildContext context, password) {
     // not have digits
     return AppLocalizations.of(context).translate('validation_mustDigits');
   }
-  if (!exp2.hasMatch(password)) {
-    // not have letters
-    return AppLocalizations.of(context).translate('validation_mustEnglish');
-  }
+  // if (!exp2.hasMatch(password)) {
+  //   // not have letters
+  //   return AppLocalizations.of(context).translate('validation_mustEnglish');
+  // }
   return null;
 }
 
