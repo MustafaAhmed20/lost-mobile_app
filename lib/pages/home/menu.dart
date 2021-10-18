@@ -316,6 +316,9 @@ class _SearchBoxState extends State<SearchBox> {
 
   String searchByText = '';
 
+  // controller for textfield
+  TextEditingController controller;
+
   DateTime firstDate;
   DateTime endDate;
 
@@ -349,6 +352,9 @@ class _SearchBoxState extends State<SearchBox> {
 
     endDate = Provider.of<OperationData>(context, listen: false)
         .customFilters['end_date'];
+
+    // set the controller
+    controller = TextEditingController(text: searchByText);
 
     super.initState();
   }
@@ -402,7 +408,7 @@ class _SearchBoxState extends State<SearchBox> {
                 Expanded(
                   child: TextInput(
                     borderRadius: 10,
-                    controller: TextEditingController(text: searchByText),
+                    controller: controller,
                     onChange: (c, text) {
                       setState(() {
                         searchByText = text;
@@ -446,7 +452,7 @@ class _SearchBoxState extends State<SearchBox> {
                             lastDate: DateTime.now(),
                             inputType: InputType.date,
                             format: formatter,
-                            currentDate: firstDate,
+                            initialValue: firstDate,
                             onChanged: (value) {
                               setState(() {
                                 firstDate = value;
@@ -463,13 +469,14 @@ class _SearchBoxState extends State<SearchBox> {
                         // some space
                         SizedBox(width: 2.w),
 
+                        // end date
                         Expanded(
                           child: FormBuilderDateTimePicker(
                             name: "end_date",
                             inputType: InputType.date,
                             format: formatter,
                             lastDate: DateTime.now(),
-                            currentDate: endDate,
+                            initialValue: endDate,
                             onChanged: (value) {
                               setState(() {
                                 endDate = value;
