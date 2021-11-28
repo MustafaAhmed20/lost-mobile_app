@@ -241,10 +241,11 @@ class CountryPage extends StatelessWidget {
           ),
 
           // icon
-          Expanded(
-            flex: 2,
-            child: getIcon(),
-          ),
+          // Expanded(
+          //   flex: 1,
+          //   child: getIcon(),
+          // ),
+          Container(margin: EdgeInsets.only(bottom: 20), child: getIcon()),
         ],
       ),
     );
@@ -339,10 +340,12 @@ class Info extends StatelessWidget {
           ),
 
           // the bottom icon
-          Expanded(
-            flex: 1,
-            child: getIcon(),
-          ),
+          // Expanded(
+          //   flex: 1,
+          //   child: getIcon(),
+          // ),
+          Container(
+              margin: EdgeInsets.only(bottom: 20, top: 20), child: getIcon()),
         ],
       ),
     );

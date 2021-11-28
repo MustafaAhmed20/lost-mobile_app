@@ -282,14 +282,15 @@ class _MenuState extends State<Menu> {
                         getIcon(),
 
                         // some space
-                        SizedBox(height: 5),
+                        SizedBox(height: 1),
 
                         // the app name
                         Text(
-                          'أنا يوسف',
+                          'أنا نور',
                           style: TextStyle(
                             color: hoverColor,
-                            fontSize: 20,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],

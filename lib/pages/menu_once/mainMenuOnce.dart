@@ -134,7 +134,7 @@ class _MainMenuOnceState extends State<MainMenuOnce> {
                     width: screenSize.width,
                     child: Center(
                       child: Text(
-                        'أنا يوسف',
+                        'أنا نور',
                         style: TextStyle(
                             color: mainTextColor,
                             fontSize: 42,

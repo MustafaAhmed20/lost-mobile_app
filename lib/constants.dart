@@ -37,6 +37,20 @@ String infoText = """
 """;
 
 // the app icon
-Widget getIcon() => FlutterLogo(
-      size: 100,
-    );
+Widget getIcon() {
+  return SizedBox(
+    child: Container(
+      padding: EdgeInsets.all(20),
+      clipBehavior: Clip.hardEdge,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
+      child: Image.asset(
+        'imeges/logo.png',
+        height: 100,
+      ),
+    ),
+  );
+}
